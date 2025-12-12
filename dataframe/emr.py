@@ -7,7 +7,7 @@ from polars import lit, LazyFrame, when, col, Enum, Utf8
 from data.price import OVERTIME_150, FREE, get_price
 from data_source.make_dataset import load_gsheet_data
 from data_source.sheet_ids import EMR_SHEET_ID, shifting_sheet, pti_sheet, washing_sheet
-from type_casting.dates import CURRENT_YEAR, SPECIAL_DAYS, public_holiday,Days
+from type_casting.dates import CURRENT_YEAR, SPECIAL_DAYS,Days
 from type_casting.validations import SetPoint, SETPOINTS
 from type_casting.containers import containers_enum
 
@@ -50,7 +50,7 @@ shifting: LazyFrame = (
 )
 
 
-# PTI records
+# PTI staging Data Set
 _pti: LazyFrame = (
     load_gsheet_data(EMR_SHEET_ID, pti_sheet)
     .select(
@@ -92,6 +92,7 @@ _pti: LazyFrame = (
     )
 )
 
+# Main PTI Data Set
 pti: pl.LazyFrame = (
     _pti.with_columns((pl.col("cum_count") - 1).alias("previous"))
     .join(
@@ -138,7 +139,7 @@ pti: pl.LazyFrame = (
     )
 )
 
-
+# Washing Data Set
 washing = (
     load_gsheet_data(EMR_SHEET_ID, washing_sheet)
     .filter(pl.col("date").dt.year().ge(CURRENT_YEAR))
