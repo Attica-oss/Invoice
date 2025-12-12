@@ -82,25 +82,6 @@ class Year(int):
         return start_of_year, end_of_year
 
 
-# def date_range_for_a_year(year: Year) -> tuple[date, date]:
-#     """
-#     Calculates the start and end date of a given year, returning a tuple containing
-#     (start_date, end_date) or None if the year is invalid.
-
-#     Args:
-#         year (Year): The year for which to calculate the date range.
-
-#     Returns:
-#         tuple[date, date] | None: A tuple containing the start and end date for the year,
-#                                   or None if the year is invalid.
-#     """
-#     if not isinstance(year, int): # to replace int with Year
-#         raise TypeError(f"Year should be a Year object, not {type(year)}")
-#     start_of_year: date = date(year, 1, 1)
-#     end_of_year: date = date(year, 12, 31)
-#     return start_of_year, end_of_year
-
-
 # Constants
 CURRENT_DATE: date = datetime.now().date()
 CURRENT_YEAR: Year = Year(CURRENT_DATE.year)

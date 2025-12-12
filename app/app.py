@@ -5,9 +5,10 @@ from time import sleep
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional,Final
+from typing import Optional
 
 from app.logger import logger
+from app.save import save_df_to_csv
 
 # from app.check import check_data
 
@@ -35,10 +36,10 @@ class DataFrameType(Enum):
 @dataclass
 class AppConfig:
     """Application configuration"""
-    VERSION: Final[str] = "0.0.2"
-    TITLE: str = "Attica Invoice"
-    AUTHOR: str = "gmounac<at>outlook<dot>com"
-    YEAR: str = "2024"
+    version: str = "0.0.3"
+    title: str = "Attica Invoice"
+    author: str = "gmounac<at>outlook<dot>com"
+    year: str = "2024"
 
 class App:
     """main application"""
@@ -61,9 +62,9 @@ class App:
     def greeting(self) -> None:
         """Returns formatted welcome message"""
         return f"""
-            {self.config.TITLE} v.{self.config.VERSION}
+            {self.config.title} v.{self.config.version}
             ---------------------------
-            {self.config.AUTHOR} (c) {self.config.YEAR}
+            {self.config.author} (c) {self.config.year}
             
             Select an option:
             ----- 1. Save dataframe to CSV file
@@ -79,7 +80,7 @@ class App:
             f"            {df.value} : {self._get_df_description(df)}"
             for df in DataFrameType
         )
-      
+
         print(options_text)
 
         while True:
@@ -104,12 +105,11 @@ class App:
             DataFrameType.TRANSPORT:"Haulage,Shore Crane and Forklift data",
             DataFrameType.MISCELLANEOUS:"CCCS and Cross stuffing data"
         }
-        return descriptions.get(df_type, "")            
+        return descriptions.get(df_type, "")
 
     def handle_save(self) -> None:
-        
         """Handles the save operation with proper validation"""
-        from app.save import save_df_to_csv
+
         self.clear_screen()
         while True:
             choice = input("Continue Saving the file [Y/n] ").lower()
@@ -129,18 +129,17 @@ class App:
                 print("Invalid choice. Please enter Y or N.")
 
 
-    
     def run(self) -> None:
         """Main application loop with improved error handling"""
         logger.info("Starting application")
-        
+
         while True:
             try:
                 self.clear_screen()
                 print(self.greeting)
-                
+
                 selection = input("Choose the option: ").strip()
-                
+
                 try:
                     option = MenuOption(int(selection))
                 except ValueError:
@@ -158,16 +157,13 @@ class App:
                     case MenuOption.CHECK:
                         logger.info("Selected: Check logistics records")
                         self.clear_screen()
-                        check_data()
+                        print("Checking logistics records...")
                     case MenuOption.EXIT:
-                        self.exit_application()       
+                        self.exit_application()
             except KeyboardInterrupt:
                 logger.info("Received interrupt signal")
                 self.exit_application()
-            except Exception as e:
-                logger.error("Unexpected error: %s", str(e))
+            except (ValueError, IOError) as e:
+                logger.error("Error processing input or file operation: %s", str(e))
                 print(f"An error occurred: {str(e)}")
                 sleep(2)
-
-
-   

@@ -69,14 +69,3 @@ transport_dataframes:dict[str,pl.LazyFrame]={
     "scow_transfer":transport.scow_transfer,
     "forklift":transport.forklift
 }
-
-# all_dataframes:dict[str,pl.LazyFrame] = {
-#     **emr_dataframes,
-#     **netlist_dataframes,
-#     **operations_dataframes,
-#     **transport_dataframes,
-#     **miscellaneous_dataframes,
-#     **stuffing_dataframes,
-#     **bin_dispatch_dataframes,
-#     **shore_handling_dataframes
-# }

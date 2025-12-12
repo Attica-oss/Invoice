@@ -1,0 +1,131 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.18.3"
+  },
+  "cells": [
+    {
+      "id": "setup",
+      "code_hash": "27b6344a90ec0fb8cdc7ea6816b274e7",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Cfoa",
+      "code_hash": "c9c46e541c9d4e46b24de62d5efa069f",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "sTEy",
+      "code_hash": "1aef098dd4c1e3bdd1633c070d2d9a96",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Cskd",
+      "code_hash": "7440e599cc1db326863ee3c245961f18",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='Cskd-0' random-id='5e991c4e-632c-2d7e-6bca-cede68033bf8'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Mon&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2024-01-15&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU0365276&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;IOT&#92;&quot;,&#92;&quot;service_remarks&#92;&quot;:&#92;&quot;Shifted to access unit TTNU8204288 for transfer&#92;&quot;,&#92;&quot;price&#92;&quot;:35.0},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Mon&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2024-01-15&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU0438053&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;IOT&#92;&quot;,&#92;&quot;service_remarks&#92;&quot;:&#92;&quot;Shifted to access unit TTNU8204288 for transfer&#92;&quot;,&#92;&quot;price&#92;&quot;:35.0},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Mon&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2024-01-15&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;TCLU1228570&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;IOT&#92;&quot;,&#92;&quot;service_remarks&#92;&quot;:&#92;&quot;Shifted to access unit TCLU1217149 &amp; TTNU8192612 for transfer&#92;&quot;,&#92;&quot;price&#92;&quot;:35.0},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Mon&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2024-01-15&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;TRIU8011175&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;IOT&#92;&quot;,&#92;&quot;service_remarks&#92;&quot;:&#92;&quot;Shifted to access unit TCLU1217149 &amp; TTNU8192612 for transfer&#92;&quot;,&#92;&quot;price&#92;&quot;:35.0},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Mon&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2024-01-15&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;GESU9511496&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;IOT&#92;&quot;,&#92;&quot;service_remarks&#92;&quot;:&#92;&quot;Shifted to access unit TRIU8881637 for transfer&#92;&quot;,&#92;&quot;price&#92;&quot;:35.0},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Mon&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2024-01-15&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;TCLU1148351&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;IOT&#92;&quot;,&#92;&quot;service_remarks&#92;&quot;:&#92;&quot;Shifted to access unit TRIU8881637 for transfer&#92;&quot;,&#92;&quot;price&#92;&quot;:35.0},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Mon&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2024-01-15&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;TTNU8204420&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;IOT&#92;&quot;,&#92;&quot;service_remarks&#92;&quot;:&#92;&quot;Shifted to access unit TTNU8193049 for transfer&#92;&quot;,&#92;&quot;price&#92;&quot;:35.0},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Mon&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2024-01-15&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;TTNU8204204&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;IOT&#92;&quot;,&#92;&quot;service_remarks&#92;&quot;:&#92;&quot;Shifted to access unit TTNU8193049 for transfer&#92;&quot;,&#92;&quot;price&#92;&quot;:35.0},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Mon&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2024-01-15&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;TTNU8031834&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;IOT&#92;&quot;,&#92;&quot;service_remarks&#92;&quot;:&#92;&quot;Shifted to access unit TTNU8193049 for transfer&#92;&quot;,&#92;&quot;price&#92;&quot;:35.0},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Mon&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2024-01-15&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;TTNU8203430&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;IOT&#92;&quot;,&#92;&quot;service_remarks&#92;&quot;:&#92;&quot;Shifted to access unit TRIU8897567 for transfer&#92;&quot;,&#92;&quot;price&#92;&quot;:35.0}]&quot;' data-total-rows='443' data-total-columns='6' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;day_name&quot;,[&quot;string&quot;,&quot;enum&quot;]],[&quot;date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;container_number&quot;,[&quot;string&quot;,&quot;enum&quot;]],[&quot;invoice_to&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;service_remarks&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;price&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "XJMD",
+      "code_hash": "ad347b115e00cf6d3be7053d6ca59912",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "pUQl",
+      "code_hash": "19818410388d6f5a3a060a11769fb78e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vHED",
+      "code_hash": "8f1707d736196dcba87d3f11ce641022",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "uwoz",
+      "code_hash": "c257d1755422ab0e4067329e7520283a",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='uwoz-0' random-id='fd0b2e96-f452-92aa-8c25-3aa4e42e76b7'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Sat&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MCAU6001185&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;service_remarks&#92;&quot;:&#92;&quot;Clean&#92;&quot;},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Sat&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MMAU1018360&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;service_remarks&#92;&quot;:&#92;&quot;Clean&#92;&quot;},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Sat&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MMAU1265502&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;service_remarks&#92;&quot;:&#92;&quot;Clean&#92;&quot;},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Sat&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MMAU1278644&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;service_remarks&#92;&quot;:&#92;&quot;Clean&#92;&quot;},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Sat&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MMAU1384076&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;service_remarks&#92;&quot;:&#92;&quot;Clean&#92;&quot;},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Sat&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU0096855&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;service_remarks&#92;&quot;:&#92;&quot;Clean&#92;&quot;},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Sat&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU0124936&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;service_remarks&#92;&quot;:&#92;&quot;Clean&#92;&quot;},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Sat&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU0227370&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;service_remarks&#92;&quot;:&#92;&quot;Clean&#92;&quot;},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Sat&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU0235328&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;service_remarks&#92;&quot;:&#92;&quot;Clean&#92;&quot;},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Sat&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU0324739&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;service_remarks&#92;&quot;:&#92;&quot;Clean&#92;&quot;}]&quot;' data-total-rows='3857' data-total-columns='4' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;day_name&quot;,[&quot;string&quot;,&quot;enum&quot;]],[&quot;container_number&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;invoice_to&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;service_remarks&quot;,[&quot;string&quot;,&quot;str&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "QkCu",
+      "code_hash": "cbb4edc454ec56ef53d9e1300f201dfa",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "sql-error",
+          "evalue": "Binder Error: Referenced column \"date\" not found in FROM clause!\nCandidate bindings: \"day_name\", \"container_number\"",
+          "traceback": []
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "xNxu",
+      "code_hash": null,
+      "outputs": [],
+      "console": []
+    }
+  ]
+}

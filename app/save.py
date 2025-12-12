@@ -1,4 +1,5 @@
 """Save dataframes to CSV files"""
+
 from functools import cache
 
 
@@ -18,13 +19,14 @@ from all_dataframes.all_dataframes import (
 )
 
 
-
-def save_to_csv(dataframe_info: tuple[str,pl.LazyFrame]) -> tuple[str,Exception|None]:
+def save_to_csv(
+    dataframe_info: tuple[str, pl.LazyFrame],
+) -> tuple[str, Exception | None]:
     """Process the dataframes to CSV file
-        Args:
-            dataframe_info: Tuple containing the dataframe name and dataframe
-        Returns:
-            tuple: Tuple containing the dataframe name and error if any
+    Args:
+        dataframe_info: Tuple containing the dataframe name and dataframe
+    Returns:
+        tuple: Tuple containing the dataframe name and error if any
     """
 
     if not isinstance(dataframe_info, tuple) or len(dataframe_info) != 2:
@@ -34,25 +36,27 @@ def save_to_csv(dataframe_info: tuple[str,pl.LazyFrame]) -> tuple[str,Exception|
 
     try:
         # Add explicit path and ensure directory exists
-        output_path = fr"P:\Verification & Invoicing\Validation Report\csv\{dataframe_name}.csv"
+        output_path = (
+            rf"P:\Verification & Invoicing\Validation Report\csv\{dataframe_name}.csv"
+        )
         dataframe.collect().write_csv(output_path)
         logger.info("Successfully wrote %s to file", dataframe_name)
         return dataframe_name, None
-    except (FileExistsError,FileNotFoundError) as e:
+    except (FileExistsError, FileNotFoundError) as e:
         error_msg = f"Error writing {dataframe_name}: {str(e)}"
         logger.error(error_msg)
         return dataframe_name, e
 
+
 @cache
-def save_df_to_csv(dataframes: str|None):
+def save_df_to_csv(dataframes: str | None):
     """
     Save the dataframes
-    
+
     Args:
         dataframes: Category of dataframes to save ('all' or specific category name)
-    
-    """
 
+    """
 
     df_dict = {
         "emr": emr_dataframes,
@@ -77,41 +81,40 @@ def save_df_to_csv(dataframes: str|None):
                     if result is None:
                         logger.error("No result returned for %s", name)
                         continue
-                        
+
                     message, error = result
                     if error:
                         logger.error("Error saving %s: %s", message, str(error))
                     else:
                         logger.info("Successfully saved %s", message)
-                except Exception as e:
+                except (ValueError, IOError) as e:
                     logger.error("Unexpected error processing %s: %s", name, str(e))
-        
+
         logger.info("Completed processing all categories")
         return
 
     # Handle single category case
     data = df_dict.get(dataframes)
 
-
     print(data)
     if data is None:
         logger.error("Invalid dataframe option: %s", dataframes)
         return
-    
+
     logger.info("Processing dataframe category: %s", dataframes)
     logger.info("Processing dataframes: %s", list(data.keys()))
-    
+
     # Process each dataframe
     successes = []
     failures = []
-    
+
     for name, df in data.items():
         try:
             result = save_to_csv((name, df))
             if result is None:
                 logger.error("No result returned for %s", name)
                 continue
-                
+
             message, error = result
             if error:
                 failures.append((message, error))
@@ -119,7 +122,7 @@ def save_df_to_csv(dataframes: str|None):
             else:
                 successes.append(message)
                 logger.info("Successfully saved %s", message)
-        except Exception as e:
+        except (IOError,ValueError) as e:
             logger.error("Unexpected error processing %s: %s", name, str(e))
             failures.append((name, e))
 
@@ -127,4 +130,7 @@ def save_df_to_csv(dataframes: str|None):
     logger.info("Save completed")
     logger.info("Successfully saved: %s", ", ".join(successes))
     if failures:
-        logger.error("Failed to save: %s", ", ".join(f"{name}: {str(err)}" for name, err in failures))
+        logger.error(
+            "Failed to save: %s",
+            ", ".join(f"{name}: {str(err)}" for name, err in failures),
+        )

@@ -17,7 +17,7 @@ from type_casting.dates import (
     public_holiday,
 )
 from type_casting.validations import (
-    FISH_STORAGE,
+    # FISH_STORAGE,
     # MOVEMENT_TYPE,
     UNLOADING_SERVICE,
     Overtime,

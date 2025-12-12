@@ -11,31 +11,66 @@ with app.setup:
 
 @app.cell
 def _():
-    from app import app
-    return (app,)
-
-
-@app.cell
-def _(app):
-    app.App().run()
+    from type_casting.dates import Days
     return
 
 
 @app.cell
 def _():
-    from type_casting import containers
-    return (containers,)
+    from dataframe.emr import shifting
+    return (shifting,)
 
 
 @app.cell
-def _(containers):
-    containers.containers.collect()
+def _(shifting):
+    shifting.collect()
     return
 
 
 @app.cell
-def _(containers):
-    containers.container_list
+def _():
+    from utils.google_sheet import GoogleSheetsLoader
+
+
+
+    gs = GoogleSheetsLoader()
+    return (gs,)
+
+
+@app.cell
+def _(gs):
+    def emr_dataframe():
+        return gs.load_sheet("container_cleaning").data
+    return (emr_dataframe,)
+
+
+@app.cell
+def _(emr_dataframe):
+    washing = emr_dataframe().filter(pl.col("date").dt.year().ge(2025)).select(pl.col("date").days.add_day_name(),pl.col("container_number"),pl.col("invoice_to"),pl.col("service_remarks"))
+    return (washing,)
+
+
+@app.cell
+def _(washing):
+    washing.collect()
+    return
+
+
+@app.cell
+def _():
+    _df = mo.sql(
+        f"""
+        WITH price AS SELECT
+            date,
+            container_number,
+            invoice_to,
+            service_remarks
+        FROM
+            washing
+        WHERE
+            YEAR(date) >= 2025
+        """
+    )
     return
 
 
