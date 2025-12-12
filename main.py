@@ -1,0 +1,13 @@
+"""Main module"""
+import pretty_errors
+from app.app import App
+
+
+pretty_errors.activate()
+
+def main():
+    """main function"""
+    return App().run()
+
+if __name__ == "__main__":
+    main()
