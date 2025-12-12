@@ -17,13 +17,13 @@ def _():
 
 @app.cell
 def _():
-    from dataframe.emr import shifting
-    return (shifting,)
+    from dataframe.emr import pti
+    return (pti,)
 
 
 @app.cell
-def _(shifting):
-    shifting.collect()
+def _(pti):
+    pti.collect()
     return
 
 
