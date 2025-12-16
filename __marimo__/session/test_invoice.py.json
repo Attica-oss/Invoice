@@ -1,9 +1,22 @@
 {
   "version": "1",
   "metadata": {
-    "marimo_version": "0.18.3"
+    "marimo_version": "0.18.4"
   },
   "cells": [
+    {
+      "id": "lEQa",
+      "code_hash": "ee354bdc707f1bb286c8774ca3c462fb",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h1 id=\"unloading-report\">\ud83e\udd47 Unloading Report</h1>\n<ul>\n<li>EGALABUR - 02/12 - to check why BONITO instead of MELVA</li>\n</ul>\n<h1 id=\"shore-crane\">Shore Crane</h1>\n<ul>\n<li>We shall not invoice Dolomieu for crane rental for the unloading of cargo in November. Peter will invoice SAPMER directly.</li>\n<li>\n<span class=\"paragraph\">To check if there were 2 shore cranes for HAWWA on 04/12 - 05/12.</span>\n<ul>\n<li><iconify-icon icon=\"lucide:a-arrow-down\" inline=\"\"></iconify-icon> on 06/12 there is only a crane at the back; with salt loading also,</li>\n<li>to check if crane was used for salt</li>\n<li><img alt=\"\" src=\"C:\\Users\\gmounac\\Invoice\\public\\image.png\" /></li>\n</ul>\n</li>\n<li>To check if there were 2 shore cranes for BERNICA unloading to CCCS as from 06/12 to ; and if for IPHS.</li>\n</ul>\n<h1 id=\"cold-store\">\u2744\ufe0f Cold Store</h1>\n<ul>\n<li>\n<span class=\"paragraph\">To check if there was overtime for IOT bin dispatch on 04/12.</span>\n<ul>\n<li><iconify-icon icon=\"lucide:a-arrow-down\" inline=\"\"></iconify-icon>Please prepare to work in overtime for IOT Full Scow transfer. Last trip to leave IPHS by 1800hrs.</li>\n</ul>\n</li>\n<li>Why is it labelled as CCCS JAMARR for the unloading of HAWWA, and who is to invoice RAWANQ or JMARR or MAERSK for this service?</li>\n<li>This net to check the start time.</li>\n</ul>\n<span class=\"paragraph\">--- 9,292     Dry     07/12/2025 00:20:00     CCCS (SAPMER)   Bernica</span>\n<h2 id=\"bycatch-transfer\">Bycatch Transfer</h2>\n<span class=\"paragraph\">\ud83d\ude9a To check the bycatch transfer forms, as WhatsApp is limited.</span>\n<ul>\n<li>To check if Playa de Ris to OB was done using IPHS truck on 03/12.</li>\n<li>To check if Hawwa's OB (3.208) was done using IPHS truck on 06/12.</li>\n<li>[12:23, 04/12/2025] Rupert Suzette: IPHS Tipping truck to collect by-catch from Hawwa and deliver to CCCS on behalf of OB</li>\n<li>[15:30, 02/12/2025] Lewis MARIE: Tipping truck no7...no2 assign with bycath for OB on playa de Azkorri.</li>\n<li>[13:52, 05/12/2025] Lewis MARIE: 1hour pass truck no6...no7  they stuck with bycath for OB on hopper no2 not unloading yet.</li>\n</ul>\n<h2 id=\"from-container-loading\">From container loading.</h2>\n<span class=\"paragraph\">04/12 - Cap Sainte Marie to OB (0.304 tons) there is a comment \"From container loading.\"</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
     {
       "id": "setup",
       "code_hash": "27b6344a90ec0fb8cdc7ea6816b274e7",
@@ -18,7 +31,7 @@
       "console": []
     },
     {
-      "id": "Cfoa",
+      "id": "Hbol",
       "code_hash": "c9c46e541c9d4e46b24de62d5efa069f",
       "outputs": [
         {
@@ -31,8 +44,8 @@
       "console": []
     },
     {
-      "id": "sTEy",
-      "code_hash": "65c437d13e2e6a554888f50e9cc4c4e4",
+      "id": "MJUe",
+      "code_hash": "aef2891a0e33ea76b6ac40c47389de90",
       "outputs": [
         {
           "type": "data",
@@ -44,21 +57,54 @@
       "console": []
     },
     {
-      "id": "Cskd",
-      "code_hash": "0675d17c308e58d57145f2090aa4c273",
+      "id": "vblA",
+      "code_hash": "d641cbd8797043dfd52f40a26c0e6d96",
       "outputs": [
         {
           "type": "data",
           "data": {
-            "text/html": "<marimo-ui-element object-id='Cskd-0' random-id='1d833e87-fc0a-3dee-0327-d0b9b2339807'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;datetime_start&#92;&quot;:&#92;&quot;2024-01-03 16:55:00&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MMAU1082543&#92;&quot;,&#92;&quot;set_point&#92;&quot;:&#92;&quot;-25&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;datetime_end&#92;&quot;:&#92;&quot;2024-01-04 10:00:00&#92;&quot;,&#92;&quot;hours&#92;&quot;:17.083333333333332,&#92;&quot;status&#92;&quot;:&#92;&quot;PASSED&#92;&quot;,&#92;&quot;plugin_price&#92;&quot;:25.0,&#92;&quot;electricity_price&#92;&quot;:70.0,&#92;&quot;no_shifting&#92;&quot;:true,&#92;&quot;generator&#92;&quot;:&#92;&quot;K3&#92;&quot;,&#92;&quot;shifting_price&#92;&quot;:35.0,&#92;&quot;total_price&#92;&quot;:130.0},{&#92;&quot;datetime_start&#92;&quot;:&#92;&quot;2024-01-03 16:55:00&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MMAU1128460&#92;&quot;,&#92;&quot;set_point&#92;&quot;:&#92;&quot;-25&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;datetime_end&#92;&quot;:&#92;&quot;2024-01-04 10:00:00&#92;&quot;,&#92;&quot;hours&#92;&quot;:17.083333333333332,&#92;&quot;status&#92;&quot;:&#92;&quot;PASSED&#92;&quot;,&#92;&quot;plugin_price&#92;&quot;:25.0,&#92;&quot;electricity_price&#92;&quot;:70.0,&#92;&quot;no_shifting&#92;&quot;:true,&#92;&quot;generator&#92;&quot;:&#92;&quot;K3&#92;&quot;,&#92;&quot;shifting_price&#92;&quot;:35.0,&#92;&quot;total_price&#92;&quot;:130.0},{&#92;&quot;datetime_start&#92;&quot;:&#92;&quot;2024-01-03 16:55:00&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU3645352&#92;&quot;,&#92;&quot;set_point&#92;&quot;:&#92;&quot;-25&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;datetime_end&#92;&quot;:&#92;&quot;2024-01-04 10:00:00&#92;&quot;,&#92;&quot;hours&#92;&quot;:17.083333333333332,&#92;&quot;status&#92;&quot;:&#92;&quot;PASSED&#92;&quot;,&#92;&quot;plugin_price&#92;&quot;:25.0,&#92;&quot;electricity_price&#92;&quot;:70.0,&#92;&quot;no_shifting&#92;&quot;:true,&#92;&quot;generator&#92;&quot;:&#92;&quot;K3&#92;&quot;,&#92;&quot;shifting_price&#92;&quot;:35.0,&#92;&quot;total_price&#92;&quot;:130.0},{&#92;&quot;datetime_start&#92;&quot;:&#92;&quot;2024-01-03 16:55:00&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU3656948&#92;&quot;,&#92;&quot;set_point&#92;&quot;:&#92;&quot;-25&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;datetime_end&#92;&quot;:&#92;&quot;2024-01-04 10:00:00&#92;&quot;,&#92;&quot;hours&#92;&quot;:17.083333333333332,&#92;&quot;status&#92;&quot;:&#92;&quot;PASSED&#92;&quot;,&#92;&quot;plugin_price&#92;&quot;:25.0,&#92;&quot;electricity_price&#92;&quot;:70.0,&#92;&quot;no_shifting&#92;&quot;:true,&#92;&quot;generator&#92;&quot;:&#92;&quot;K3&#92;&quot;,&#92;&quot;shifting_price&#92;&quot;:35.0,&#92;&quot;total_price&#92;&quot;:130.0},{&#92;&quot;datetime_start&#92;&quot;:&#92;&quot;2024-01-03 16:55:00&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU4208001&#92;&quot;,&#92;&quot;set_point&#92;&quot;:&#92;&quot;-25&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;datetime_end&#92;&quot;:&#92;&quot;2024-01-04 10:00:00&#92;&quot;,&#92;&quot;hours&#92;&quot;:17.083333333333332,&#92;&quot;status&#92;&quot;:&#92;&quot;PASSED&#92;&quot;,&#92;&quot;plugin_price&#92;&quot;:25.0,&#92;&quot;electricity_price&#92;&quot;:70.0,&#92;&quot;no_shifting&#92;&quot;:true,&#92;&quot;generator&#92;&quot;:&#92;&quot;K3&#92;&quot;,&#92;&quot;shifting_price&#92;&quot;:35.0,&#92;&quot;total_price&#92;&quot;:130.0},{&#92;&quot;datetime_start&#92;&quot;:&#92;&quot;2024-01-03 16:55:00&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;SUDU6078561&#92;&quot;,&#92;&quot;set_point&#92;&quot;:&#92;&quot;-25&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;datetime_end&#92;&quot;:&#92;&quot;2024-01-04 10:00:00&#92;&quot;,&#92;&quot;hours&#92;&quot;:17.083333333333332,&#92;&quot;status&#92;&quot;:&#92;&quot;PASSED&#92;&quot;,&#92;&quot;plugin_price&#92;&quot;:25.0,&#92;&quot;electricity_price&#92;&quot;:70.0,&#92;&quot;no_shifting&#92;&quot;:true,&#92;&quot;generator&#92;&quot;:&#92;&quot;K3&#92;&quot;,&#92;&quot;shifting_price&#92;&quot;:35.0,&#92;&quot;total_price&#92;&quot;:130.0},{&#92;&quot;datetime_start&#92;&quot;:&#92;&quot;2024-01-03 16:55:00&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU4292970&#92;&quot;,&#92;&quot;set_point&#92;&quot;:&#92;&quot;-25&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;datetime_end&#92;&quot;:&#92;&quot;2024-01-04 10:00:00&#92;&quot;,&#92;&quot;hours&#92;&quot;:17.083333333333332,&#92;&quot;status&#92;&quot;:&#92;&quot;FAILED&#92;&quot;,&#92;&quot;plugin_price&#92;&quot;:25.0,&#92;&quot;electricity_price&#92;&quot;:70.0,&#92;&quot;no_shifting&#92;&quot;:true,&#92;&quot;generator&#92;&quot;:&#92;&quot;K3&#92;&quot;,&#92;&quot;shifting_price&#92;&quot;:35.0,&#92;&quot;total_price&#92;&quot;:130.0},{&#92;&quot;datetime_start&#92;&quot;:&#92;&quot;2024-01-04 10:30:00&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU4292970&#92;&quot;,&#92;&quot;set_point&#92;&quot;:&#92;&quot;-25&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;datetime_end&#92;&quot;:&#92;&quot;2024-01-05 10:05:00&#92;&quot;,&#92;&quot;hours&#92;&quot;:23.583333333333332,&#92;&quot;status&#92;&quot;:&#92;&quot;PASSED&#92;&quot;,&#92;&quot;plugin_price&#92;&quot;:25.0,&#92;&quot;electricity_price&#92;&quot;:70.0,&#92;&quot;no_shifting&#92;&quot;:false,&#92;&quot;generator&#92;&quot;:&#92;&quot;K3&#92;&quot;,&#92;&quot;shifting_price&#92;&quot;:0.0,&#92;&quot;total_price&#92;&quot;:95.0},{&#92;&quot;datetime_start&#92;&quot;:&#92;&quot;2024-01-04 15:30:00&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MMAU1165376&#92;&quot;,&#92;&quot;set_point&#92;&quot;:&#92;&quot;-25&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;datetime_end&#92;&quot;:&#92;&quot;2024-01-05 10:05:00&#92;&quot;,&#92;&quot;hours&#92;&quot;:18.583333333333332,&#92;&quot;status&#92;&quot;:&#92;&quot;FAILED&#92;&quot;,&#92;&quot;plugin_price&#92;&quot;:25.0,&#92;&quot;electricity_price&#92;&quot;:70.0,&#92;&quot;no_shifting&#92;&quot;:true,&#92;&quot;generator&#92;&quot;:&#92;&quot;K3&#92;&quot;,&#92;&quot;shifting_price&#92;&quot;:35.0,&#92;&quot;total_price&#92;&quot;:130.0},{&#92;&quot;datetime_start&#92;&quot;:&#92;&quot;2024-01-04 15:30:00&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MMAU1188052&#92;&quot;,&#92;&quot;set_point&#92;&quot;:&#92;&quot;-25&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;datetime_end&#92;&quot;:&#92;&quot;2024-01-05 10:05:00&#92;&quot;,&#92;&quot;hours&#92;&quot;:18.583333333333332,&#92;&quot;status&#92;&quot;:&#92;&quot;PASSED&#92;&quot;,&#92;&quot;plugin_price&#92;&quot;:25.0,&#92;&quot;electricity_price&#92;&quot;:70.0,&#92;&quot;no_shifting&#92;&quot;:true,&#92;&quot;generator&#92;&quot;:&#92;&quot;K3&#92;&quot;,&#92;&quot;shifting_price&#92;&quot;:35.0,&#92;&quot;total_price&#92;&quot;:130.0}]&quot;' data-total-rows='9215' data-total-columns='13' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;datetime_start&quot;,[&quot;datetime&quot;,&quot;datetime[\u03bcs]&quot;]],[&quot;container_number&quot;,[&quot;string&quot;,&quot;enum&quot;]],[&quot;set_point&quot;,[&quot;string&quot;,&quot;enum&quot;]],[&quot;invoice_to&quot;,[&quot;string&quot;,&quot;enum&quot;]],[&quot;datetime_end&quot;,[&quot;datetime&quot;,&quot;datetime[\u03bcs]&quot;]],[&quot;hours&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;status&quot;,[&quot;string&quot;,&quot;enum&quot;]],[&quot;plugin_price&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;electricity_price&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;no_shifting&quot;,[&quot;boolean&quot;,&quot;bool&quot;]],[&quot;generator&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;shifting_price&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;total_price&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+            "text/html": "<marimo-ui-element object-id='vblA-0' random-id='40f6090c-8d8e-fab8-e750-794f72b8f5b5'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-06&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;BERNICA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;17:24:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;CCCS (SAPMER)&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;overtime 150%&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Brine&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;17:50:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:24.723999999999997,&#92;&quot;service&#92;&quot;:&#92;&quot;Unload to CCCS&#92;&quot;,&#92;&quot;Price&#92;&quot;:43.875,&#92;&quot;invoice_value&#92;&quot;:1084.765},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-06&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;BERNICA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;08:51:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;CCCS (SAPMER)&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Dry&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;16:50:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:8.534000000000002,&#92;&quot;service&#92;&quot;:&#92;&quot;Unload to CCCS&#92;&quot;,&#92;&quot;Price&#92;&quot;:44.25,&#92;&quot;invoice_value&#92;&quot;:377.63},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-06&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;BERNICA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;11:41:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;CCCS (IOT)&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Dry&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;16:52:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:37.147999999999996,&#92;&quot;service&#92;&quot;:&#92;&quot;Unload to Quay&#92;&quot;,&#92;&quot;Price&#92;&quot;:33.25,&#92;&quot;invoice_value&#92;&quot;:1235.171},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-06&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;BERNICA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;17:07:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;CCCS (IOT)&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;overtime 150%&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Dry&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;17:34:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:13.496000000000002,&#92;&quot;service&#92;&quot;:&#92;&quot;Unload to Quay&#92;&quot;,&#92;&quot;Price&#92;&quot;:49.875,&#92;&quot;invoice_value&#92;&quot;:673.113},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-06&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;BERNICA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;11:45:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;CCCS (SAPMER)&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Brine&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;16:49:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:39.51299999999999,&#92;&quot;service&#92;&quot;:&#92;&quot;Unload to CCCS&#92;&quot;,&#92;&quot;Price&#92;&quot;:29.25,&#92;&quot;invoice_value&#92;&quot;:1155.755}]&quot;' data-total-rows='5' data-total-columns='11' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;start_time&quot;,[&quot;time&quot;,&quot;time&quot;]],[&quot;destination&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;overtime&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;storage_type&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;end_time&quot;,[&quot;time&quot;,&quot;time&quot;]],[&quot;total_tonnage&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;service&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Price&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;invoice_value&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "<sys>:0: UserWarning: Sortedness of columns cannot be checked when 'by' groups provided\n<string>:1: UserWarning: Sortedness of columns cannot be checked when 'by' groups provided\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "5911025a2081c856bfe22d0cfdb90372",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<pre class='text-xs'>20.700999999999993</pre>"
           }
         }
       ],
       "console": []
     },
     {
-      "id": "XJMD",
-      "code_hash": "ad347b115e00cf6d3be7053d6ca59912",
+      "id": "PKri",
+      "code_hash": "ba090d603e5edbe799ac7528d32852bd",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='PKri-0' random-id='d2f68664-243c-d7ad-2540-38bf80cb195e'><marimo-file-browser data-initial-value='[]' data-label='null' data-initial-path='&quot;C:&#92;&#92;Users&#92;&#92;gmounac&#92;&#92;Invoice&quot;' data-selection-mode='&quot;file&quot;' data-filetypes='[]' data-multiple='true' data-restrict-navigation='false'></marimo-file-browser></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "db7207bfbaff68f1586414a0b0d20c4d",
       "outputs": [
         {
           "type": "data",
@@ -70,61 +116,49 @@
       "console": []
     },
     {
-      "id": "pUQl",
-      "code_hash": "19818410388d6f5a3a060a11769fb78e",
-      "outputs": [
-        {
-          "type": "data",
-          "data": {
-            "text/plain": ""
-          }
-        }
-      ],
-      "console": []
-    },
-    {
-      "id": "vHED",
-      "code_hash": "8f1707d736196dcba87d3f11ce641022",
-      "outputs": [
-        {
-          "type": "data",
-          "data": {
-            "text/plain": ""
-          }
-        }
-      ],
-      "console": []
-    },
-    {
-      "id": "uwoz",
-      "code_hash": "c257d1755422ab0e4067329e7520283a",
-      "outputs": [
-        {
-          "type": "data",
-          "data": {
-            "text/html": "<marimo-ui-element object-id='uwoz-0' random-id='fd0b2e96-f452-92aa-8c25-3aa4e42e76b7'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Sat&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MCAU6001185&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;service_remarks&#92;&quot;:&#92;&quot;Clean&#92;&quot;},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Sat&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MMAU1018360&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;service_remarks&#92;&quot;:&#92;&quot;Clean&#92;&quot;},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Sat&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MMAU1265502&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;service_remarks&#92;&quot;:&#92;&quot;Clean&#92;&quot;},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Sat&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MMAU1278644&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;service_remarks&#92;&quot;:&#92;&quot;Clean&#92;&quot;},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Sat&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MMAU1384076&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;service_remarks&#92;&quot;:&#92;&quot;Clean&#92;&quot;},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Sat&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU0096855&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;service_remarks&#92;&quot;:&#92;&quot;Clean&#92;&quot;},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Sat&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU0124936&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;service_remarks&#92;&quot;:&#92;&quot;Clean&#92;&quot;},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Sat&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU0227370&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;service_remarks&#92;&quot;:&#92;&quot;Clean&#92;&quot;},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Sat&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU0235328&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;service_remarks&#92;&quot;:&#92;&quot;Clean&#92;&quot;},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Sat&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU0324739&#92;&quot;,&#92;&quot;invoice_to&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;service_remarks&#92;&quot;:&#92;&quot;Clean&#92;&quot;}]&quot;' data-total-rows='3857' data-total-columns='4' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;day_name&quot;,[&quot;string&quot;,&quot;enum&quot;]],[&quot;container_number&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;invoice_to&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;service_remarks&quot;,[&quot;string&quot;,&quot;str&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
-          }
-        }
-      ],
-      "console": []
-    },
-    {
-      "id": "QkCu",
-      "code_hash": "cbb4edc454ec56ef53d9e1300f201dfa",
+      "id": "SFPL",
+      "code_hash": "5b0eced781db384bb17f96a4ce5372b4",
       "outputs": [
         {
           "type": "error",
-          "ename": "sql-error",
-          "evalue": "Binder Error: Referenced column \"date\" not found in FROM clause!\nCandidate bindings: \"day_name\", \"container_number\"",
+          "ename": "exception",
+          "evalue": "source must be a string or bytes",
           "traceback": []
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "<span class=\"codehilite\"><div class=\"highlight\"><pre><span></span><span class=\"gt\">Traceback (most recent call last):</span>\n  File <span class=\"nb\">&quot;C:\\Users\\gmounac\\AppData\\Local\\uv\\cache\\archive-v0\\FtstEpb_2gNmOn8AkDZpW\\Lib\\site-packages\\marimo\\_runtime\\executor.py&quot;</span>, line <span class=\"m\">139</span>, in <span class=\"n\">execute_cell</span>\n<span class=\"w\">    </span><span class=\"k\">return</span> <span class=\"nb\">eval</span><span class=\"p\">(</span><span class=\"n\">cell</span><span class=\"o\">.</span><span class=\"n\">last_expr</span><span class=\"p\">,</span> <span class=\"n\">glbls</span><span class=\"p\">)</span>\n  File <span class=\"nb\">&quot;C:\\Users\\gmounac\\AppData\\Local\\Temp\\marimo_20968\\__marimo__cell_SFPL_.py&quot;</span>, line <span class=\"m\">1</span>, in <span class=\"n\">&lt;module&gt;</span>\n<span class=\"w\">    </span><span class=\"n\">pl</span><span class=\"o\">.</span><span class=\"n\">read_excel</span><span class=\"p\">(</span><span class=\"n\">cccs_reports</span><span class=\"o\">.</span><span class=\"n\">path</span><span class=\"p\">(</span><span class=\"n\">index</span><span class=\"o\">=</span><span class=\"mi\">0</span><span class=\"p\">),</span> <span class=\"n\">sheet_name</span><span class=\"o\">=</span><span class=\"s2\">&quot;JMARR&quot;</span><span class=\"p\">)</span>\n<span class=\"w\">    </span><span class=\"pm\">~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span>\n  File <span class=\"nb\">&quot;C:\\Users\\gmounac\\AppData\\Local\\uv\\cache\\archive-v0\\FtstEpb_2gNmOn8AkDZpW\\Lib\\site-packages\\polars\\_utils\\deprecation.py&quot;</span>, line <span class=\"m\">128</span>, in <span class=\"n\">wrapper</span>\n<span class=\"w\">    </span><span class=\"k\">return</span> <span class=\"n\">function</span><span class=\"p\">(</span><span class=\"o\">*</span><span class=\"n\">args</span><span class=\"p\">,</span> <span class=\"o\">**</span><span class=\"n\">kwargs</span><span class=\"p\">)</span>\n  File <span class=\"nb\">&quot;C:\\Users\\gmounac\\AppData\\Local\\uv\\cache\\archive-v0\\FtstEpb_2gNmOn8AkDZpW\\Lib\\site-packages\\polars\\_utils\\deprecation.py&quot;</span>, line <span class=\"m\">128</span>, in <span class=\"n\">wrapper</span>\n<span class=\"w\">    </span><span class=\"k\">return</span> <span class=\"n\">function</span><span class=\"p\">(</span><span class=\"o\">*</span><span class=\"n\">args</span><span class=\"p\">,</span> <span class=\"o\">**</span><span class=\"n\">kwargs</span><span class=\"p\">)</span>\n  File <span class=\"nb\">&quot;C:\\Users\\gmounac\\AppData\\Local\\uv\\cache\\archive-v0\\FtstEpb_2gNmOn8AkDZpW\\Lib\\site-packages\\polars\\io\\spreadsheet\\functions.py&quot;</span>, line <span class=\"m\">403</span>, in <span class=\"n\">read_excel</span>\n<span class=\"w\">    </span><span class=\"n\">_read_spreadsheet</span><span class=\"p\">(</span>\n<span class=\"w\">    </span><span class=\"pm\">~~~~~~~~~~~~~~~~~^</span>\n<span class=\"w\">    </span>    <span class=\"n\">src</span><span class=\"p\">,</span>\n<span class=\"w\">        </span><span class=\"pm\">^^^^</span>\n<span class=\"w\">    </span><span class=\"o\">...&lt;</span><span class=\"mi\">13</span> <span class=\"n\">lines</span><span class=\"o\">&gt;...</span>\n<span class=\"w\">    </span>    <span class=\"n\">drop_empty_cols</span><span class=\"o\">=</span><span class=\"n\">drop_empty_cols</span><span class=\"p\">,</span>\n<span class=\"w\">        </span><span class=\"pm\">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span>\n<span class=\"w\">    </span><span class=\"p\">)</span>\n<span class=\"w\">    </span><span class=\"pm\">^</span>\n  File <span class=\"nb\">&quot;C:\\Users\\gmounac\\AppData\\Local\\uv\\cache\\archive-v0\\FtstEpb_2gNmOn8AkDZpW\\Lib\\site-packages\\polars\\io\\spreadsheet\\functions.py&quot;</span>, line <span class=\"m\">678</span>, in <span class=\"n\">_read_spreadsheet</span>\n<span class=\"w\">    </span><span class=\"n\">reader_fn</span><span class=\"p\">,</span> <span class=\"n\">parser</span><span class=\"p\">,</span> <span class=\"n\">worksheets</span> <span class=\"o\">=</span> <span class=\"n\">_initialise_spreadsheet_parser</span><span class=\"p\">(</span>\n<span class=\"w\">                                    </span><span class=\"pm\">~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^</span>\n<span class=\"w\">    </span>    <span class=\"n\">engine</span><span class=\"p\">,</span> <span class=\"n\">source</span><span class=\"p\">,</span> <span class=\"n\">engine_options</span>\n<span class=\"w\">        </span><span class=\"pm\">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span>\n<span class=\"w\">    </span><span class=\"p\">)</span>\n<span class=\"w\">    </span><span class=\"pm\">^</span>\n  File <span class=\"nb\">&quot;C:\\Users\\gmounac\\AppData\\Local\\uv\\cache\\archive-v0\\FtstEpb_2gNmOn8AkDZpW\\Lib\\site-packages\\polars\\io\\spreadsheet\\functions.py&quot;</span>, line <span class=\"m\">884</span>, in <span class=\"n\">_initialise_spreadsheet_parser</span>\n<span class=\"w\">    </span><span class=\"n\">parser</span> <span class=\"o\">=</span> <span class=\"n\">fastexcel</span><span class=\"o\">.</span><span class=\"n\">read_excel</span><span class=\"p\">(</span><span class=\"n\">source</span><span class=\"p\">,</span> <span class=\"o\">**</span><span class=\"n\">engine_options</span><span class=\"p\">)</span>\n  File <span class=\"nb\">&quot;C:\\Users\\gmounac\\AppData\\Local\\uv\\cache\\archive-v0\\FtstEpb_2gNmOn8AkDZpW\\Lib\\site-packages\\fastexcel\\__init__.py&quot;</span>, line <span class=\"m\">696</span>, in <span class=\"n\">read_excel</span>\n<span class=\"w\">    </span><span class=\"k\">return</span> <span class=\"n\">ExcelReader</span><span class=\"p\">(</span><span class=\"n\">_read_excel</span><span class=\"p\">(</span><span class=\"n\">source</span><span class=\"p\">))</span>\n<span class=\"w\">                       </span><span class=\"pm\">~~~~~~~~~~~^^^^^^^^</span>\n<span class=\"gr\">_fastexcel.InvalidParametersError</span>: <span class=\"n\">source must be a string or bytes</span>\n</pre></div>\n</span>",
+          "mimetype": "application/vnd.marimo+traceback"
+        }
+      ]
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "0e2c9b1890ffb277a6721b634eccde64",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<pre class='text-xs'>122.41499999999999</pre>"
+          }
         }
       ],
       "console": []
     },
     {
-      "id": "xNxu",
+      "id": "RGSE",
       "code_hash": null,
-      "outputs": [],
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
       "console": []
     }
   ]

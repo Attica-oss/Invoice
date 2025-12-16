@@ -82,6 +82,7 @@ shipper = (
         "IOT IMPORT",
         "CCCS",
         "IPHS",
+        "JMARR"
         # "ALBACORA SA",
         # "INPESCA SA",
     ]
