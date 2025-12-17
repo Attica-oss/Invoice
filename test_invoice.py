@@ -31,16 +31,136 @@ def _():
 @app.cell
 def _():
     from dataframe.netlist import netList
+    return (netList,)
+
+
+@app.cell
+def _(netList):
+    net_dataf = netList.with_columns(pl.col("date").days.add_day_name())
+    return (net_dataf,)
+
+
+@app.cell
+def _(net_dataf):
+    clean = mo.sql(
+        f"""
+        SELECT
+            *,
+            CASE
+                WHEN day_name IN ('PH', 'Sun')
+                AND overtime = 'overtime 150%' THEN 'normal hours'
+                ELSE overtime
+            END AS filter_overtime
+        FROM
+            net_dataf
+        WHERE
+            filter_overtime <> 'normal hours'
+        """
+    )
+    return (clean,)
+
+
+@app.cell
+def _(net_dataf):
+    list_x = mo.sql(
+        f"""
+        WITH
+            overtime_only AS (
+                SELECT
+                    *,
+                    CASE
+                        WHEN day_name IN ('PH', 'Sun')
+                        AND overtime = 'overtime 150%' THEN 'normal hours'
+                        ELSE overtime
+                    END AS filter_overtime
+                FROM
+                    net_dataf
+                WHERE
+                    filter_overtime <> 'normal hours'
+            ),
+            net_list_data AS (
+                SELECT
+                    day_name,
+                    date,
+                    vessel,
+                    MIN(start_time) AS start_time,
+                    overtime,
+                    storage_type,
+                    MAX(end_time) AS end_time,
+                    ROUND(SUM(total_tonnage), 3) AS total_tonnage
+                FROM
+                    overtime_only
+                GROUP BY
+                    day_name,
+                    date,
+                    vessel,
+                    overtime,
+                    storage_type
+                ORDER BY
+                    date
+            ),
+            data_to_check AS (
+                SELECT
+                    "Day" AS day_name,
+                    "Date" AS date,
+                    UPPER("Vessel") AS vessel,
+                    Tonnage AS total_tonnage,
+                    Hours AS num_of_hours,
+                    "Num of Stevedores" AS num_of_stevedores
+                FROM
+                    READ_CSV("./additional_stevedores.csv")
+                ORDER BY
+                    "Date"
+            )
+        SELECT
+            *
+        FROM
+            net_list_data n
+            FULL OUTER JOIN data_to_check d ON n.date = d.date
+            AND n.vessel = d.vessel
+            --AND n.total_tonnage = d.total_tonnage
+        WHERE
+            d.day_name IS NULL
+        ORDER BY d.date
+        """
+    )
+    return (list_x,)
+
+
+@app.cell
+def _(clean, list_x):
+    test = mo.sql(
+        f"""
+        SELECT
+            *
+        FROM
+            clean n
+            JOIN list_x l ON n.date = l.date
+            AND n.vessel = l.vessel
+        ORDER BY n.date
+        """
+    )
+    return (test,)
+
+
+@app.cell
+def _(test):
+    _df = mo.sql(
+        f"""
+        SELECT * FROM test WHERE date = '2025-11-13' AND vessel = 'ATERPE ALAI'
+        """
+    )
     return
 
 
 @app.cell
-def _(netlist):
-    _df = mo.sql(
-        f"""
-        SELECT * FROM netList WHERE date = '2025-12-06' AND vessel = 'BERNICA'
-        """
-    )
+def _():
+    sum([
+    5.9,
+    10.53,
+    6.83,
+    11.55,
+    2.06])
     return
 
 

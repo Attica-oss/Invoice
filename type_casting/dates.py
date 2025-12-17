@@ -283,6 +283,7 @@ def __get_public_holidays(year: Year | int) -> list[date]:
     election_dates = [
         date(2025, 10, 13),  # Election Celebration
         date(2025, 10, 11),  # Election Day
+        date(2025,10,27),  # Celebration Election Day
     ]
 
     public_holidays.extend(election_dates)

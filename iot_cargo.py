@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.18.3"
+__generated_with = "0.18.4"
 app = marimo.App(width="medium")
 
 with app.setup:
@@ -14,37 +14,76 @@ with app.setup:
 
 @app.cell
 def _():
-    3*45
+    mo.md(r"""
+    # Verification
+
+    - Salt and Forklift for salt operation check
+    """)
     return
 
 
 @app.cell
 def _():
-    from dataframe.shore_handling import salt,forklift_salt
-    return forklift_salt, salt
+    mo.md(r"""
+    ## 🧂 Salt and Forklift for salt operation check
+    """)
+    return
 
 
 @app.cell
-def _(forklift_salt):
+def _():
+    # Invoicing Salt and forklift salt dataf
+
+    from dataframe.shore_handling import salt,forklift_salt
+
+
     f_salt = forklift_salt()
     return (f_salt,)
+
+
+@app.cell
+def _():
+    # Logistics Salt and forklift salt dataf
+
+    forklift_path: str = (
+        r"C:\Users\gmounac\Dropbox\Container and Transport\Transport Section\Forklift Usage\Forklift Record.xlsx"
+    )
+
+    salt_path:str = (
+        r"C:\Users\gmounac\Dropbox\Container and Transport\Salt Handling\IPHS Salt Operations.xlsx"
+    )
+
+    forklift_log_dataf = pl.read_excel(forklift_path,sheet_name="Forklift_Operation",schema_overrides={"Time In":pl.Time,"Time Out":pl.Time,"Duration":pl.Time})
+
+    salt_dataf = pl.read_excel(salt_path,sheet_name="Salt Operations")
+    return (forklift_log_dataf,)
 
 
 @app.cell
 def _(f_salt):
     _df = mo.sql(
         f"""
-        SELECT * FROM f_salt WHERE date BETWEEN '2025-09-01' AND '2025-09-30' AND vessel = 'ALBACORA CUATRO'
+        WITH
+            invoice_forklift_salt AS (
+                SELECT
+                    *
+                FROM
+                    f_salt
+                WHERE
+                    YEAR(date) = 2025
+            )
+
+        SELECT * FROM invoice_forklift_salt
         """
     )
     return
 
 
 @app.cell
-def _(salt):
-    _df = mo.sql(
+def _(forklift_log_dataf):
+    invoice_salt = mo.sql(
         f"""
-        SELECT * FROM salt WHERE date BETWEEN '2025-09-01' AND '2025-09-30' AND vessel = 'ALBACORA CUATRO'
+        SELECT "Date of Service" AS date FROM forklift_log_dataf WHERE YEAR("Date of Service") = 2025 AND UPPER(Purpose) LIKE '%SALT LOADING%'
         """
     )
     return
@@ -66,17 +105,11 @@ def _():
 
     shifting = r"C:\Users\gmounac\Dropbox\Container and Transport\Transport Section\Container Shifting Records\IPHS Container Shifting Record.xlsx"
 
-    forklift_path: str = (
-        r"C:\Users\gmounac\Dropbox\Container and Transport\Transport Section\Forklift Usage\Forklift Record.xlsx"
-    )
 
-    salt_path:str = (
-        r"C:\Users\gmounac\Dropbox\Container and Transport\Salt Handling\IPHS Salt Operations.xlsx"
-    )
 
 
     storage = r"P:\Verification & Invoicing\Validation Report\Validation Report - 2024.xlsx"
-    return forklift_path, salt_path, shifting, stdu_transfer, storage, transfer
+    return shifting, stdu_transfer, storage, transfer
 
 
 @app.cell
@@ -88,36 +121,14 @@ def _(storage):
 
 
 @app.cell
-def _(forklift_path: str, shifting, stdu_transfer, transfer):
+def _(shifting, stdu_transfer, transfer):
     stdu_dataf = pl.read_excel(stdu_transfer,schema_overrides={"Time out":pl.Time,"Time in":pl.Time})
 
     transfer_log_dataf = pl.read_excel(transfer,sheet_name="Transfer",schema_overrides={"Time out":pl.Time,"Time in":pl.Time})
 
     shifting_log_dataf = pl.read_excel(shifting)
 
-    forklift_log_dataf = pl.read_excel(forklift_path,sheet_name="Forklift_Operation",schema_overrides={"Time In":pl.Time,"Time Out":pl.Time,"Duration":pl.Time})
-    return (
-        forklift_log_dataf,
-        shifting_log_dataf,
-        stdu_dataf,
-        transfer_log_dataf,
-    )
-
-
-@app.cell
-def _(salt_path: str):
-    salt_dataf = pl.read_excel(salt_path,sheet_name="Salt Operations")
-    return (salt_dataf,)
-
-
-@app.cell
-def _(salt_dataf):
-    _df = mo.sql(
-        f"""
-        SELECT * FROM salt_dataf WHERE Vessel = 'Izurdia' AND YEAR("Tue 17/01") = 2025 AND MONTH("Tue 17/01") = 9
-        """
-    )
-    return
+    return shifting_log_dataf, stdu_dataf, transfer_log_dataf
 
 
 @app.cell
@@ -1235,8 +1246,7 @@ def _(ops_act_dataf):
         FROM
             ops_act_dataf
         WHERE
-            DATE BETWEEN '2025-09-21' AND '2025-10-30'
-        AND "VESSEL NAME" = 'ALBACAN'
+            DATE BETWEEN '2025-10-01' AND '2025-11-30'
         """
     )
     return (ops,)
@@ -1246,30 +1256,42 @@ def _(ops_act_dataf):
 def _(extra_men_check_dataf, ops):
     _df = mo.sql(
         f"""
-        WITH main AS (SELECT
-            DAY,
-            DATE,
-            "VESSEL NAME",
-            ROUND("TOTAL TONNAGE", 3) AS total_tonnage,
-            -- "Transhipment Brine" AS trans_brine,
-            -- "Simple Unloading Brine" AS simpl_brine,
-            -- "Unloading to CCCS Brine" AS unl_cccs_brine,
-            "Extra Men" AS extra_men,
-
-            "Number of Stevedores" AS num_stevedores,
-            "Comments",
-            checking
+        WITH
+            main AS (
+                SELECT
+                    DAY,
+                    DATE,
+                    "VESSEL NAME" AS vessel,
+                    ROUND("TOTAL TONNAGE", 3) AS total_tonnage,
+                    -- "Transhipment Brine" AS trans_brine,
+                    -- "Simple Unloading Brine" AS simpl_brine,
+                    -- "Unloading to CCCS Brine" AS unl_cccs_brine,
+                    "Extra Men" AS extra_men,
+                    "Number of Stevedores" AS num_stevedores,
+                    "Comments",
+                    checking
+                FROM
+                    ops
+            ),
+            extra AS (
+                SELECT
+                    *
+                FROM
+                    extra_men_check_dataf
+                WHERE
+                    NOT "Check"
+                    AND MONTH(Date) >= 9
+            )
+        SELECT
+            e.date,
+            e.vessel,
+            m.extra_men,
+            e.comments,
+            e.num_as_per_comments,
+            m.num_stevedores
         FROM
-            ops),
-            extra AS (SELECT
-            *
-        FROM
-            extra_men_check_dataf
-        WHERE
-          NOT  "Check" AND MONTH(Date)>=9)
-
-
-        SELECT e.date,e.vessel,m.extra_men,e.comments,e.num_as_per_comments,m.num_stevedores FROM extra e JOIN main m ON m.date = e.date
+            extra e
+            JOIN main m ON m.date = e.date AND m.vessel = e.vessel
         """
     )
     return
@@ -1282,7 +1304,7 @@ def _(ops):
         SELECT
             DAY,
             DATE,
-            "VESSEL NAME",
+            "VESSEL NAME" AS vessel,
             ROUND("TOTAL TONNAGE", 3) AS total_tonnage,
             -- "Transhipment Brine" AS trans_brine,
             -- "Simple Unloading Brine" AS simpl_brine,
@@ -1294,6 +1316,7 @@ def _(ops):
             checking
         FROM
             ops
+        WHERE overtime_tonnage > 0
         """
     )
     return (ios,)
@@ -1303,7 +1326,7 @@ def _(ops):
 def _(ios):
     _df = mo.sql(
         f"""
-        SELECT DATE,Comments FROM ios
+        SELECT *  FROM ios WHERE (date IN ('2025-10-20') AND vessel in ('ALAKRANA')) AND (date IN ('2025-11-01') AND vessel = 'EGALABUR')
         """
     )
     return
@@ -1313,7 +1336,7 @@ def _(ios):
 def _(netlist):
     _df = mo.sql(
         f"""
-        SELECT * FROM netList WHERE vessel = 'ALBACAN'
+        SELECT * FROM netList WHERE vessel = 'BERNICA' AND date = '2025-12-09'
         """
     )
     return
@@ -1322,6 +1345,25 @@ def _(netlist):
 @app.cell
 def _():
     round(23.99 +1.43+ 20.65 +8.759,3)
+    return
+
+
+@app.cell
+def _():
+    _df = mo.sql(
+        f"""
+        SELECT
+            "Day" AS day_name,
+            "Date" AS date,
+            UPPER("Vessel") AS vessel,
+            Tonnage AS tonnage,
+            Hours AS num_of_hours,
+            "Num of Stevedores" AS num_of_stevedores
+        FROM
+            READ_CSV("./additional_stevedores.csv")
+        ORDER BY "Date"
+        """
+    )
     return
 
 
