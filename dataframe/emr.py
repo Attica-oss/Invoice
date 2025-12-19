@@ -1,13 +1,10 @@
 """EMR lazyframes"""
-
 import polars as pl
-
-from polars import lit, LazyFrame, when, col, Enum, Utf8
 
 from data.price import OVERTIME_150, FREE, get_price
 from data_source.make_dataset import load_gsheet_data
 from data_source.sheet_ids import EMR_SHEET_ID, shifting_sheet, pti_sheet, washing_sheet
-from type_casting.dates import CURRENT_YEAR, SPECIAL_DAYS,Days
+from type_casting.dates import CURRENT_YEAR, SPECIAL_DAYS
 from type_casting.validations import SetPoint, SETPOINTS
 from type_casting.containers import containers_enum
 
@@ -30,20 +27,20 @@ WASHING = (
 
 
 # Shifting Data Set
-shifting: LazyFrame = (
+shifting: pl.LazyFrame = (
     load_gsheet_data(sheet_id=EMR_SHEET_ID, sheet_name=shifting_sheet)
     .with_columns(
         pl.col("date").days.add_day_name()
     ).filter(pl.col("invoice_to").ne("INVALID"))
     .select(
-        col("day_name"),
-        col("date"),
-        col("container_number").cast(dtype=containers_enum),
-        col("invoice_to"),
-        col("service_remarks"),
+        pl.col("day_name"),
+        pl.col("date"),
+        pl.col("container_number").cast(dtype=containers_enum),
+        pl.col("invoice_to"),
+        pl.col("service_remarks"),
     )
     .with_columns(
-        pl.when(col("day_name").is_in(SPECIAL_DAYS))
+        pl.when(pl.col("day_name").is_in(SPECIAL_DAYS))
         .then(SHIFTING * OVERTIME_150)
         .otherwise(SHIFTING).alias("price")
     )
@@ -51,30 +48,30 @@ shifting: LazyFrame = (
 
 
 # PTI staging Data Set
-_pti: LazyFrame = (
+_pti: pl.LazyFrame = (
     load_gsheet_data(EMR_SHEET_ID, pti_sheet)
     .select(
-        col("datetime_start"),
-        col("container_number").cast(dtype=containers_enum),
-        col("set_point").cast(Utf8).cast(dtype=Enum(SETPOINTS)),
-        col("unit_manufacturer"),
-        col("datetime_end"),
-        col("status").cast(dtype=Enum(["PASSED", "FAILED"])),
-        col("invoice_to").cast(dtype=Enum(["MAERSKLINE", "IOT", "INVALID", "CMA CGM"])),
-        col("plugged_on").alias("generator"),
+        pl.col("datetime_start"),
+        pl.col("container_number").cast(dtype=containers_enum),
+        pl.col("set_point").cast(pl.Utf8).cast(dtype=pl.Enum(SETPOINTS)),
+        pl.col("unit_manufacturer"),
+        pl.col("datetime_end"),
+        pl.col("status").cast(dtype=pl.Enum(["PASSED", "FAILED"])),
+        pl.col("invoice_to").cast(dtype=pl.Enum(["MAERSKLINE", "IOT", "INVALID", "CMA CGM"])),
+        pl.col("plugged_on").alias("generator"),
     )
     .with_columns(
-        hours=(pl.col("datetime_end") - col("datetime_start")).dt.total_minutes() / 60,
+        hours=(pl.col("datetime_end") - pl.col("datetime_start")).dt.total_minutes() / 60,
         plugin_price=PLUGIN,
     )
-    .with_columns(above_8_hours=when(col("hours").gt(lit(8))).then(2).otherwise(1))
+    .with_columns(above_8_hours=pl.when(pl.col("hours").gt(pl.lit(8))).then(2).otherwise(1))
     .with_columns(
         electricity_price=(
-            when(col("invoice_to").eq(lit("IOT")))
+            pl.when(pl.col("invoice_to").eq(pl.lit("IOT")))
             .then(
-                (col("datetime_end") - col("datetime_start")).dt.total_hours() / 24 + 1
+                (pl.col("datetime_end") - pl.col("datetime_start")).dt.total_hours() / 24 + 1
             )
-            .when(col("set_point").eq(SetPoint.s_freezer))
+            .when(pl.col("set_point").eq(SetPoint.s_freezer))
             .then(S_FREEZER_PTI_ELECTRICITY)
             .when(pl.col("set_point") == SetPoint.magnum)
             .then(MAGNUM_PTI_ELECTRICITY)
@@ -156,6 +153,7 @@ washing = (
                     "INVALID",
                     "IPHS",
                     "IOT",
+                    "IOT IMPORT",
                     "PEVASA",
                     "RAWANQ",
                     "OMAN PELAGIC",

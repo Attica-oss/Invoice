@@ -1,9 +1,5 @@
 """Main module"""
-import pretty_errors
 from app.app import App
-
-
-pretty_errors.activate()
 
 def main():
     """main function"""

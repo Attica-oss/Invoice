@@ -1,0 +1,8 @@
+polars
+python-dateutil
+tqdm
+xlsx2csv
+requests
+
+[:python_version < "3.10"]
+importlib-metadata

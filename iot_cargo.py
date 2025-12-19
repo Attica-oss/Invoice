@@ -22,7 +22,7 @@ def _():
     return
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _():
     mo.md(r"""
     ## 🧂 Salt and Forklift for salt operation check
@@ -56,11 +56,21 @@ def _():
     forklift_log_dataf = pl.read_excel(forklift_path,sheet_name="Forklift_Operation",schema_overrides={"Time In":pl.Time,"Time Out":pl.Time,"Duration":pl.Time})
 
     salt_dataf = pl.read_excel(salt_path,sheet_name="Salt Operations")
-    return (forklift_log_dataf,)
+    return forklift_log_dataf, salt_dataf
 
 
 @app.cell
-def _(f_salt):
+def _():
+    _df = mo.sql(
+        f"""
+
+        """
+    )
+    return
+
+
+@app.cell
+def _(f_salt, salt_dataf):
     _df = mo.sql(
         f"""
         WITH
@@ -71,9 +81,25 @@ def _(f_salt):
                     f_salt
                 WHERE
                     YEAR(date) = 2025
+            ),
+            salt_logistics AS (
+                SELECT
+                    "Tue 17/01" AS date,
+                    UPPER(Vessel) AS vessel,
+                    Client AS client,
+                    Tonnage as tonnage
+                FROM
+                    salt_dataf
+                WHERE
+                    YEAR("Tue 17/01") = 2025
             )
-
-        SELECT * FROM invoice_forklift_salt
+        SELECT
+            *
+        FROM
+            invoice_forklift_salt i
+            FULL OUTER JOIN salt_logistics l ON l.date = i.date
+            AND i.vessel = l.vessel
+        WHERE MONTH(i.date) = 10
         """
     )
     return
@@ -127,7 +153,6 @@ def _(shifting, stdu_transfer, transfer):
     transfer_log_dataf = pl.read_excel(transfer,sheet_name="Transfer",schema_overrides={"Time out":pl.Time,"Time in":pl.Time})
 
     shifting_log_dataf = pl.read_excel(shifting)
-
     return shifting_log_dataf, stdu_dataf, transfer_log_dataf
 
 
@@ -318,7 +343,7 @@ def _():
 def _(line_selector, transfer_log_dataf):
     _df = mo.sql(
         f"""
-        SELECT * FROM transfer_log_dataf WHERE Date BETWEEN '2025-09-01' AND '2025-11-30'
+        SELECT * FROM transfer_log_dataf WHERE Date BETWEEN '2025-10-01' AND '2025-10-31'
             AND "Line/Client" = '{line_selector.value}' --AND Status = 'Empty' --AND Driver <> 'Hunt Deltel'
         """
     )
@@ -356,6 +381,38 @@ def _(line_selector, transfer_log_dataf):
 def _():
     container_operations_path = r"C:\Users\gmounac\Dropbox\Container and Transport\Container Section\Container Operations Activity\Container Operation Activity.xlsx"
     return (container_operations_path,)
+
+
+@app.cell
+def _(container_operations_path):
+    coa_df = pl.read_excel(container_operations_path)
+    return (coa_df,)
+
+
+@app.cell
+def _(coa_df):
+    iot_coa = mo.sql(
+        f"""
+        SELECT
+            *
+        FROM
+            coa_df
+        WHERE
+            "Date affected" BETWEEN '2025-10-01' AND '2025-10-31'
+            AND "Shipping Line" = 'IOT'
+        """
+    )
+    return (iot_coa,)
+
+
+@app.cell
+def _(iot_coa):
+    _df = mo.sql(
+        f"""
+        SELECT ROUND(SUM(Tonnage * 0.001),3) FROM iot_coa
+        """
+    )
+    return
 
 
 @app.cell
@@ -677,11 +734,34 @@ def _():
 def _():
     pti_dataf = GoogleSheetsLoader().load_sheet(config_name="CONTAINER_PTI_LOG").data
     cleaning_dataf = GoogleSheetsLoader().load_sheet(config_name="CONTAINER_CLEANING_LOG").data
-    return (cleaning_dataf,)
+    return cleaning_dataf, pti_dataf
+
+
+@app.cell
+def _(pti_dataf):
+    _df = mo.sql(
+        f"""
+        SELECT * FROM pti_dataf WHERE MONTH("Date Plugin") = 10 AND DAY("Date Plugin") = 3 --AND "Shipping Line" = 'IOT'
+        """
+    )
+    return
+
+
+@app.cell
+def _(gatein_log):
+    _df = mo.sql(
+        f"""
+        SELECT * FROM gatein_log WHERE "Shipping Line" = 'IOT' AND MONTH(Date) = 10
+        """
+    )
+    return
 
 
 @app.cell
 def _():
+    mo.md(r"""
+    ![](C:\Users\gmounac\Invoice\public\image_1.png)
+    """)
     return
 
 
@@ -708,8 +788,8 @@ def _(cleaning_dataf, gatein_log):
                     cleaning_dataf
                 WHERE
                     date BETWEEN '2025-10-01' AND '2025-10-31'
-                    AND shipping_line = 'MAERSK'
-                    AND "Invoice To" = 'MAERSKLINE'
+                    AND shipping_line = 'IOT'
+                    AND "Invoice To" = 'IOT'
             ),
             gate AS (
                 SELECT

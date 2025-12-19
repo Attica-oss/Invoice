@@ -12,7 +12,6 @@ from data_source.sheet_ids import (
     ALL_CCCS_DATA_SHEET,
 )
 from type_casting.dates import (
-    # DAY_NAMES,
     SPECIAL_DAYS,
     UPPER_BOUND,
     UPPER_BOUND_SPECIAL_DAY,
