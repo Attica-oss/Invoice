@@ -309,7 +309,7 @@ netList = (
 )
 
 # Maersk OSS stuffing list ; Separated between Full and Basic OSS
-oss: pl.LazyFrame = (
+oss = (
     netList.select(pl.all().exclude(["Price", "invoice_value"]))
     .filter(pl.col("service").str.contains("OSS"))
     .with_columns(

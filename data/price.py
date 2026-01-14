@@ -5,6 +5,24 @@ import polars as pl
 from data_source.make_dataset import load_gsheet_data
 from data_source.sheet_ids import MASTER_ID, price_sheet
 
+from utils.google_sheet import GoogleSheetsLoader
+from utils.result import Result
+
+gs = GoogleSheetsLoader()
+
+def filter_price_services(ldf:Result,service:str) -> pl.LazyFrame:
+    """Filter price services from google sheet data"""
+    if ldf.success:
+        ldf = ldf.data.filter(pl.col("Service") == service).select(
+            # pl.col("Service"),
+            pl.col("Price"),
+            pl.col("StartingDate").alias("Date"),
+        )
+    else:
+        ldf.error("Failed to load price data")
+        return pl.LazyFrame()
+    return ldf
+
 # from type_casting.dates import SPECIAL_DAYS
 
 # Overtime %

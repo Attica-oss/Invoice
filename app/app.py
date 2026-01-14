@@ -9,7 +9,7 @@ from typing import Optional
 
 from app.logger import logger
 from app.save import save_df_to_csv
-
+from app.view import forklift_logistics_dataset, view_data
 # from app.check import check_data
 
 
@@ -59,7 +59,7 @@ class App:
         sys.exit(0)
 
     @property
-    def greeting(self) -> None:
+    def greeting(self) -> str:
         """Returns formatted welcome message"""
         return f"""
             {self.config.title} v.{self.config.version}
@@ -153,6 +153,10 @@ class App:
                         self.handle_save()
                     case MenuOption.VIEW:
                         logger.info("Selected: View dataframe")
+                        self.clear_screen()
+                     
+                        view_data(forklift_logistics_dataset())
+
                         # Implement view functionality
                     case MenuOption.CHECK:
                         logger.info("Selected: Check logistics records")

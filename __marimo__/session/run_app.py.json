@@ -1,0 +1,47 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.18.4"
+  },
+  "cells": [
+    {
+      "id": "setup",
+      "code_hash": "54e21a3314136c99f7e5f5d91e8e7bfb",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "2025-12-29 09:46:10,802 - DEBUG - Starting new HTTPS connection (1): docs.google.com:443\n2025-12-29 09:46:11,899 - DEBUG - https://docs.google.com:443 \"GET /spreadsheets/d/1ai-zQMtbPUx0LeQeLmXcpPgKvL5cyvwDfSJqRzxfUQg/gviz/tq?tqx=out:csv&sheet=Price HTTP/1.1\" 200 None\n2025-12-29 09:46:12,030 - DEBUG - Starting new HTTPS connection (1): docs.google.com:443\n2025-12-29 09:46:13,395 - DEBUG - https://docs.google.com:443 \"GET /spreadsheets/d/1O8K26c7CqLSdLr-f2gvZliDpBn9ArxXvj9tEJy-ElUg/gviz/tq?tqx=out:csv&sheet=Transfer HTTP/1.1\" 200 None\n2025-12-29 09:46:13,856 - DEBUG - Starting new HTTPS connection (1): docs.google.com:443\n2025-12-29 09:46:14,514 - DEBUG - https://docs.google.com:443 \"GET /spreadsheets/d/1O8K26c7CqLSdLr-f2gvZliDpBn9ArxXvj9tEJy-ElUg/gviz/tq?tqx=out:csv&sheet=ShoreCrane HTTP/1.1\" 200 None\n2025-12-29 09:46:14,581 - DEBUG - Starting new HTTPS connection (1): docs.google.com:443\n2025-12-29 09:46:15,538 - DEBUG - https://docs.google.com:443 \"GET /spreadsheets/d/1O8K26c7CqLSdLr-f2gvZliDpBn9ArxXvj9tEJy-ElUg/gviz/tq?tqx=out:csv&sheet=ScowTransfer HTTP/1.1\" 200 None\n2025-12-29 09:46:15,668 - DEBUG - Starting new HTTPS connection (1): docs.google.com:443\n2025-12-29 09:46:16,570 - DEBUG - https://docs.google.com:443 \"GET /spreadsheets/d/1O8K26c7CqLSdLr-f2gvZliDpBn9ArxXvj9tEJy-ElUg/gviz/tq?tqx=out:csv&sheet=ForkliftRecord HTTP/1.1\" 200 None\n2025-12-29 09:46:16,760 - DEBUG - Starting new HTTPS connection (1): docs.google.com:443\n2025-12-29 09:46:17,604 - DEBUG - https://docs.google.com:443 \"GET /spreadsheets/d/1VbfiiWsp8yxs6KSR1CXpw1S_35tYlWV8UjjWah9Afpw/gviz/tq?tqx=out:csv&sheet=CCCSReport HTTP/1.1\" 200 None\n2025-12-29 09:46:17,825 - DEBUG - Starting new HTTPS connection (1): docs.google.com:443\n2025-12-29 09:46:18,602 - DEBUG - https://docs.google.com:443 \"GET /spreadsheets/d/1sPK_pSIJ8iR38yJExtvzGgJO2aMz2VN6_uDHh37TqR0/gviz/tq?tqx=out:csv&sheet=ContainerShifting HTTP/1.1\" 200 None\n2025-12-29 09:46:18,632 - DEBUG - Starting new HTTPS connection (1): docs.google.com:443\n2025-12-29 09:46:19,720 - DEBUG - https://docs.google.com:443 \"GET /spreadsheets/d/1sPK_pSIJ8iR38yJExtvzGgJO2aMz2VN6_uDHh37TqR0/gviz/tq?tqx=out:csv&sheet=PTI HTTP/1.1\" 200 None\n2025-12-29 09:46:20,484 - DEBUG - Starting new HTTPS connection (1): docs.google.com:443\n2025-12-29 09:46:21,302 - DEBUG - https://docs.google.com:443 \"GET /spreadsheets/d/1sPK_pSIJ8iR38yJExtvzGgJO2aMz2VN6_uDHh37TqR0/gviz/tq?tqx=out:csv&sheet=ContainerCleaning HTTP/1.1\" 200 None\n2025-12-29 09:46:21,548 - DEBUG - Starting new HTTPS connection (1): docs.google.com:443\n2025-12-29 09:46:22,165 - DEBUG - https://docs.google.com:443 \"GET /spreadsheets/d/1ai-zQMtbPUx0LeQeLmXcpPgKvL5cyvwDfSJqRzxfUQg/gviz/tq?tqx=out:csv&sheet=Client HTTP/1.1\" 200 None\n2025-12-29 09:46:22,209 - DEBUG - Starting new HTTPS connection (1): docs.google.com:443\n2025-12-29 09:46:22,780 - DEBUG - https://docs.google.com:443 \"GET /spreadsheets/d/1VbfiiWsp8yxs6KSR1CXpw1S_35tYlWV8UjjWah9Afpw/gviz/tq?tqx=out:csv&sheet=CrossStuffing HTTP/1.1\" 200 None\n2025-12-29 09:46:22,896 - DEBUG - Starting new HTTPS connection (1): docs.google.com:443\n2025-12-29 09:46:23,480 - DEBUG - https://docs.google.com:443 \"GET /spreadsheets/d/1VbfiiWsp8yxs6KSR1CXpw1S_35tYlWV8UjjWah9Afpw/gviz/tq?tqx=out:csv&sheet=IPHSBycatchTransfer HTTP/1.1\" 200 None\n2025-12-29 09:46:23,527 - DEBUG - Starting new HTTPS connection (1): docs.google.com:443\n2025-12-29 09:46:24,153 - DEBUG - https://docs.google.com:443 \"GET /spreadsheets/d/1VbfiiWsp8yxs6KSR1CXpw1S_35tYlWV8UjjWah9Afpw/gviz/tq?tqx=out:csv&sheet=CCCSContainerStuffing HTTP/1.1\" 200 None\n2025-12-29 09:46:24,278 - DEBUG - Starting new HTTPS connection (1): docs.google.com:443\n2025-12-29 09:46:24,894 - DEBUG - https://docs.google.com:443 \"GET /spreadsheets/d/1L0HlevB-asshOgXMmIQ14bysq56lUPp0lYCrHPB0iGg/gviz/tq?tqx=out:csv&sheet=LinerPallet HTTP/1.1\" 200 None\n2025-12-29 09:46:24,937 - DEBUG - Starting new HTTPS connection (1): docs.google.com:443\n2025-12-29 09:46:25,752 - DEBUG - https://docs.google.com:443 \"GET /spreadsheets/d/1L0HlevB-asshOgXMmIQ14bysq56lUPp0lYCrHPB0iGg/gviz/tq?tqx=out:csv&sheet=containerOperations HTTP/1.1\" 200 None\n2025-12-29 09:46:26,175 - DEBUG - Starting new HTTPS connection (1): docs.google.com:443\n2025-12-29 09:46:28,871 - DEBUG - https://docs.google.com:443 \"GET /spreadsheets/d/1PvTkl6DYZdhtaiNshz0qwtSPxC8S1OOeu905NmhFKNs/gviz/tq?tqx=out:csv&sheet=RawData HTTP/1.1\" 200 None\n2025-12-29 09:46:29,497 - DEBUG - Starting new HTTPS connection (1): docs.google.com:443\n2025-12-29 09:46:30,150 - DEBUG - https://docs.google.com:443 \"GET /spreadsheets/d/1PvTkl6DYZdhtaiNshz0qwtSPxC8S1OOeu905NmhFKNs/gviz/tq?tqx=out:csv&sheet=UnloadingSummary HTTP/1.1\" 200 None\n2025-12-29 09:46:30,428 - DEBUG - Starting new HTTPS connection (1): docs.google.com:443\n2025-12-29 09:46:33,112 - DEBUG - https://docs.google.com:443 \"GET /spreadsheets/d/1PvTkl6DYZdhtaiNshz0qwtSPxC8S1OOeu905NmhFKNs/gviz/tq?tqx=out:csv&sheet=RawData HTTP/1.1\" 200 None\n2025-12-29 09:46:34,076 - DEBUG - Starting new HTTPS connection (1): docs.google.com:443\n2025-12-29 09:46:35,186 - DEBUG - https://docs.google.com:443 \"GET /spreadsheets/d/1R1M5La8lqF7NjJa7qspfPYvHU_Ej2o4YX7gduxb-Zu8/gviz/tq?tqx=out:csv&sheet=SaltOperation HTTP/1.1\" 200 None\n2025-12-29 09:46:35,206 - DEBUG - Starting new HTTPS connection (1): docs.google.com:443\n2025-12-29 09:46:35,908 - DEBUG - https://docs.google.com:443 \"GET /spreadsheets/d/1R1M5La8lqF7NjJa7qspfPYvHU_Ej2o4YX7gduxb-Zu8/gviz/tq?tqx=out:csv&sheet=BinTipping HTTP/1.1\" 200 None\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "Hbol",
+      "code_hash": "31f81920a4461dc4c0988b8fffe24fa7",
+      "outputs": [],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "2025-12-29 09:46:41,782 - INFO - Starting application\n2025-12-29 09:46:41,783 - INFO - Clearing screen\n\f\n            Attica Invoice v.0.0.3\n            ---------------------------\n            gmounac<at>outlook<dot>com (c) 2024\n            \n            Select an option:\n            ----- 1. Save dataframe to CSV file\n            ----- 2. View dataframe\n            ----- 3. Check Logistics Record\n            ----- 4. Exit Application\n            \nChoose the option:  1\n2025-12-29 09:46:44,195 - INFO - Selected: Save files\n2025-12-29 09:46:44,196 - INFO - Clearing screen\n\fContinue Saving the file [Y/n]  y\n            all : For all of the dataframes\n            emr : For shifting, PTI and Washing\n            operations : Operations data\n            netlist : Genesis data sets\n            bin_dispatch : IOT Scow transfer data\n            shore_handling : Salt and Bin Tipping data\n            stuffing : Plugging including stuffing of containers\n            transport : Haulage,Shore Crane and Forklift data\n            miscellaneous : CCCS and Cross stuffing data\nSelect the dataframe or 'all' for all dataframes:  emr\n2025-12-29 09:46:53,867 - INFO - Initiating save operation for emr\n{'shifting': <LazyFrame at 0x1F2E8D5D860>, 'washing': <LazyFrame at 0x1F2E8D5DEA0>, 'pti': <LazyFrame at 0x1F2E8C150E0>}\n2025-12-29 09:46:53,867 - INFO - Processing dataframe category: emr\n2025-12-29 09:46:53,867 - INFO - Processing dataframes: ['shifting', 'washing', 'pti']\n2025-12-29 09:46:53,895 - INFO - Successfully wrote shifting to file\n2025-12-29 09:46:53,895 - INFO - Successfully saved shifting\n2025-12-29 09:46:53,904 - INFO - Successfully wrote washing to file\n2025-12-29 09:46:53,904 - INFO - Successfully saved washing\n2025-12-29 09:46:53,943 - INFO - Successfully wrote pti to file\n2025-12-29 09:46:53,943 - INFO - Successfully saved pti\n2025-12-29 09:46:53,943 - INFO - Save completed\n2025-12-29 09:46:53,943 - INFO - Successfully saved: shifting, washing, pti\nReturn to the main menu [Y/n]",
+          "mimetype": "text/plain"
+        },
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "",
+          "mimetype": "text/plain"
+        }
+      ]
+    }
+  ]
+}

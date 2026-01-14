@@ -155,12 +155,17 @@ def _(test):
 
 @app.cell
 def _():
-    sum([
-    5.9,
-    10.53,
-    6.83,
-    11.55,
-    2.06])
+    from dataframe.emr import shifting
+    return (shifting,)
+
+
+@app.cell
+def _(shifting):
+    _df = mo.sql(
+        f"""
+        SELECT * FROM shifting WHERE date > '2025-09-30'
+        """
+    )
     return
 
 

@@ -1,4 +1,6 @@
 """EMR lazyframes"""
+
+from __future__ import annotations
 import polars as pl
 
 from data.price import OVERTIME_150, FREE, get_price
@@ -7,6 +9,7 @@ from data_source.sheet_ids import EMR_SHEET_ID, shifting_sheet, pti_sheet, washi
 from type_casting.dates import CURRENT_YEAR, SPECIAL_DAYS
 from type_casting.validations import SetPoint, SETPOINTS
 from type_casting.containers import containers_enum
+
 
 # Price
 
@@ -29,8 +32,10 @@ WASHING = (
 # Shifting Data Set
 shifting: pl.LazyFrame = (
     load_gsheet_data(sheet_id=EMR_SHEET_ID, sheet_name=shifting_sheet)
+    # Add the day name column to invoice overtime calculation
     .with_columns(
         pl.col("date").days.add_day_name()
+    # Filter invalid invoices
     ).filter(pl.col("invoice_to").ne("INVALID"))
     .select(
         pl.col("day_name"),

@@ -12,13 +12,186 @@ with app.setup:
 
 @app.cell
 def _():
-    from app.app import App
-    return (App,)
+    from dataframe.netlist import netList
+    from dataframe.stuffing import coa
+    from dataframe.transport import forklift,transfer,shore_crane
+    from dataframe.shore_handling import salt
+    from dataframe.miscellaneous import cross_stuffing
+    from dataframe.netlist import iot_cargo
+    from dataframe.emr import shifting
+    return (
+        coa,
+        cross_stuffing,
+        forklift,
+        iot_cargo,
+        salt,
+        shifting,
+        shore_crane,
+        transfer,
+    )
 
 
 @app.cell
-def _(App):
-    App().run()
+def _(shore_crane):
+    _df = mo.sql(
+        f"""
+        SELECT * FROM shore_crane WHERE MONTH(date) = 11
+        """
+    )
+    return
+
+
+@app.cell
+def _(shifting):
+    _df = mo.sql(
+        f"""
+        SELECT * FROM shifting WHERE date BETWEEN '2025-10-01' AND '2025-11-30'
+        """
+    )
+    return
+
+
+@app.cell
+def _(iot_cargo):
+    iot_cargo_df = mo.sql(
+        f"""
+        SELECT * FROM iot_cargo WHERE vessel = 'DOLOMIEU'
+        """
+    )
+    return (iot_cargo_df,)
+
+
+@app.cell
+def _(iot_cargo_df):
+    iot_cargo_df.select(pl.col("total_price").sum().round())
+    return
+
+
+@app.cell
+def _(cross_stuffing):
+    _df = mo.sql(
+        f"""
+        SELECT * FROM cross_stuffing WHERE date between '2025-10-01' AND '2025-11-30'
+        """
+    )
+    return
+
+
+@app.cell
+def _():
+    1_337.22 + 1_672.8
+    return
+
+
+@app.cell
+def _(cross_stuffing):
+    _df = mo.sql(
+        f"""
+        WITH cross_stuff AS (SELECT
+            *
+        FROM
+            cross_stuffing
+        WHERE
+            date BETWEEN '2025-11-01' AND '2025-11-30')
+
+        SELECT Service,invoiced, SUM(total_price) AS total_price FROM cross_stuff GROUP BY Service,invoiced
+        """
+    )
+    return
+
+
+@app.cell
+def _(salt):
+    _df = mo.sql(
+        f"""
+        SELECT * FROM salt  WHERE vessel = 'ADAMAS' AND date BETWEEN  '2025-10-29' AND '2025-11-10'
+        """
+    )
+    return
+
+
+@app.cell
+def _(forklift):
+    _df = mo.sql(
+        f"""
+        SELECT * FROM forklift WHERE customer = 'ADAMAS' AND date BETWEEN '2025-10-29' AND '2025-11-10'
+        """
+    )
+    return
+
+
+@app.cell
+def _():
+    search_container = mo.ui.text(max_length=11)
+    search_container
+    return (search_container,)
+
+
+@app.cell
+def _(coa, search_container):
+    _df = mo.sql(
+        f"""
+        SELECT * FROM coa WHERE container_number = '{search_container.value}'
+        """
+    )
+    return
+
+
+@app.cell
+def _(coa):
+    _df = mo.sql(
+        f"""
+        SELECT
+            customer,
+            MAKE_TIMESTAMP(
+                YEAR(date_plugged),
+                MONTH(date_plugged),
+                DAY(date_plugged),
+                HOUR(time_plugged),
+                MINUTE(time_plugged),
+                SECOND(time_plugged)
+            ) AS datetime_plugging,
+            container_number,
+            operation_type,
+            days_on_plug,
+            date_out,
+            total
+        FROM
+            coa
+        WHERE
+            customer = 'IOT IMPORT' AND MONTH(datetime_plugging) = 11
+        """
+    )
+    return
+
+
+@app.cell
+def _(netlist, search_container):
+    _df = mo.sql(
+        f"""
+        SELECT * FROM netList WHERE destination = '{search_container.value}'
+        """
+    )
+    return
+
+
+@app.cell
+def _(search_container, transfer):
+    _df = mo.sql(
+        f"""
+        SELECT * FROM transfer WHERE container_number = '{search_container.value}'
+        """
+    )
+    return
+
+
+@app.cell
+def _(transfer):
+    _df = mo.sql(
+        f"""
+        SELECT * FROM transfer WHERE remarks = 'IOT IMPORT' AND MONTH(date) = 11
+        """
+    )
     return
 
 
@@ -43,6 +216,12 @@ def _(gs):
         pti_log_dataf,
         washing_log_dataf,
     )
+
+
+@app.cell
+def _(pti_log_dataf):
+    pti_log_dataf
+    return
 
 
 @app.cell
@@ -101,7 +280,7 @@ def _(washing_log_dataf):
         FROM
             washing_log_dataf
         WHERE
-            date BETWEEN '2025-10-01' AND '2025-11-30' --AND container_number = 'MNBU0285329'
+            date BETWEEN '2025-10-01' AND '2025-12-30' AND "Invoice To" LIKE '%SAPMER%'
         """
     )
     return (washing_df,)

@@ -20,7 +20,7 @@ def miscellaneous() -> pl.LazyFrame:
     """Miscellaneous main sheet"""
     return (
         load_gsheet_data(MISC_SHEET_ID, ALL_CCCS_DATA_SHEET)
-        .filter(pl.col("date").dt.year().eq(CURRENT_YEAR))
+        .filter(pl.col("date").dt.year().ge(CURRENT_YEAR - 1))
         .select(
             pl.col("day").cast(dtype=pl.Enum(DAY_NAMES)),
             pl.col("date"),
@@ -50,7 +50,7 @@ def cross_stuffing() -> pl.LazyFrame:
         load_gsheet_data(MISC_SHEET_ID, CROSS_STUFFING_SHEET)
         # .filter(pl.col("day").str.replace("", "x").ne("x"))
         .with_columns(storage_type=pl.lit("Dry", dtype=pl.Utf8))
-        .filter(pl.col("date").dt.year().eq(CURRENT_YEAR))
+        .filter(pl.col("date").dt.year().ge(CURRENT_YEAR - 1))
         .select(
             pl.col("day").cast(dtype=pl.Enum(DAY_NAMES)),
             pl.col("vessel_client"),
@@ -75,7 +75,7 @@ def by_catch_transfer() -> pl.LazyFrame:
     """by catch transfer sheet"""
     return (
         load_gsheet_data(MISC_SHEET_ID, BY_CATCH_SHEET)
-        .filter(pl.col("date").dt.year().eq(CURRENT_YEAR))
+        .filter(pl.col("date").dt.year().ge(CURRENT_YEAR - 1))
         .with_columns(
             day=pl.when(pl.col("date").is_in(public_holiday(CURRENT_YEAR)))
             .then(pl.lit("PH"))
@@ -100,7 +100,7 @@ def cccs_container_stuffing() -> pl.LazyFrame:
     """CCCS container stuffing dataframe clean up"""
     return (
         load_gsheet_data(MISC_SHEET_ID, CCCS_STUFFING_SHEET)
-        .filter(pl.col("date").dt.year().eq(CURRENT_YEAR))
+        .filter(pl.col("date").dt.year().ge(CURRENT_YEAR    - 1))
         .with_columns(storage_type=pl.lit("Dry", dtype=pl.Utf8))
         .select(
             pl.col("Day").cast(dtype=pl.Enum(DAY_NAMES)),

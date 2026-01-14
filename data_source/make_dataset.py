@@ -3,48 +3,16 @@
 import logging
 from io import StringIO
 from functools import cache
+# from pathlib import Path
 import requests
 import polars as pl
 
-
-# import aiohttp
-
+from data_source.excel_file_path import ExcelFiles
 # Configure logging
 logging.basicConfig(level=logging.ERROR)
 
-# To test Async
-# async def load_gsheet_data_async(sheet_id: str, sheet_name: str) -> pl.LazyFrame:
-#     """
-#     Loads a Google Sheet as a Polars LazyFrame asynchronously.
-
-#     Args:
-#         sheet_id (str): The ID of the Google Sheet.
-#         sheet_name (str): The name of the sheet to load.
-
-#     Returns:
-#         pl.LazyFrame: A LazyFrame containing the sheet data, or None if an error occurred.
-#     """
-#     link:str = "https://docs.google.com/spreadsheets"
-#     url:str = f"{link}/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
-
-#     try:
-#         async with aiohttp.ClientSession() as session:
-#             async with session.get(url) as response:
-#                 response.raise_for_status()
-#                 csv_data = StringIO(await response.text())
-#                 return pl.read_csv(csv_data, try_parse_dates=True).lazy()
-
-#     except aiohttp.ClientError as e:
-#         logging.error(
-#             "An error occurred while trying to access the Google Sheet: %s", e
-#         )
-#         return pl.LazyFrame()
-#     except pl.exceptions.ComputeError as e:
-#         logging.error("An error occurred while parsing the CSV data: %s", e)
-#         return pl.LazyFrame()
-
-
-
+# Excel file path type
+# type ExcelFiles = tuple[Path,str]
 
 @cache
 def load_gsheet_data(sheet_id: str, sheet_name: str) -> pl.LazyFrame:
@@ -77,3 +45,16 @@ def load_gsheet_data(sheet_id: str, sheet_name: str) -> pl.LazyFrame:
     except pl.exceptions.ComputeError as e:
         logging.error("An error occurred while parsing the CSV data: %s", e)
         return pl.LazyFrame()
+
+def load_excel(file_path:ExcelFiles) -> pl.LazyFrame:
+    """
+    Loads an Excel file as a Polars LazyFrame.
+
+    Args:
+        file_path (ExcelFiles): The path to the Excel file.
+    Returns:
+
+        pl.LazyFrame: A LazyFrame containing the Excel data.
+    """
+    file,sheet = file_path.value
+    return pl.read_excel(file,sheet_name=sheet).lazy()

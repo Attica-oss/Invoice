@@ -7,3 +7,4 @@ Requires-Dist: tqdm
 Requires-Dist: xlsx2csv
 Requires-Dist: requests
 Requires-Dist: importlib-metadata; python_version < "3.10"
+Requires-Dist: python-dotenv>=1.2.1

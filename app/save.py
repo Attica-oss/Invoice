@@ -1,5 +1,6 @@
 """Save dataframes to CSV files"""
 
+from pathlib import Path
 from functools import cache
 
 
@@ -36,9 +37,10 @@ def save_to_csv(
 
     try:
         # Add explicit path and ensure directory exists
-        output_path = (
-            rf"P:\Verification & Invoicing\Validation Report\csv\{dataframe_name}.csv"
-        )
+        # output_path = (
+        #     rf"P:\Verification & Invoicing\Validation Report\csv\{dataframe_name}.csv"
+        # )
+        output_path = rf"{Path.home()}\Invoice\csv\{dataframe_name}.csv"
         dataframe.collect().write_csv(output_path)
         logger.info("Successfully wrote %s to file", dataframe_name)
         return dataframe_name, None
@@ -122,7 +124,7 @@ def save_df_to_csv(dataframes: str | None):
             else:
                 successes.append(message)
                 logger.info("Successfully saved %s", message)
-        except (IOError,ValueError) as e:
+        except (IOError, ValueError) as e:
             logger.error("Unexpected error processing %s: %s", name, str(e))
             failures.append((name, e))
 
