@@ -27,7 +27,18 @@ def _(gs):
 def _(report):
     _df = mo.sql(
         f"""
-        SELECT sub_type,report_name,customer,starting_date,ending_date,remarks FROM report WHERE report_type = 'si' AND month LIKE '%December%'
+        SELECT
+            sub_type,
+            report_name,
+            customer,
+            starting_date,
+            ending_date,
+            remarks
+        FROM
+            report
+        WHERE
+            report_type = 'si'
+            AND month LIKE '%December%'
         """
     )
     return
@@ -35,20 +46,88 @@ def _(report):
 
 @app.cell
 def _():
-    from dataframe.miscellaneous import cross_stuffing
-    return (cross_stuffing,)
+    from dataframe.transport import forklift
+    return (forklift,)
 
 
 @app.cell
-def _(cross_stuffing):
+def _(forklift):
+    _df = mo.sql(
+        f"""
+        WITH raw AS (SELECT
+            *
+        FROM
+            forklift
+        WHERE
+            date BETWEEN '2025-12-01' AND '2025-12-31'
+            AND invoiced_in IN ('ECHEBASTAR', 'HARTSWATER LIMITED'))
+
+        SELECT invoiced_in,CEIL(SUM(normal_hours) / 60) * 30 AS price FROM raw GROUP BY invoiced_in
+        """
+    )
+    return
+
+
+@app.cell
+def _():
+    from dataframe.shore_handling import forklift_salt,salt
+    return forklift_salt, salt
+
+
+@app.cell
+def _(salt):
+    _df = mo.sql(
+        f"""
+        SELECT customer,ROUND(SUM(price),3) AS price FROM salt WHERE
+            date BETWEEN '2025-12-01' AND '2025-12-31'
+            AND customer IN ('ECHEBASTAR', 'HARTSWATER LIMITED') GROUP BY customer
+        """
+    )
+    return
+
+
+@app.cell
+def _(forklift_salt):
+    fs =forklift_salt()
+    return (fs,)
+
+
+@app.cell
+def _(fs):
+    _df = mo.sql(
+        f"""
+        SELECT * FROM fs WHERE
+            date BETWEEN '2025-12-01' AND '2025-12-31'
+        """
+    )
+    return
+
+
+@app.cell
+def _():
+    from dataframe.stuffing import coa
+    return (coa,)
+
+
+@app.cell
+def _(coa):
     _df = mo.sql(
         f"""
         SELECT
-            *
+            *,
+            CASE 
+            	WHEN (date_out > '2025-12-31' OR date_out IS NULL) THEN '2025-12-31' ELSE 
+            date_out END AS end_date,
+            DATEDIFF('days',date_plugged,end_date) AS days
         FROM
-            cross_stuffing
+            coa
         WHERE
-            date BETWEEN '2025-12-01' AND '2025-12-31' AND invoiced <> 'IPHS'
+            (customer = 'IOT IMPORT')
+            AND (date_plugged < '2025-12-31')
+            AND (
+                date_out IS NULL
+                OR date_out > '2025-12-01'
+            )
         """
     )
     return
@@ -56,34 +135,13 @@ def _(cross_stuffing):
 
 @app.cell
 def _():
-    from dataframe.transport import transfer
-    from dataframe.emr import washing
-    return transfer, washing
-
-
-@app.cell
-def _(transfer):
-    _df = mo.sql(
-        f"""
-        SELECT * FROM transfer WHERE container_number IN ('SUDU8195865','MNBU0302365','MNBU9043434','MNBU0655228') AND movement_type <> 'Delivery'
-        """
-    )
-    return
-
-
-@app.cell
-def _(washing):
-    _df = mo.sql(
-        f"""
-        SELECT * FROM washing --WHERE container_number IN ('SUDU8195865','MNBU0302365','MNBU9043434','MNBU0655228')
-        """
-    )
+    38.76 + 30 +35
     return
 
 
 @app.cell
 def _():
-    (90 * 4) + (35 * 4) + (530.007+ 533.43 +526.973 +522.894)
+    6168.304 + (35*4)
     return
 
 

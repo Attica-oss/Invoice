@@ -314,6 +314,7 @@ def forklift_salt()->pl.LazyFrame:
         pl.col("day_name").alias("day"),
         pl.col("date"),
         pl.col("vessel"),
+        pl.col("customer"),
         pl.col("start_time"),
         pl.col("end_time"),
         (pl.lit("Salt Loading (" ) + pl.col("tonnage").cast(pl.Int64).cast(pl.Utf8) + pl.lit(" ) Tons")).alias("purpose"),
