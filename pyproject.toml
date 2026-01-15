@@ -1,11 +1,11 @@
-[build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
-
 [project]
-name = "attica"
-version = "0.0.1"
+name = "invoice"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
 dependencies = [
+<<<<<<< Updated upstream
     "polars",
     "python-dateutil",
     "tqdm",
@@ -29,4 +29,10 @@ packages = [
 [dependency-groups]
 dev = [
     "ty>=0.0.10",
+=======
+    "marimo>=0.18.4",
+    "polars>=1.36.1",
+    "python-dateutil>=2.9.0.post0",
+    "requests>=2.32.5",
+>>>>>>> Stashed changes
 ]

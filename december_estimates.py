@@ -20,7 +20,7 @@ def _():
 @app.cell
 def _(gs):
     report = gs.load_sheet(config_name="validation",parse_dates=True).data
-    return (report,)
+    return
 
 
 @app.cell(hide_code=True)
@@ -32,7 +32,7 @@ def _():
 
 
 @app.cell
-def _(report):
+def _():
     sto_dataf = mo.sql(
         f"""
         --- STO reports for December 25'
@@ -50,11 +50,11 @@ def _(report):
         ORDER BY starting_date ASC
         """
     )
-    return (sto_dataf,)
+    return
 
 
 @app.cell
-def _(netlist):
+def _():
     _df = mo.sql(
         f"""
         SELECT * FROM netList
@@ -64,7 +64,7 @@ def _(netlist):
 
 
 @app.cell
-def _(netlist, sto_dataf):
+def _():
     _df = mo.sql(
         f"""
         WITH
@@ -81,7 +81,7 @@ def _(netlist, sto_dataf):
                     netList
             ),
         joined AS (
-    
+
 
         SELECT
             s.id,
@@ -99,7 +99,6 @@ def _(netlist, sto_dataf):
         )
 
         SELECT id,vessel,ROUND(SUM(total_tonnage),3) AS tonnage, ROUND(SUM(invoice_value),3) AS amount FROM joined GROUP BY id,vessel
-
         """
     )
     return
@@ -114,11 +113,11 @@ def _():
 @app.cell
 def _(coa):
     electricity = coa
-    return (electricity,)
+    return
 
 
 @app.cell
-def _(electricity, sto_dataf):
+def _():
     _df = mo.sql(
         f"""
         WITH
@@ -143,8 +142,8 @@ def _(electricity, sto_dataf):
             e.monitoring_price,
             e.electricity_unit_price,
             e.total
-    
-    
+
+
         FROM
             sto s
             JOIN elect e ON e.date_plugged BETWEEN s.starting_date AND s.ending_date

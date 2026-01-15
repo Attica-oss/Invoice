@@ -66,12 +66,17 @@ def add_day_name_column(date_col: pl.Expr) -> pl.Expr:
         .otherwise(date_col.dt.to_string(format="%a"))
     ).cast(dtype=pl.Enum(DAY_NAMES))
 
-
-main_file = (
-    pl.read_excel(OPS_ACTIVITY_PATH, sheet_name="HANDLING ACTIVITY", engine="calamine")
-    .filter(pl.col("DAY") != "", pl.col("DAY") != "Total")
-    .lazy()
-)
+try:
+    main_file = (
+        pl.read_excel(
+            OPS_ACTIVITY_PATH, sheet_name="HANDLING ACTIVITY", engine="calamine"
+        )
+        .filter(pl.col("DAY") != "", pl.col("DAY") != "Total")
+        .lazy()
+    )
+except FileNotFoundError as e:
+    print(f"Error loading OPS activity file: {e}")
+    main_file = pl.LazyFrame()
 
 handling_activity = main_file.select(
     pl.col("DATE").alias("date"),
@@ -185,7 +190,7 @@ hatch_to_hatch: pl.LazyFrame = (
             OvertimePerc.normal_hour * pl.col("Price") * pl.col("Well-to-Well Transfer")
         )
     )
-     .with_columns(
+    .with_columns(
         price=pl.when(pl.col("day_name").is_in(SPECIAL_DAYS))
         .then(OvertimePerc.overtime_150 * pl.col("Price"))
         .otherwise(OvertimePerc.normal_hour * pl.col("Price"))
@@ -223,16 +228,12 @@ tare: pl.DataFrame = (
                 & (pl.col("Comments").str.contains("back"))
             )
             | (
-                (
-                    (pl.col("Comments").str.contains("front"))
-                    & (pl.col("Comments").str.contains("middle"))
-                )
+                (pl.col("Comments").str.contains("front"))
+                & (pl.col("Comments").str.contains("middle"))
             )
             | (
-                (
-                    (pl.col("Comments").str.contains("back"))
-                    & (pl.col("Comments").str.contains("middle"))
-                )
+                (pl.col("Comments").str.contains("back"))
+                & (pl.col("Comments").str.contains("middle"))
             )
             | (pl.col("Comments").str.contains("both sides"))
         )

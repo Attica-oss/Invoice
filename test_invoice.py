@@ -2,10 +2,17 @@
 # requires-python = ">=3.13"
 # dependencies = [
 #     "duckdb==1.4.3",
+<<<<<<< Updated upstream
 #     "fastexcel==0.18.0",
 #     "polars==1.36.1",
 #     "pyarrow==22.0.0",
 #     "python-dateutil==2.9.0.post0",
+=======
+#     "polars==1.36.1",
+#     "pyarrow==22.0.0",
+#     "python-dateutil==2.9.0.post0",
+#     "python-dotenv==1.2.1",
+>>>>>>> Stashed changes
 #     "requests==2.32.5",
 #     "sqlglot==28.3.0",
 # ]
@@ -24,11 +31,51 @@ with app.setup:
 
 @app.cell
 def _():
+<<<<<<< Updated upstream
     from type_casting.dates import Days
+=======
+    from utils.google_sheet import GoogleSheetsLoader
+    return (GoogleSheetsLoader,)
+
+
+@app.cell
+def _(GoogleSheetsLoader):
+    gs = GoogleSheetsLoader()
+    return (gs,)
+
+
+@app.cell
+def _(gs):
+    gate_in_dataf = gs.load_sheet(config_name="container_gate_in").data
+    gate_out_dataf = gs.load_sheet(config_name="container_gate_out").data
+    pti_dataf = gs.load_sheet(config_name="container_pti_log").data
+    return gate_in_dataf, pti_dataf
+
+
+@app.cell
+def _(gate_in_dataf):
+    _df = mo.sql(
+        f"""
+        SELECT
+            Date,
+            Time,
+            "Container Number" AS container_number,
+            "Shipping Line" AS shipping_line,
+            "Type" AS container_type,
+            "Unit Manufacturer" AS unit_manufacturer,
+            "Status" AS status,
+            "PTI Status" AS pti_status,
+            "Haulage" AS haulage
+        FROM
+            gate_in_dataf
+        """
+    )
+>>>>>>> Stashed changes
     return
 
 
 @app.cell
+<<<<<<< Updated upstream
 def _():
     from dataframe.netlist import netList
     return (netList,)
@@ -55,6 +102,80 @@ def _(net_dataf):
             net_dataf
         WHERE
             filter_overtime <> 'normal hours'
+=======
+def _(pti_dataf):
+    pti_dataf.collect().head()
+    return
+
+
+@app.cell
+def _(gate_in_dataf, pti_dataf):
+    pti_check = mo.sql(
+        f"""
+        -- Pre Trip Inspection 
+        WITH
+            pti AS (
+                SELECT
+                    -- CAST(STRPTIME("Date Plugin", '%d/%m/%Y') AS DATE) AS date_plugin,
+                    "Date Plugin" AS date_plugin,
+                    --CAST(STRPTIME("Time Plugin", '%H:%M:%S') AS TIME) AS time_plugin,
+                    "Time Plugin" AS time_plugin,
+                    "Container Number" AS container_number,
+                    Size AS size,
+                    CAST("Set Point" AS INTEGER) AS set_point,
+                    "Unit Manufacturer" AS unit_manufacturer,
+                    "Shipping Line" AS shipping_line,
+                    "Unplugged Date" AS date_unplugged,
+                    "Sticker" AS sticker,
+                    "Status" AS status
+                FROM
+                    pti_dataf
+            ),
+            -- Gate in 
+            gate_in AS (
+                SELECT
+                    Date AS date,
+                    Time AS time,
+                    "Container Number" AS container_number,
+                    "Shipping Line" AS shipping_line,
+                    "Type" AS container_type,
+                    "Unit Manufacturer" AS unit_manufacturer,
+                    "Status" AS status,
+                    "PTI Status" AS pti_status,
+                    "Haulage" AS haulage
+                FROM
+                    gate_in_dataf
+            )
+            -- Combine PTI and Gate in 
+        SELECT
+            *,
+            g.unit_manufacturer = p.unit_manufacturer AS unit_check
+        FROM
+            gate_in g
+            JOIN pti p ON g.date <= p.date_plugin
+            AND g.container_number = p.container_number
+        WHERE
+            MONTH(p.date_plugin) > 9
+            AND YEAR(g.date) = 2025 AND NOT unit_check --AND g.container_number = 'MNBU3494770'
+        """
+    )
+    return (pti_check,)
+
+
+@app.cell
+def _(pti_check):
+    _df = mo.sql(
+        f"""
+        SELECT
+            date AS gate_in_date,
+            container_number,
+            shipping_line,
+            unit_manufacturer AS unit_man_gate_in,
+            date_plugin,
+            unit_manufacturer_1 AS unit_man_pti
+        FROM
+            pti_check
+>>>>>>> Stashed changes
         """
     )
     return (clean,)
