@@ -144,7 +144,7 @@ pti: pl.LazyFrame = (
 # Washing Data Set
 washing = (
     load_gsheet_data(EMR_SHEET_ID, washing_sheet)
-    .filter(pl.col("date").dt.year().ge(CURRENT_YEAR))
+    .filter(pl.col("date").dt.year().ge(CURRENT_YEAR -1))
     .select(
         pl.col("date"),
         pl.col("container_number").cast(dtype=containers_enum),
