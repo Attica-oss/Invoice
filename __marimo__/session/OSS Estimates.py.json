@@ -1,0 +1,223 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.19.2"
+  },
+  "cells": [
+    {
+      "id": "setup",
+      "code_hash": "da996cf697b43047660d920638e5d68a",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Hbol",
+      "code_hash": "600125661cbecc278bb6909ba3fd7da7",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "pxfa",
+      "code_hash": "a2d621ae5c8f08e716841dd73b41c073",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "VwGA",
+      "code_hash": "36f587d31cc79396238733136b332249",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='VwGA-0' random-id='0cdfbb87-047e-ac62-e967-fa36cd64c6ce'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;id&#92;&quot;:1,&#92;&quot;vessel&#92;&quot;:&#92;&quot;IZARO&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-11-28&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2025-12-05&#92;&quot;},{&#92;&quot;id&#92;&quot;:2,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ATERPE ALAI&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-05&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2025-12-09&#92;&quot;},{&#92;&quot;id&#92;&quot;:3,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ELAI ALAI&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-12&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2025-12-16&#92;&quot;},{&#92;&quot;id&#92;&quot;:4,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EUSKADI ALAI&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-16&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2025-12-18&#92;&quot;},{&#92;&quot;id&#92;&quot;:5,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-16&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2025-12-17&#92;&quot;},{&#92;&quot;id&#92;&quot;:6,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-20&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2025-12-31&#92;&quot;},{&#92;&quot;id&#92;&quot;:7,&#92;&quot;vessel&#92;&quot;:&#92;&quot;JAI ALAI&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-26&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2026-01-05&#92;&quot;},{&#92;&quot;id&#92;&quot;:8,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EUSKADI ALAI&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-27&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2025-12-31&#92;&quot;},{&#92;&quot;id&#92;&quot;:9,&#92;&quot;vessel&#92;&quot;:&#92;&quot;DOLOMIEU&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-28&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2025-12-31&#92;&quot;},{&#92;&quot;id&#92;&quot;:10,&#92;&quot;vessel&#92;&quot;:&#92;&quot;IZARO&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-31&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2026-01-08&#92;&quot;}]&quot;' data-total-rows='10' data-total-columns='5' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;,[&quot;integer&quot;,&quot;i64&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;customer&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;starting_date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;ending_date&quot;,[&quot;date&quot;,&quot;date&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Mmze",
+      "code_hash": "f966434aacb5fc308335c3747a270ff4",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "cyMH",
+      "code_hash": "11ede1b6d2f5835bdf9f2d738d6fc40c",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='cyMH-0' random-id='9dabab7e-83de-0dd6-06bd-3641c45b747d'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;id&#92;&quot;:3,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ELAI ALAI&#92;&quot;,&#92;&quot;total&#92;&quot;:26065.0},{&#92;&quot;id&#92;&quot;:7,&#92;&quot;vessel&#92;&quot;:&#92;&quot;JAI ALAI&#92;&quot;,&#92;&quot;total&#92;&quot;:6270.0},{&#92;&quot;id&#92;&quot;:2,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ATERPE ALAI&#92;&quot;,&#92;&quot;total&#92;&quot;:70365.0},{&#92;&quot;id&#92;&quot;:1,&#92;&quot;vessel&#92;&quot;:&#92;&quot;IZARO&#92;&quot;,&#92;&quot;total&#92;&quot;:18555.0},{&#92;&quot;id&#92;&quot;:8,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EUSKADI ALAI&#92;&quot;,&#92;&quot;total&#92;&quot;:5705.0},{&#92;&quot;id&#92;&quot;:5,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;total&#92;&quot;:4945.0},{&#92;&quot;id&#92;&quot;:4,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EUSKADI ALAI&#92;&quot;,&#92;&quot;total&#92;&quot;:4010.0},{&#92;&quot;id&#92;&quot;:9,&#92;&quot;vessel&#92;&quot;:&#92;&quot;DOLOMIEU&#92;&quot;,&#92;&quot;total&#92;&quot;:5225.0},{&#92;&quot;id&#92;&quot;:6,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;total&#92;&quot;:38075.0}]&quot;' data-total-rows='9' data-total-columns='3' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;,[&quot;integer&quot;,&quot;i64&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;total&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "CapE",
+      "code_hash": "e9591c93483748cc534fa633ade9cab5",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "KSNS",
+      "code_hash": "bc40767d3f773e8ffac23241dc02605c",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='KSNS-0' random-id='fa196ba7-0aa9-881c-e2bf-b4b88da1eebc'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;id&#92;&quot;:1,&#92;&quot;vessel&#92;&quot;:&#92;&quot;IZARO&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-11-28&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2025-12-05&#92;&quot;,&#92;&quot;date&#92;&quot;:null,&#92;&quot;vessel_1&#92;&quot;:null,&#92;&quot;invoiced_to&#92;&quot;:null,&#92;&quot;total_price&#92;&quot;:null},{&#92;&quot;id&#92;&quot;:2,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ATERPE ALAI&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-05&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2025-12-09&#92;&quot;,&#92;&quot;date&#92;&quot;:null,&#92;&quot;vessel_1&#92;&quot;:null,&#92;&quot;invoiced_to&#92;&quot;:null,&#92;&quot;total_price&#92;&quot;:null},{&#92;&quot;id&#92;&quot;:3,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ELAI ALAI&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-12&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2025-12-16&#92;&quot;,&#92;&quot;date&#92;&quot;:null,&#92;&quot;vessel_1&#92;&quot;:null,&#92;&quot;invoiced_to&#92;&quot;:null,&#92;&quot;total_price&#92;&quot;:null},{&#92;&quot;id&#92;&quot;:4,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EUSKADI ALAI&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-16&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2025-12-18&#92;&quot;,&#92;&quot;date&#92;&quot;:null,&#92;&quot;vessel_1&#92;&quot;:null,&#92;&quot;invoiced_to&#92;&quot;:null,&#92;&quot;total_price&#92;&quot;:null},{&#92;&quot;id&#92;&quot;:5,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-16&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2025-12-17&#92;&quot;,&#92;&quot;date&#92;&quot;:null,&#92;&quot;vessel_1&#92;&quot;:null,&#92;&quot;invoiced_to&#92;&quot;:null,&#92;&quot;total_price&#92;&quot;:null},{&#92;&quot;id&#92;&quot;:6,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-20&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2025-12-31&#92;&quot;,&#92;&quot;date&#92;&quot;:null,&#92;&quot;vessel_1&#92;&quot;:null,&#92;&quot;invoiced_to&#92;&quot;:null,&#92;&quot;total_price&#92;&quot;:null},{&#92;&quot;id&#92;&quot;:7,&#92;&quot;vessel&#92;&quot;:&#92;&quot;JAI ALAI&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-26&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2026-01-05&#92;&quot;,&#92;&quot;date&#92;&quot;:null,&#92;&quot;vessel_1&#92;&quot;:null,&#92;&quot;invoiced_to&#92;&quot;:null,&#92;&quot;total_price&#92;&quot;:null},{&#92;&quot;id&#92;&quot;:8,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EUSKADI ALAI&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-27&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2025-12-31&#92;&quot;,&#92;&quot;date&#92;&quot;:null,&#92;&quot;vessel_1&#92;&quot;:null,&#92;&quot;invoiced_to&#92;&quot;:null,&#92;&quot;total_price&#92;&quot;:null},{&#92;&quot;id&#92;&quot;:9,&#92;&quot;vessel&#92;&quot;:&#92;&quot;DOLOMIEU&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-28&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2025-12-31&#92;&quot;,&#92;&quot;date&#92;&quot;:null,&#92;&quot;vessel_1&#92;&quot;:null,&#92;&quot;invoiced_to&#92;&quot;:null,&#92;&quot;total_price&#92;&quot;:null},{&#92;&quot;id&#92;&quot;:10,&#92;&quot;vessel&#92;&quot;:&#92;&quot;IZARO&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-31&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2026-01-08&#92;&quot;,&#92;&quot;date&#92;&quot;:null,&#92;&quot;vessel_1&#92;&quot;:null,&#92;&quot;invoiced_to&#92;&quot;:null,&#92;&quot;total_price&#92;&quot;:null}]&quot;' data-total-rows='10' data-total-columns='9' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;,[&quot;integer&quot;,&quot;i64&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;customer&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;starting_date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;ending_date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;vessel_1&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;invoiced_to&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;total_price&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "nDOT",
+      "code_hash": "dd2969c5f21c942b8827c8be64831ce0",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Riff",
+      "code_hash": "fe15d62f8095f050b8fbad6ac839139f",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='Riff-0' random-id='e2da2976-46d8-7fdd-b5e0-4c7a72167dfe'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;id&#92;&quot;:8,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EUSKADI ALAI&#92;&quot;,&#92;&quot;total&#92;&quot;:13600.088},{&#92;&quot;id&#92;&quot;:3,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ELAI ALAI&#92;&quot;,&#92;&quot;total&#92;&quot;:27211.8},{&#92;&quot;id&#92;&quot;:7,&#92;&quot;vessel&#92;&quot;:&#92;&quot;JAI ALAI&#92;&quot;,&#92;&quot;total&#92;&quot;:7031.4},{&#92;&quot;id&#92;&quot;:6,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;total&#92;&quot;:61481.912},{&#92;&quot;id&#92;&quot;:4,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EUSKADI ALAI&#92;&quot;,&#92;&quot;total&#92;&quot;:3077.725},{&#92;&quot;id&#92;&quot;:1,&#92;&quot;vessel&#92;&quot;:&#92;&quot;IZARO&#92;&quot;,&#92;&quot;total&#92;&quot;:32864.475},{&#92;&quot;id&#92;&quot;:5,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;total&#92;&quot;:3398.881},{&#92;&quot;id&#92;&quot;:9,&#92;&quot;vessel&#92;&quot;:&#92;&quot;DOLOMIEU&#92;&quot;,&#92;&quot;total&#92;&quot;:12838.344},{&#92;&quot;id&#92;&quot;:2,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ATERPE ALAI&#92;&quot;,&#92;&quot;total&#92;&quot;:57414.375}]&quot;' data-total-rows='9' data-total-columns='3' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;,[&quot;integer&quot;,&quot;i64&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;total&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "<sys>:0: UserWarning: Sortedness of columns cannot be checked when 'by' groups provided\n<string>:1: UserWarning: Sortedness of columns cannot be checked when 'by' groups provided\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "hSAk",
+      "code_hash": "e89b012855cf395d433f9c4442e250d1",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "FDBb",
+      "code_hash": "709aac4129ff5a61ee0d9c16445043d5",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "XPgG",
+      "code_hash": "9e8a778f0f61c60694de5934effd4f9e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='XPgG-0' random-id='27949fba-0c54-e0b4-c11d-fe8b9060c09d'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;id&#92;&quot;:1,&#92;&quot;vessel&#92;&quot;:&#92;&quot;IZARO&#92;&quot;,&#92;&quot;total&#92;&quot;:3015.0},{&#92;&quot;id&#92;&quot;:6,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;total&#92;&quot;:90.0},{&#92;&quot;id&#92;&quot;:5,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;total&#92;&quot;:90.0},{&#92;&quot;id&#92;&quot;:3,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ELAI ALAI&#92;&quot;,&#92;&quot;total&#92;&quot;:1890.0},{&#92;&quot;id&#92;&quot;:2,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ATERPE ALAI&#92;&quot;,&#92;&quot;total&#92;&quot;:4050.0}]&quot;' data-total-rows='5' data-total-columns='3' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;,[&quot;integer&quot;,&quot;i64&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;total&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "<string>:1: UserWarning: Sortedness of columns cannot be checked when 'by' groups provided\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "UqSK",
+      "code_hash": "0fd88cfd437c0a40b0f07cfeeaa33e20",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='UqSK-0' random-id='dc5d0640-d3a1-7cef-de8f-b8767900b988'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;id&#92;&quot;:1,&#92;&quot;vessel&#92;&quot;:&#92;&quot;IZARO&#92;&quot;,&#92;&quot;total&#92;&quot;:3015.0},{&#92;&quot;id&#92;&quot;:6,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;total&#92;&quot;:90.0},{&#92;&quot;id&#92;&quot;:5,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;total&#92;&quot;:90.0},{&#92;&quot;id&#92;&quot;:3,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ELAI ALAI&#92;&quot;,&#92;&quot;total&#92;&quot;:1890.0},{&#92;&quot;id&#92;&quot;:2,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ATERPE ALAI&#92;&quot;,&#92;&quot;total&#92;&quot;:4050.0}]&quot;' data-total-rows='5' data-total-columns='3' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;,[&quot;integer&quot;,&quot;i64&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;total&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "BwmO",
+      "code_hash": "a56070c873a7acad156eb4e6eddaf515",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='BwmO-0' random-id='af1169af-55bc-00f7-2137-a7e2119b6159'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;id&#92;&quot;:1,&#92;&quot;vessel&#92;&quot;:&#92;&quot;IZARO&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-11-28&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2025-12-05&#92;&quot;,&#92;&quot;electricity_price&#92;&quot;:18555.0,&#92;&quot;stuffing_price&#92;&quot;:32864.475,&#92;&quot;haulage_price&#92;&quot;:3015.0},{&#92;&quot;id&#92;&quot;:2,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ATERPE ALAI&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-05&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2025-12-09&#92;&quot;,&#92;&quot;electricity_price&#92;&quot;:70365.0,&#92;&quot;stuffing_price&#92;&quot;:57414.375,&#92;&quot;haulage_price&#92;&quot;:4050.0},{&#92;&quot;id&#92;&quot;:3,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ELAI ALAI&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-12&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2025-12-16&#92;&quot;,&#92;&quot;electricity_price&#92;&quot;:26065.0,&#92;&quot;stuffing_price&#92;&quot;:27211.8,&#92;&quot;haulage_price&#92;&quot;:1890.0},{&#92;&quot;id&#92;&quot;:5,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-16&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2025-12-17&#92;&quot;,&#92;&quot;electricity_price&#92;&quot;:4945.0,&#92;&quot;stuffing_price&#92;&quot;:3398.881,&#92;&quot;haulage_price&#92;&quot;:90.0},{&#92;&quot;id&#92;&quot;:6,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-20&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2025-12-31&#92;&quot;,&#92;&quot;electricity_price&#92;&quot;:38075.0,&#92;&quot;stuffing_price&#92;&quot;:61481.912,&#92;&quot;haulage_price&#92;&quot;:90.0},{&#92;&quot;id&#92;&quot;:4,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EUSKADI ALAI&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-16&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2025-12-18&#92;&quot;,&#92;&quot;electricity_price&#92;&quot;:4010.0,&#92;&quot;stuffing_price&#92;&quot;:3077.725,&#92;&quot;haulage_price&#92;&quot;:0.0},{&#92;&quot;id&#92;&quot;:7,&#92;&quot;vessel&#92;&quot;:&#92;&quot;JAI ALAI&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-26&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2026-01-05&#92;&quot;,&#92;&quot;electricity_price&#92;&quot;:6270.0,&#92;&quot;stuffing_price&#92;&quot;:7031.4,&#92;&quot;haulage_price&#92;&quot;:0.0},{&#92;&quot;id&#92;&quot;:8,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EUSKADI ALAI&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-27&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2025-12-31&#92;&quot;,&#92;&quot;electricity_price&#92;&quot;:5705.0,&#92;&quot;stuffing_price&#92;&quot;:13600.088,&#92;&quot;haulage_price&#92;&quot;:0.0},{&#92;&quot;id&#92;&quot;:9,&#92;&quot;vessel&#92;&quot;:&#92;&quot;DOLOMIEU&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-28&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2025-12-31&#92;&quot;,&#92;&quot;electricity_price&#92;&quot;:5225.0,&#92;&quot;stuffing_price&#92;&quot;:12838.344,&#92;&quot;haulage_price&#92;&quot;:0.0},{&#92;&quot;id&#92;&quot;:10,&#92;&quot;vessel&#92;&quot;:&#92;&quot;IZARO&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-31&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2026-01-08&#92;&quot;,&#92;&quot;electricity_price&#92;&quot;:0.0,&#92;&quot;stuffing_price&#92;&quot;:0.0,&#92;&quot;haulage_price&#92;&quot;:0.0}]&quot;' data-total-rows='10' data-total-columns='7' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;,[&quot;integer&quot;,&quot;i64&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;starting_date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;ending_date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;electricity_price&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;stuffing_price&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;haulage_price&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "mTLC",
+      "code_hash": null,
+      "outputs": [],
+      "console": []
+    }
+  ]
+}

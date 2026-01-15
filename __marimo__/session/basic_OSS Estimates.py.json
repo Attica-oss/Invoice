@@ -1,0 +1,270 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.19.2"
+  },
+  "cells": [
+    {
+      "id": "setup",
+      "code_hash": "da996cf697b43047660d920638e5d68a",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Hbol",
+      "code_hash": "600125661cbecc278bb6909ba3fd7da7",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "a2d621ae5c8f08e716841dd73b41c073",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "aa725f5c49bdfdcf30d60dfb3205df7a",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='vblA-0' random-id='60954002-0c50-3474-7362-03f275e23d69'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;id&#92;&quot;:1,&#92;&quot;vessel&#92;&quot;:&#92;&quot;PLAYA DE AZKORRI&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-01&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2025-12-02&#92;&quot;},{&#92;&quot;id&#92;&quot;:2,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EGALABUR&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-03&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2025-12-04&#92;&quot;},{&#92;&quot;id&#92;&quot;:3,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-09&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2025-12-18&#92;&quot;},{&#92;&quot;id&#92;&quot;:4,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EGALABUR&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-28&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2026-01-06&#92;&quot;}]&quot;' data-total-rows='4' data-total-columns='5' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;,[&quot;integer&quot;,&quot;i64&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;customer&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;starting_date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;ending_date&quot;,[&quot;date&quot;,&quot;date&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "f966434aacb5fc308335c3747a270ff4",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "93acd6de7155aae382d4447d9daf1056",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='lEQa-0' random-id='435d545d-9540-5b9a-5ff8-465ddd8bd1d5'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;id&#92;&quot;:4,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EGALABUR&#92;&quot;,&#92;&quot;total&#92;&quot;:1570.0},{&#92;&quot;id&#92;&quot;:1,&#92;&quot;vessel&#92;&quot;:&#92;&quot;PLAYA DE AZKORRI&#92;&quot;,&#92;&quot;total&#92;&quot;:6380.0},{&#92;&quot;id&#92;&quot;:2,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EGALABUR&#92;&quot;,&#92;&quot;total&#92;&quot;:24035.0},{&#92;&quot;id&#92;&quot;:3,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;total&#92;&quot;:26180.0}]&quot;' data-total-rows='4' data-total-columns='3' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;,[&quot;integer&quot;,&quot;i64&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;total&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "e9591c93483748cc534fa633ade9cab5",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "7d59cd1e158130a8b2c4e60eea846eb7",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='Xref-0' random-id='253931de-0dc4-27d5-6ee8-f95490512c2f'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;id&#92;&quot;:1,&#92;&quot;vessel&#92;&quot;:&#92;&quot;PLAYA DE AZKORRI&#92;&quot;,&#92;&quot;total&#92;&quot;:0.0},{&#92;&quot;id&#92;&quot;:2,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EGALABUR&#92;&quot;,&#92;&quot;total&#92;&quot;:0.0},{&#92;&quot;id&#92;&quot;:4,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EGALABUR&#92;&quot;,&#92;&quot;total&#92;&quot;:1417.5},{&#92;&quot;id&#92;&quot;:3,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;total&#92;&quot;:0.0}]&quot;' data-total-rows='4' data-total-columns='3' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;,[&quot;integer&quot;,&quot;i64&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;total&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "aef2891a0e33ea76b6ac40c47389de90",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "EhIb",
+      "code_hash": "b8d9af86e22f621bbb8edebe55f5e48b",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='EhIb-0' random-id='674f3dde-19b2-9a52-052b-57a54424338d'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-03&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;13:33:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MSFU0002762&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Dry&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;14:21:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:9.49,&#92;&quot;service&#92;&quot;:&#92;&quot;Full OSS&#92;&quot;,&#92;&quot;Price&#92;&quot;:0.0,&#92;&quot;invoice_value&#92;&quot;:0.0},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-03&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;14:38:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MSFU0000203&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Dry&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;15:18:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:9.71,&#92;&quot;service&#92;&quot;:&#92;&quot;Full OSS&#92;&quot;,&#92;&quot;Price&#92;&quot;:0.0,&#92;&quot;invoice_value&#92;&quot;:0.0},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-03&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;08:29:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;Sierra Lara&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Brine&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;16:47:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:193.15,&#92;&quot;service&#92;&quot;:&#92;&quot;Transhipment&#92;&quot;,&#92;&quot;Price&#92;&quot;:32.25,&#92;&quot;invoice_value&#92;&quot;:6229.088},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-03&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;09:20:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU0280857&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Brine&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;16:45:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:19.62,&#92;&quot;service&#92;&quot;:&#92;&quot;Basic OSS&#92;&quot;,&#92;&quot;Price&#92;&quot;:18.25,&#92;&quot;invoice_value&#92;&quot;:358.065},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-03&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;09:34:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU4452276&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Brine&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;16:16:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:27.34,&#92;&quot;service&#92;&quot;:&#92;&quot;Basic OSS&#92;&quot;,&#92;&quot;Price&#92;&quot;:18.25,&#92;&quot;invoice_value&#92;&quot;:498.955},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-03&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;10:01:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU3760762&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Brine&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;16:43:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:16.35,&#92;&quot;service&#92;&quot;:&#92;&quot;Basic OSS&#92;&quot;,&#92;&quot;Price&#92;&quot;:18.25,&#92;&quot;invoice_value&#92;&quot;:298.388},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-03&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;14:02:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;Unload to Quay&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Brine&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;15:20:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:9.48,&#92;&quot;service&#92;&quot;:&#92;&quot;Unload to Quay&#92;&quot;,&#92;&quot;Price&#92;&quot;:18.25,&#92;&quot;invoice_value&#92;&quot;:173.01},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-04&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;08:44:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU0614912&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Brine&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;10:05:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:24.05,&#92;&quot;service&#92;&quot;:&#92;&quot;Full OSS&#92;&quot;,&#92;&quot;Price&#92;&quot;:0.0,&#92;&quot;invoice_value&#92;&quot;:0.0},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-04&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;09:16:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU3580781&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Brine&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;12:24:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:26.59,&#92;&quot;service&#92;&quot;:&#92;&quot;Full OSS&#92;&quot;,&#92;&quot;Price&#92;&quot;:0.0,&#92;&quot;invoice_value&#92;&quot;:0.0},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-04&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;10:27:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU4177929&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Brine&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;12:49:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:26.87,&#92;&quot;service&#92;&quot;:&#92;&quot;Full OSS&#92;&quot;,&#92;&quot;Price&#92;&quot;:0.0,&#92;&quot;invoice_value&#92;&quot;:0.0}]&quot;' data-total-rows='6134' data-total-columns='11' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;start_time&quot;,[&quot;time&quot;,&quot;time&quot;]],[&quot;destination&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;overtime&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;storage_type&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;end_time&quot;,[&quot;time&quot;,&quot;time&quot;]],[&quot;total_tonnage&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;service&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Price&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;invoice_value&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "<sys>:0: UserWarning: Sortedness of columns cannot be checked when 'by' groups provided\n<string>:1: UserWarning: Sortedness of columns cannot be checked when 'by' groups provided\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "gUCP",
+      "code_hash": "f89a7448d58f5f5c482d1de125afbab8",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='gUCP-0' random-id='5a6d58f8-a329-7a01-8b24-5e38fd262683'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-03&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU0280857&#92;&quot;,&#92;&quot;service&#92;&quot;:&#92;&quot;Basic OSS&#92;&quot;},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-03&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU4452276&#92;&quot;,&#92;&quot;service&#92;&quot;:&#92;&quot;Basic OSS&#92;&quot;},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-03&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU3760762&#92;&quot;,&#92;&quot;service&#92;&quot;:&#92;&quot;Basic OSS&#92;&quot;},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-04&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU3760762&#92;&quot;,&#92;&quot;service&#92;&quot;:&#92;&quot;Basic OSS&#92;&quot;},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-04&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU0280857&#92;&quot;,&#92;&quot;service&#92;&quot;:&#92;&quot;Basic OSS&#92;&quot;},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-04&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU0429196&#92;&quot;,&#92;&quot;service&#92;&quot;:&#92;&quot;Basic OSS&#92;&quot;},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-04&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU3807751&#92;&quot;,&#92;&quot;service&#92;&quot;:&#92;&quot;Basic OSS&#92;&quot;},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-04&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU0280857&#92;&quot;,&#92;&quot;service&#92;&quot;:&#92;&quot;Basic OSS&#92;&quot;},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-04&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU0429196&#92;&quot;,&#92;&quot;service&#92;&quot;:&#92;&quot;Basic OSS&#92;&quot;},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-05&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU3807751&#92;&quot;,&#92;&quot;service&#92;&quot;:&#92;&quot;Basic OSS&#92;&quot;}]&quot;' data-total-rows='884' data-total-columns='4' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;destination&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;service&quot;,[&quot;string&quot;,&quot;str&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "<sys>:0: UserWarning: Sortedness of columns cannot be checked when 'by' groups provided\n<string>:1: UserWarning: Sortedness of columns cannot be checked when 'by' groups provided\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "58c416e46723f9d7f26b6beb6c3fdc21",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='BYtC-0' random-id='0470ccac-3063-3ab4-33d6-80ec1e55c013'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;id&#92;&quot;:4,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EGALABUR&#92;&quot;,&#92;&quot;total&#92;&quot;:2136.518},{&#92;&quot;id&#92;&quot;:3,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;total&#92;&quot;:20218.823},{&#92;&quot;id&#92;&quot;:1,&#92;&quot;vessel&#92;&quot;:&#92;&quot;PLAYA DE AZKORRI&#92;&quot;,&#92;&quot;total&#92;&quot;:9970.755},{&#92;&quot;id&#92;&quot;:2,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EGALABUR&#92;&quot;,&#92;&quot;total&#92;&quot;:10931.085}]&quot;' data-total-rows='4' data-total-columns='3' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;,[&quot;integer&quot;,&quot;i64&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;total&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "<sys>:0: UserWarning: Sortedness of columns cannot be checked when 'by' groups provided\n<string>:1: UserWarning: Sortedness of columns cannot be checked when 'by' groups provided\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "RGSE",
+      "code_hash": "e89b012855cf395d433f9c4442e250d1",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Kclp",
+      "code_hash": "709aac4129ff5a61ee0d9c16445043d5",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "emfo",
+      "code_hash": "87ddcfe886d08feb43efa6f51edeb864",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='emfo-0' random-id='470c0f8a-3243-4fac-1e42-41988e7e9db8'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;id&#92;&quot;:2,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EGALABUR&#92;&quot;,&#92;&quot;total&#92;&quot;:1350.0},{&#92;&quot;id&#92;&quot;:1,&#92;&quot;vessel&#92;&quot;:&#92;&quot;PLAYA DE AZKORRI&#92;&quot;,&#92;&quot;total&#92;&quot;:1395.0},{&#92;&quot;id&#92;&quot;:3,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;total&#92;&quot;:2160.0}]&quot;' data-total-rows='3' data-total-columns='3' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;,[&quot;integer&quot;,&quot;i64&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;total&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "<string>:1: UserWarning: Sortedness of columns cannot be checked when 'by' groups provided\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "Hstk",
+      "code_hash": "af3bf98ef8743781c68f9ceae6c6de44",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='Hstk-0' random-id='f45dd3a9-0368-e16e-096c-2cf25b22f704'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;id&#92;&quot;:2,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EGALABUR&#92;&quot;,&#92;&quot;total&#92;&quot;:1350.0},{&#92;&quot;id&#92;&quot;:1,&#92;&quot;vessel&#92;&quot;:&#92;&quot;PLAYA DE AZKORRI&#92;&quot;,&#92;&quot;total&#92;&quot;:1395.0},{&#92;&quot;id&#92;&quot;:3,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;total&#92;&quot;:2160.0}]&quot;' data-total-rows='3' data-total-columns='3' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;,[&quot;integer&quot;,&quot;i64&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;total&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "nWHF",
+      "code_hash": "25085d145ab1ea77167999f469ee4da1",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='nWHF-0' random-id='a1a3449a-5961-2bd4-3861-1d7bf7abce69'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;id&#92;&quot;:1,&#92;&quot;vessel&#92;&quot;:&#92;&quot;PLAYA DE AZKORRI&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-01&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2025-12-02&#92;&quot;,&#92;&quot;electricity_price&#92;&quot;:6380.0,&#92;&quot;stuffing_price&#92;&quot;:9970.755,&#92;&quot;crane_price&#92;&quot;:0.0,&#92;&quot;haulage_price&#92;&quot;:1395.0},{&#92;&quot;id&#92;&quot;:2,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EGALABUR&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-03&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2025-12-04&#92;&quot;,&#92;&quot;electricity_price&#92;&quot;:24035.0,&#92;&quot;stuffing_price&#92;&quot;:10931.085,&#92;&quot;crane_price&#92;&quot;:0.0,&#92;&quot;haulage_price&#92;&quot;:1350.0},{&#92;&quot;id&#92;&quot;:3,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-09&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2025-12-18&#92;&quot;,&#92;&quot;electricity_price&#92;&quot;:26180.0,&#92;&quot;stuffing_price&#92;&quot;:20218.823,&#92;&quot;crane_price&#92;&quot;:0.0,&#92;&quot;haulage_price&#92;&quot;:2160.0},{&#92;&quot;id&#92;&quot;:4,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EGALABUR&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-28&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;2026-01-06&#92;&quot;,&#92;&quot;electricity_price&#92;&quot;:1570.0,&#92;&quot;stuffing_price&#92;&quot;:2136.518,&#92;&quot;crane_price&#92;&quot;:1417.5,&#92;&quot;haulage_price&#92;&quot;:0.0}]&quot;' data-total-rows='4' data-total-columns='8' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;,[&quot;integer&quot;,&quot;i64&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;starting_date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;ending_date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;electricity_price&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;stuffing_price&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;crane_price&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;haulage_price&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "iLit",
+      "code_hash": null,
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    }
+  ]
+}

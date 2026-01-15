@@ -38,7 +38,7 @@ TRANSFER_PRICE = get_price(["Haulage FEU", "Haulage TEU"])
 
 shore_crane: pl.LazyFrame = (
     load_gsheet_data(TRANSPORT_SHEET_ID, shore_crane_sheet)
-    .filter(pl.col("date").dt.year().eq(CURRENT_YEAR))
+    # .filter(pl.col("date").dt.year().eq(CURRENT_YEAR))
     .select(
         pl.col("day").cast(dtype=pl.Enum(DAY_NAMES)),
         cs.contains("date"),

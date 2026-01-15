@@ -66,3 +66,7 @@ class ExcelFiles(Enum):
         ),
         "BERTH DUES IPHS",
     )
+
+    MOVEMENT_OUT = (
+        "P:\Verification & Invoicing\Validation Report\Validation Report - 2024.xlsx","movement_out"
+    )
