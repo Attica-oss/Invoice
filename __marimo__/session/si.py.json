@@ -45,12 +45,12 @@
     },
     {
       "id": "vblA",
-      "code_hash": "7199a30a7689f272d8693c0155a933a0",
+      "code_hash": "10e37fe57429da8b04e7bfba175b9346",
       "outputs": [
         {
           "type": "data",
           "data": {
-            "text/html": "<marimo-ui-element object-id='vblA-0' random-id='27bdd058-396c-23f6-2fba-9b0a3f000b5e'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;sub_type&#92;&quot;:&#92;&quot;TRUCK TO CCCS VIA SKIFF&#92;&quot;,&#92;&quot;report_name&#92;&quot;:&#92;&quot;TXORI BERRI&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;INPESCA S.A&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-02&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;02/12/2025&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Shore Crane&#92;&quot;},{&#92;&quot;sub_type&#92;&quot;:&#92;&quot;UNSTUFFING BY HAND&#92;&quot;,&#92;&quot;report_name&#92;&quot;:&#92;&quot;ELAI ALAI&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;ECHEBASTAR&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-16&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;16/12/2025&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Removal of partial&#92;&quot;},{&#92;&quot;sub_type&#92;&quot;:&#92;&quot;&#92;&quot;,&#92;&quot;report_name&#92;&quot;:&#92;&quot;ACILA&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;OMAN PELAGIC&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-23&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;26/12/2025&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;&#92;&quot;},{&#92;&quot;sub_type&#92;&quot;:&#92;&quot;&#92;&quot;,&#92;&quot;report_name&#92;&quot;:&#92;&quot;HAIZEA BOST&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;ISABELLA FISHING LTD&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-25&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;30/12/2025&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;&#92;&quot;},{&#92;&quot;sub_type&#92;&quot;:&#92;&quot;&#92;&quot;,&#92;&quot;report_name&#92;&quot;:&#92;&quot;TXORI HIRU&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;INPESCA S.A&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-28&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;31/12/2025&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;To check if there were services&#92;&quot;},{&#92;&quot;sub_type&#92;&quot;:&#92;&quot;UNSTUFFING BY HAND&#92;&quot;,&#92;&quot;report_name&#92;&quot;:&#92;&quot;ELAI ALAI&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;ECHEBASTAR&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-28&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;29/12/2025&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;&#92;&quot;},{&#92;&quot;sub_type&#92;&quot;:&#92;&quot;UNSTUFFING TO COLD STORE&#92;&quot;,&#92;&quot;report_name&#92;&quot;:&#92;&quot;IOT - IMPORT&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;IOT&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-01&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;31/12/2025&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;&#92;&quot;},{&#92;&quot;sub_type&#92;&quot;:&#92;&quot;UNSTUFFING BY HAND&#92;&quot;,&#92;&quot;report_name&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;ECHEBASTAR&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-26&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;26/12/2025&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Tally and Tare&#92;&quot;}]&quot;' data-total-rows='8' data-total-columns='6' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;sub_type&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;report_name&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;customer&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;starting_date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;ending_date&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;remarks&quot;,[&quot;string&quot;,&quot;str&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+            "text/html": "<marimo-ui-element object-id='vblA-0' random-id='d94c850e-6ea1-fd32-748b-b21d63098cc0'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;report_type&#92;&quot;:&#92;&quot;si&#92;&quot;,&#92;&quot;sub_type&#92;&quot;:&#92;&quot;TRUCK TO CCCS VIA SKIFF&#92;&quot;,&#92;&quot;report_name&#92;&quot;:&#92;&quot;TXORI BERRI&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;INPESCA S.A&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-02&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;02/12/2025&#92;&quot;,&#92;&quot;invoice_total&#92;&quot;:&#92;&quot;195.698&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Shore Crane&#92;&quot;},{&#92;&quot;report_type&#92;&quot;:&#92;&quot;si&#92;&quot;,&#92;&quot;sub_type&#92;&quot;:&#92;&quot;UNSTUFFING BY HAND&#92;&quot;,&#92;&quot;report_name&#92;&quot;:&#92;&quot;ELAI ALAI&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;ECHEBASTAR&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-16&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;16/12/2025&#92;&quot;,&#92;&quot;invoice_total&#92;&quot;:&#92;&quot;103&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Removal of partial&#92;&quot;},{&#92;&quot;report_type&#92;&quot;:&#92;&quot;si&#92;&quot;,&#92;&quot;sub_type&#92;&quot;:&#92;&quot;&#92;&quot;,&#92;&quot;report_name&#92;&quot;:&#92;&quot;ACILA&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;OMAN PELAGIC&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-23&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;26/12/2025&#92;&quot;,&#92;&quot;invoice_total&#92;&quot;:&#92;&quot;&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;&#92;&quot;},{&#92;&quot;report_type&#92;&quot;:&#92;&quot;si&#92;&quot;,&#92;&quot;sub_type&#92;&quot;:&#92;&quot;&#92;&quot;,&#92;&quot;report_name&#92;&quot;:&#92;&quot;HAIZEA BOST&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;ISABELLA FISHING LTD&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-25&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;30/12/2025&#92;&quot;,&#92;&quot;invoice_total&#92;&quot;:&#92;&quot;&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;&#92;&quot;},{&#92;&quot;report_type&#92;&quot;:&#92;&quot;si&#92;&quot;,&#92;&quot;sub_type&#92;&quot;:&#92;&quot;&#92;&quot;,&#92;&quot;report_name&#92;&quot;:&#92;&quot;TXORI HIRU&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;INPESCA S.A&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-28&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;31/12/2025&#92;&quot;,&#92;&quot;invoice_total&#92;&quot;:&#92;&quot;&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;To check if there were services&#92;&quot;},{&#92;&quot;report_type&#92;&quot;:&#92;&quot;si&#92;&quot;,&#92;&quot;sub_type&#92;&quot;:&#92;&quot;UNSTUFFING BY HAND&#92;&quot;,&#92;&quot;report_name&#92;&quot;:&#92;&quot;ELAI ALAI&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;ECHEBASTAR&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-28&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;29/12/2025&#92;&quot;,&#92;&quot;invoice_total&#92;&quot;:&#92;&quot;17&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;&#92;&quot;},{&#92;&quot;report_type&#92;&quot;:&#92;&quot;oss&#92;&quot;,&#92;&quot;sub_type&#92;&quot;:&#92;&quot;CCCS OSS&#92;&quot;,&#92;&quot;report_name&#92;&quot;:&#92;&quot;INPESCA&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-01&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;31/12/2025&#92;&quot;,&#92;&quot;invoice_total&#92;&quot;:&#92;&quot;46347.74475&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;&#92;&quot;},{&#92;&quot;report_type&#92;&quot;:&#92;&quot;oss&#92;&quot;,&#92;&quot;sub_type&#92;&quot;:&#92;&quot;CCCS OSS&#92;&quot;,&#92;&quot;report_name&#92;&quot;:&#92;&quot;OCEAN BASKET&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-01&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;31/12/2025&#92;&quot;,&#92;&quot;invoice_total&#92;&quot;:&#92;&quot;54768.02575&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;&#92;&quot;},{&#92;&quot;report_type&#92;&quot;:&#92;&quot;oss&#92;&quot;,&#92;&quot;sub_type&#92;&quot;:&#92;&quot;CCCS OSS&#92;&quot;,&#92;&quot;report_name&#92;&quot;:&#92;&quot;AMIRANTE&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-01&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;31/12/2025&#92;&quot;,&#92;&quot;invoice_total&#92;&quot;:&#92;&quot;62500.0075&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;&#92;&quot;},{&#92;&quot;report_type&#92;&quot;:&#92;&quot;oss&#92;&quot;,&#92;&quot;sub_type&#92;&quot;:&#92;&quot;CCCS OSS&#92;&quot;,&#92;&quot;report_name&#92;&quot;:&#92;&quot;ECHEBASTAR&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;starting_date&#92;&quot;:&#92;&quot;2025-12-01&#92;&quot;,&#92;&quot;ending_date&#92;&quot;:&#92;&quot;31/12/2025&#92;&quot;,&#92;&quot;invoice_total&#92;&quot;:&#92;&quot;32350.527&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;&#92;&quot;}]&quot;' data-total-rows='34' data-total-columns='8' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;report_type&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;sub_type&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;report_name&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;customer&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;starting_date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;ending_date&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;invoice_total&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;remarks&quot;,[&quot;string&quot;,&quot;str&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
           }
         }
       ],
@@ -58,7 +58,7 @@
     },
     {
       "id": "bkHC",
-      "code_hash": "14ed6a79c5bdaaa5b2697bbe825dcfff",
+      "code_hash": "b93bf936289d29870fda2e89c885245a",
       "outputs": [
         {
           "type": "data",
@@ -71,71 +71,6 @@
     },
     {
       "id": "lEQa",
-      "code_hash": "6252d5500c78eda194fa1b67c6cfacaa",
-      "outputs": [
-        {
-          "type": "data",
-          "data": {
-            "text/html": "<marimo-ui-element object-id='lEQa-0' random-id='b4f30898-6bdf-b232-81a0-064d483277e5'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;invoiced_in&#92;&quot;:&#92;&quot;HARTSWATER LIMITED&#92;&quot;,&#92;&quot;price&#92;&quot;:90.0},{&#92;&quot;invoiced_in&#92;&quot;:&#92;&quot;ECHEBASTAR&#92;&quot;,&#92;&quot;price&#92;&quot;:150.0}]&quot;' data-total-rows='2' data-total-columns='2' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;invoiced_in&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;price&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
-          }
-        }
-      ],
-      "console": []
-    },
-    {
-      "id": "nqJo",
-      "code_hash": "dd5c51c2d49c718c7e9458258c2df1c3",
-      "outputs": [
-        {
-          "type": "data",
-          "data": {
-            "text/plain": ""
-          }
-        }
-      ],
-      "console": []
-    },
-    {
-      "id": "rNgk",
-      "code_hash": "457c0b98390e6d728632c8c946fe47e5",
-      "outputs": [
-        {
-          "type": "data",
-          "data": {
-            "text/html": "<marimo-ui-element object-id='rNgk-0' random-id='cdfbe930-fb3d-f53d-1869-5a482a18154c'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;customer&#92;&quot;:&#92;&quot;HARTSWATER LIMITED&#92;&quot;,&#92;&quot;price&#92;&quot;:4404.348},{&#92;&quot;customer&#92;&quot;:&#92;&quot;ECHEBASTAR&#92;&quot;,&#92;&quot;price&#92;&quot;:6250.0}]&quot;' data-total-rows='2' data-total-columns='2' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;customer&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;price&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
-          }
-        }
-      ],
-      "console": []
-    },
-    {
-      "id": "KJdp",
-      "code_hash": "c80087f9222c6039e5c6608993020be0",
-      "outputs": [
-        {
-          "type": "data",
-          "data": {
-            "text/plain": ""
-          }
-        }
-      ],
-      "console": []
-    },
-    {
-      "id": "cJYi",
-      "code_hash": "468b040082accae08114bde14a0edb1e",
-      "outputs": [
-        {
-          "type": "data",
-          "data": {
-            "text/html": "<marimo-ui-element object-id='cJYi-0' random-id='f91e9eab-8e6c-1ecd-bdca-d4b91711f99d'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;day&#92;&quot;:&#92;&quot;Mon&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-01&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;IZARO&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;18:00:00&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;21:40:00&#92;&quot;,&#92;&quot;purpose&#92;&quot;:&#92;&quot;Salt Loading (76 ) Tons&#92;&quot;,&#92;&quot;total_duration&#92;&quot;:&#92;&quot;03:40:00&#92;&quot;,&#92;&quot;overtime_for_normal_services&#92;&quot;:&#92;&quot;03:40:00&#92;&quot;,&#92;&quot;overtime_for_extended_services&#92;&quot;:&#92;&quot;00:00:00&#92;&quot;,&#92;&quot;normal_hour_services&#92;&quot;:&#92;&quot;00:00:00&#92;&quot;},{&#92;&quot;day&#92;&quot;:&#92;&quot;Mon&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-01&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;PLAYA DE AZKORRI&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;18:20:00&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;21:05:00&#92;&quot;,&#92;&quot;purpose&#92;&quot;:&#92;&quot;Salt Loading (80 ) Tons&#92;&quot;,&#92;&quot;total_duration&#92;&quot;:&#92;&quot;02:45:00&#92;&quot;,&#92;&quot;overtime_for_normal_services&#92;&quot;:&#92;&quot;02:45:00&#92;&quot;,&#92;&quot;overtime_for_extended_services&#92;&quot;:&#92;&quot;00:00:00&#92;&quot;,&#92;&quot;normal_hour_services&#92;&quot;:&#92;&quot;00:00:00&#92;&quot;},{&#92;&quot;day&#92;&quot;:&#92;&quot;Tue&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-02&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;IZARO&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;16:05:00&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;19:09:00&#92;&quot;,&#92;&quot;purpose&#92;&quot;:&#92;&quot;Salt Loading (64 ) Tons&#92;&quot;,&#92;&quot;total_duration&#92;&quot;:&#92;&quot;03:04:00&#92;&quot;,&#92;&quot;overtime_for_normal_services&#92;&quot;:&#92;&quot;02:09:00&#92;&quot;,&#92;&quot;overtime_for_extended_services&#92;&quot;:&#92;&quot;00:00:00&#92;&quot;,&#92;&quot;normal_hour_services&#92;&quot;:&#92;&quot;00:55:00&#92;&quot;},{&#92;&quot;day&#92;&quot;:&#92;&quot;Sat&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-06&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;HAWWA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;12:05:00&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;15:00:00&#92;&quot;,&#92;&quot;purpose&#92;&quot;:&#92;&quot;Salt Loading (64 ) Tons&#92;&quot;,&#92;&quot;total_duration&#92;&quot;:&#92;&quot;02:55:00&#92;&quot;,&#92;&quot;overtime_for_normal_services&#92;&quot;:&#92;&quot;00:00:00&#92;&quot;,&#92;&quot;overtime_for_extended_services&#92;&quot;:&#92;&quot;00:00:00&#92;&quot;,&#92;&quot;normal_hour_services&#92;&quot;:&#92;&quot;02:55:00&#92;&quot;},{&#92;&quot;day&#92;&quot;:&#92;&quot;Sat&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-06&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ATERPE ALAI&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;18:15:00&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;23:05:00&#92;&quot;,&#92;&quot;purpose&#92;&quot;:&#92;&quot;Salt Loading (70 ) Tons&#92;&quot;,&#92;&quot;total_duration&#92;&quot;:&#92;&quot;04:50:00&#92;&quot;,&#92;&quot;overtime_for_normal_services&#92;&quot;:&#92;&quot;04:50:00&#92;&quot;,&#92;&quot;overtime_for_extended_services&#92;&quot;:&#92;&quot;00:00:00&#92;&quot;,&#92;&quot;normal_hour_services&#92;&quot;:&#92;&quot;00:00:00&#92;&quot;},{&#92;&quot;day&#92;&quot;:&#92;&quot;PH&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-08&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ATERPE ALAI&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;17:50:00&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;21:00:00&#92;&quot;,&#92;&quot;purpose&#92;&quot;:&#92;&quot;Salt Loading (65 ) Tons&#92;&quot;,&#92;&quot;total_duration&#92;&quot;:&#92;&quot;03:10:00&#92;&quot;,&#92;&quot;overtime_for_normal_services&#92;&quot;:&#92;&quot;00:00:00&#92;&quot;,&#92;&quot;overtime_for_extended_services&#92;&quot;:&#92;&quot;03:10:00&#92;&quot;,&#92;&quot;normal_hour_services&#92;&quot;:&#92;&quot;00:00:00&#92;&quot;},{&#92;&quot;day&#92;&quot;:&#92;&quot;Tue&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-09&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;BERNICA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;17:37:00&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;21:05:00&#92;&quot;,&#92;&quot;purpose&#92;&quot;:&#92;&quot;Salt Loading (60 ) Tons&#92;&quot;,&#92;&quot;total_duration&#92;&quot;:&#92;&quot;03:28:00&#92;&quot;,&#92;&quot;overtime_for_normal_services&#92;&quot;:&#92;&quot;03:28:00&#92;&quot;,&#92;&quot;overtime_for_extended_services&#92;&quot;:&#92;&quot;00:00:00&#92;&quot;,&#92;&quot;normal_hour_services&#92;&quot;:&#92;&quot;00:00:00&#92;&quot;},{&#92;&quot;day&#92;&quot;:&#92;&quot;Sun&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-14&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ELAI ALAI&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;17:30:00&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;21:30:00&#92;&quot;,&#92;&quot;purpose&#92;&quot;:&#92;&quot;Salt Loading (75 ) Tons&#92;&quot;,&#92;&quot;total_duration&#92;&quot;:&#92;&quot;04:00:00&#92;&quot;,&#92;&quot;overtime_for_normal_services&#92;&quot;:&#92;&quot;00:00:00&#92;&quot;,&#92;&quot;overtime_for_extended_services&#92;&quot;:&#92;&quot;04:00:00&#92;&quot;,&#92;&quot;normal_hour_services&#92;&quot;:&#92;&quot;00:00:00&#92;&quot;},{&#92;&quot;day&#92;&quot;:&#92;&quot;Tue&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-16&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;18:45:00&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;22:00:00&#92;&quot;,&#92;&quot;purpose&#92;&quot;:&#92;&quot;Salt Loading (100 ) Tons&#92;&quot;,&#92;&quot;total_duration&#92;&quot;:&#92;&quot;03:15:00&#92;&quot;,&#92;&quot;overtime_for_normal_services&#92;&quot;:&#92;&quot;03:15:00&#92;&quot;,&#92;&quot;overtime_for_extended_services&#92;&quot;:&#92;&quot;00:00:00&#92;&quot;,&#92;&quot;normal_hour_services&#92;&quot;:&#92;&quot;00:00:00&#92;&quot;},{&#92;&quot;day&#92;&quot;:&#92;&quot;Thu&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-18&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EUSKADI ALAI&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;17:50:00&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;21:40:00&#92;&quot;,&#92;&quot;purpose&#92;&quot;:&#92;&quot;Salt Loading (80 ) Tons&#92;&quot;,&#92;&quot;total_duration&#92;&quot;:&#92;&quot;03:50:00&#92;&quot;,&#92;&quot;overtime_for_normal_services&#92;&quot;:&#92;&quot;03:50:00&#92;&quot;,&#92;&quot;overtime_for_extended_services&#92;&quot;:&#92;&quot;00:00:00&#92;&quot;,&#92;&quot;normal_hour_services&#92;&quot;:&#92;&quot;00:00:00&#92;&quot;}]&quot;' data-total-rows='19' data-total-columns='10' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;day&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;start_time&quot;,[&quot;time&quot;,&quot;time&quot;]],[&quot;end_time&quot;,[&quot;time&quot;,&quot;time&quot;]],[&quot;purpose&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;total_duration&quot;,[&quot;time&quot;,&quot;time&quot;]],[&quot;overtime_for_normal_services&quot;,[&quot;time&quot;,&quot;time&quot;]],[&quot;overtime_for_extended_services&quot;,[&quot;time&quot;,&quot;time&quot;]],[&quot;normal_hour_services&quot;,[&quot;time&quot;,&quot;time&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
-          }
-        }
-      ],
-      "console": []
-    },
-    {
-      "id": "PKri",
       "code_hash": "f966434aacb5fc308335c3747a270ff4",
       "outputs": [
         {
@@ -148,13 +83,33 @@
       "console": []
     },
     {
-      "id": "Xref",
-      "code_hash": "7b92ea61b72c8b0997c2c01d0f7340a2",
+      "id": "PKri",
+      "code_hash": "931c1d26a53a78f143b814a8b40e3eaa",
       "outputs": [
         {
           "type": "data",
           "data": {
-            "text/html": "<marimo-ui-element object-id='Xref-0' random-id='4e09a440-c11e-f566-0451-1d205b86103c'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;vessel_client&#92;&quot;:&#92;&quot;IOT IMPORT&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;IOT IMPORT&#92;&quot;,&#92;&quot;date_plugged&#92;&quot;:&#92;&quot;2025-12-15&#92;&quot;,&#92;&quot;time_plugged&#92;&quot;:&#92;&quot;00:00:00&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU0302365&#92;&quot;,&#92;&quot;operation_type&#92;&quot;:&#92;&quot;Cross Stuffing - Direct Transfer&#92;&quot;,&#92;&quot;shipping_line&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;plugged_status&#92;&quot;:&#92;&quot;Full&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:0.0,&#92;&quot;set_point&#92;&quot;:-25,&#92;&quot;date_out&#92;&quot;:&#92;&quot;2025-12-15&#92;&quot;,&#92;&quot;location&#92;&quot;:&#92;&quot;Unload Container to CCCS&#92;&quot;,&#92;&quot;days_on_plug&#92;&quot;:0,&#92;&quot;plugin_price&#92;&quot;:0.0,&#92;&quot;monitoring_price&#92;&quot;:0.0,&#92;&quot;electricity_unit_price&#92;&quot;:70.0,&#92;&quot;total_electricity&#92;&quot;:0.0,&#92;&quot;total&#92;&quot;:0.0,&#92;&quot;end_date&#92;&quot;:&#92;&quot;2025-12-15&#92;&quot;,&#92;&quot;days&#92;&quot;:0},{&#92;&quot;vessel_client&#92;&quot;:&#92;&quot;IOT IMPORT&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;IOT IMPORT&#92;&quot;,&#92;&quot;date_plugged&#92;&quot;:&#92;&quot;2025-12-15&#92;&quot;,&#92;&quot;time_plugged&#92;&quot;:&#92;&quot;00:00:00&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU0655228&#92;&quot;,&#92;&quot;operation_type&#92;&quot;:&#92;&quot;Cross Stuffing - Direct Transfer&#92;&quot;,&#92;&quot;shipping_line&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;plugged_status&#92;&quot;:&#92;&quot;Full&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:0.0,&#92;&quot;set_point&#92;&quot;:-25,&#92;&quot;date_out&#92;&quot;:&#92;&quot;2025-12-15&#92;&quot;,&#92;&quot;location&#92;&quot;:&#92;&quot;Unload Container to CCCS&#92;&quot;,&#92;&quot;days_on_plug&#92;&quot;:0,&#92;&quot;plugin_price&#92;&quot;:0.0,&#92;&quot;monitoring_price&#92;&quot;:0.0,&#92;&quot;electricity_unit_price&#92;&quot;:70.0,&#92;&quot;total_electricity&#92;&quot;:0.0,&#92;&quot;total&#92;&quot;:0.0,&#92;&quot;end_date&#92;&quot;:&#92;&quot;2025-12-15&#92;&quot;,&#92;&quot;days&#92;&quot;:0},{&#92;&quot;vessel_client&#92;&quot;:&#92;&quot;IOT IMPORT&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;IOT IMPORT&#92;&quot;,&#92;&quot;date_plugged&#92;&quot;:&#92;&quot;2025-12-15&#92;&quot;,&#92;&quot;time_plugged&#92;&quot;:&#92;&quot;16:29:00&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU3402429&#92;&quot;,&#92;&quot;operation_type&#92;&quot;:&#92;&quot;Plugin&#92;&quot;,&#92;&quot;shipping_line&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;plugged_status&#92;&quot;:&#92;&quot;Full&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:0.0,&#92;&quot;set_point&#92;&quot;:-25,&#92;&quot;date_out&#92;&quot;:&#92;&quot;2026-01-09&#92;&quot;,&#92;&quot;location&#92;&quot;:&#92;&quot;Unload Container to CCCS&#92;&quot;,&#92;&quot;days_on_plug&#92;&quot;:26,&#92;&quot;plugin_price&#92;&quot;:25.0,&#92;&quot;monitoring_price&#92;&quot;:30.0,&#92;&quot;electricity_unit_price&#92;&quot;:70.0,&#92;&quot;total_electricity&#92;&quot;:1820.0,&#92;&quot;total&#92;&quot;:1875.0,&#92;&quot;end_date&#92;&quot;:&#92;&quot;2025-12-31&#92;&quot;,&#92;&quot;days&#92;&quot;:16},{&#92;&quot;vessel_client&#92;&quot;:&#92;&quot;IOT IMPORT&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;IOT IMPORT&#92;&quot;,&#92;&quot;date_plugged&#92;&quot;:&#92;&quot;2025-12-15&#92;&quot;,&#92;&quot;time_plugged&#92;&quot;:&#92;&quot;00:00:00&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU9043434&#92;&quot;,&#92;&quot;operation_type&#92;&quot;:&#92;&quot;Cross Stuffing - Direct Transfer&#92;&quot;,&#92;&quot;shipping_line&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;plugged_status&#92;&quot;:&#92;&quot;Full&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:0.0,&#92;&quot;set_point&#92;&quot;:-25,&#92;&quot;date_out&#92;&quot;:&#92;&quot;2025-12-15&#92;&quot;,&#92;&quot;location&#92;&quot;:&#92;&quot;Unload Container to CCCS&#92;&quot;,&#92;&quot;days_on_plug&#92;&quot;:0,&#92;&quot;plugin_price&#92;&quot;:0.0,&#92;&quot;monitoring_price&#92;&quot;:0.0,&#92;&quot;electricity_unit_price&#92;&quot;:70.0,&#92;&quot;total_electricity&#92;&quot;:0.0,&#92;&quot;total&#92;&quot;:0.0,&#92;&quot;end_date&#92;&quot;:&#92;&quot;2025-12-15&#92;&quot;,&#92;&quot;days&#92;&quot;:0},{&#92;&quot;vessel_client&#92;&quot;:&#92;&quot;IOT IMPORT&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;IOT IMPORT&#92;&quot;,&#92;&quot;date_plugged&#92;&quot;:&#92;&quot;2025-12-15&#92;&quot;,&#92;&quot;time_plugged&#92;&quot;:&#92;&quot;16:35:00&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;SUDU8027199&#92;&quot;,&#92;&quot;operation_type&#92;&quot;:&#92;&quot;Plugin&#92;&quot;,&#92;&quot;shipping_line&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;plugged_status&#92;&quot;:&#92;&quot;Full&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:0.0,&#92;&quot;set_point&#92;&quot;:-25,&#92;&quot;date_out&#92;&quot;:&#92;&quot;2026-01-09&#92;&quot;,&#92;&quot;location&#92;&quot;:&#92;&quot;Unload Container to CCCS&#92;&quot;,&#92;&quot;days_on_plug&#92;&quot;:26,&#92;&quot;plugin_price&#92;&quot;:25.0,&#92;&quot;monitoring_price&#92;&quot;:30.0,&#92;&quot;electricity_unit_price&#92;&quot;:70.0,&#92;&quot;total_electricity&#92;&quot;:1820.0,&#92;&quot;total&#92;&quot;:1875.0,&#92;&quot;end_date&#92;&quot;:&#92;&quot;2025-12-31&#92;&quot;,&#92;&quot;days&#92;&quot;:16},{&#92;&quot;vessel_client&#92;&quot;:&#92;&quot;IOT IMPORT&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;IOT IMPORT&#92;&quot;,&#92;&quot;date_plugged&#92;&quot;:&#92;&quot;2025-12-15&#92;&quot;,&#92;&quot;time_plugged&#92;&quot;:&#92;&quot;16:37:00&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;SUDU8044684&#92;&quot;,&#92;&quot;operation_type&#92;&quot;:&#92;&quot;Plugin&#92;&quot;,&#92;&quot;shipping_line&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;plugged_status&#92;&quot;:&#92;&quot;Full&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:0.0,&#92;&quot;set_point&#92;&quot;:-25,&#92;&quot;date_out&#92;&quot;:&#92;&quot;2026-01-09&#92;&quot;,&#92;&quot;location&#92;&quot;:&#92;&quot;Unload Container to CCCS&#92;&quot;,&#92;&quot;days_on_plug&#92;&quot;:26,&#92;&quot;plugin_price&#92;&quot;:25.0,&#92;&quot;monitoring_price&#92;&quot;:30.0,&#92;&quot;electricity_unit_price&#92;&quot;:70.0,&#92;&quot;total_electricity&#92;&quot;:1820.0,&#92;&quot;total&#92;&quot;:1875.0,&#92;&quot;end_date&#92;&quot;:&#92;&quot;2025-12-31&#92;&quot;,&#92;&quot;days&#92;&quot;:16},{&#92;&quot;vessel_client&#92;&quot;:&#92;&quot;IOT IMPORT&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;IOT IMPORT&#92;&quot;,&#92;&quot;date_plugged&#92;&quot;:&#92;&quot;2025-12-15&#92;&quot;,&#92;&quot;time_plugged&#92;&quot;:&#92;&quot;00:00:00&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;SUDU8195865&#92;&quot;,&#92;&quot;operation_type&#92;&quot;:&#92;&quot;Cross Stuffing - Direct Transfer&#92;&quot;,&#92;&quot;shipping_line&#92;&quot;:&#92;&quot;MAERSKLINE&#92;&quot;,&#92;&quot;plugged_status&#92;&quot;:&#92;&quot;Full&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:0.0,&#92;&quot;set_point&#92;&quot;:-25,&#92;&quot;date_out&#92;&quot;:&#92;&quot;2025-12-15&#92;&quot;,&#92;&quot;location&#92;&quot;:&#92;&quot;Unload Container to CCCS&#92;&quot;,&#92;&quot;days_on_plug&#92;&quot;:0,&#92;&quot;plugin_price&#92;&quot;:0.0,&#92;&quot;monitoring_price&#92;&quot;:0.0,&#92;&quot;electricity_unit_price&#92;&quot;:70.0,&#92;&quot;total_electricity&#92;&quot;:0.0,&#92;&quot;total&#92;&quot;:0.0,&#92;&quot;end_date&#92;&quot;:&#92;&quot;2025-12-15&#92;&quot;,&#92;&quot;days&#92;&quot;:0}]&quot;' data-total-rows='7' data-total-columns='20' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;vessel_client&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;customer&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;date_plugged&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;time_plugged&quot;,[&quot;time&quot;,&quot;time&quot;]],[&quot;container_number&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;operation_type&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;shipping_line&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;plugged_status&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;tonnage&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;set_point&quot;,[&quot;integer&quot;,&quot;i64&quot;]],[&quot;date_out&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;location&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;days_on_plug&quot;,[&quot;integer&quot;,&quot;i64&quot;]],[&quot;plugin_price&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;monitoring_price&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;electricity_unit_price&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;total_electricity&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;total&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;end_date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;days&quot;,[&quot;integer&quot;,&quot;i64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+            "text/html": "<marimo-ui-element object-id='PKri-0' random-id='4837ad41-f090-309f-c2b7-0e2f058057c8'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[]&quot;' data-total-rows='0' data-total-columns='25' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;date_plugged&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;container_number&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;plugged_status&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;end_date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;days&quot;,[&quot;integer&quot;,&quot;i64&quot;]],[&quot;plugin_price&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;monitoring&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;electricity_price&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;total&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;day_name&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;container_number_1&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;line&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;movement_type&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;driver&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;origin&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;time_out&quot;,[&quot;time&quot;,&quot;time&quot;]],[&quot;destination&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;time_in&quot;,[&quot;time&quot;,&quot;time&quot;]],[&quot;status&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;type&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;size&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;remarks&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;shifting_price&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;haulage_price&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "<string>:1: UserWarning: Sortedness of columns cannot be checked when 'by' groups provided\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "Xref",
+      "code_hash": "91934247009b79bf8edf23a86e9deb5f",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='Xref-0' random-id='4e09a440-c11e-f566-0451-1d205b86103c'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;sum(total)&#92;&quot;:null,&#92;&quot;sum(haulage_price)&#92;&quot;:null}]&quot;' data-total-rows='1' data-total-columns='2' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;sum(total)&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;sum(haulage_price)&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
           }
         }
       ],
@@ -162,12 +117,12 @@
     },
     {
       "id": "SFPL",
-      "code_hash": "c6b39763aa77812364e76613b8461fb8",
+      "code_hash": "2bcc97ccc866b2c10c3d4bcb1cb0266c",
       "outputs": [
         {
           "type": "data",
           "data": {
-            "text/html": "<pre class='text-xs'>103.75999999999999</pre>"
+            "text/html": "<pre class='text-xs'>195.698</pre>"
           }
         }
       ],
@@ -175,20 +130,33 @@
     },
     {
       "id": "BYtC",
-      "code_hash": "097f3fd4ecaa71782b3a0db673f8d3c0",
+      "code_hash": "6a63db03b539022390067bf0aa53f165",
       "outputs": [
         {
-          "type": "data",
-          "data": {
-            "text/html": "<pre class='text-xs'>6308.304</pre>"
-          }
+          "type": "error",
+          "ename": "sql-error",
+          "evalue": "Catalog Error: Table with name cross_stuffing does not exist!\nDid you mean \"pg_constraint\"?",
+          "traceback": []
         }
       ],
       "console": []
     },
     {
       "id": "RGSE",
-      "code_hash": null,
+      "code_hash": "64da8f1b421baa42e8ef7340414ae2e1",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<pre class='text-xs'>6236.62075</pre>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Kclp",
+      "code_hash": "8d6ba82fed70af23b0acaa34b0df34f0",
       "outputs": [
         {
           "type": "data",
@@ -197,6 +165,97 @@
           }
         }
       ],
+      "console": []
+    },
+    {
+      "id": "emfo",
+      "code_hash": "324544ef0eef6ccc38904b5f53dd8ccb",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='emfo-0' random-id='c4f0b922-d0a1-eb96-a6f7-0d0132a82ec3'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;sum(total_price)&#92;&quot;:3508.5545}]&quot;' data-total-rows='1' data-total-columns='1' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;sum(total_price)&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "<string>:1: UserWarning: Sortedness of columns cannot be checked when 'by' groups provided\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "Hstk",
+      "code_hash": "9c059b21cee3d5992391cb8da6f41f6a",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "nWHF",
+      "code_hash": "22139d02c755fe491b96fb639a585972",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='nWHF-0' random-id='fe4c27e5-da6b-ad79-e217-baf024610df2'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;(sum(tonnage) * 3.5)&#92;&quot;:4778.157999999999}]&quot;' data-total-rows='1' data-total-columns='1' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;(sum(tonnage) * 3.5)&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "iLit",
+      "code_hash": "d1fc0147d1e39ba71d50ec4d032ccef8",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<pre class='text-xs'>16858.316</pre>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ZHCJ",
+      "code_hash": "21b911dba78cd2c4a259d1ab1f23b616",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "fonR",
+      "code_hash": "4434e183f1fb09ccc362e38cf8e9a6a2",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<div style='display: flex;flex: 1;flex-direction: row;justify-content: center;align-items: normal;flex-wrap: nowrap;gap: 1rem'><img src='./@file/142985-73977-IEkvD55E.jpeg' style='height: 500px' /><span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">Good morning.<br>\nI hope you will get the help you clearly need.<br>\nWe may share a surname, but make no mistake\u2014<strong>we are no longer family</strong>.<br>\n\"Loose lips sink ships.\" Remember that.<br>\nThis is the last time you'll hear from me. I don't forgive, and I don't forget either.<br>\nGet yourself sorted out\u2014<strong>Adieu</strong>.<br></span></span></div>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lavq",
+      "code_hash": null,
+      "outputs": [],
       "console": []
     }
   ]
