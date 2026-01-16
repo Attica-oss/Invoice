@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.19.2"
+__generated_with = "0.19.4"
 app = marimo.App(width="medium")
 
 with app.setup:
@@ -32,6 +32,14 @@ def _():
 
 
 @app.cell
+def _():
+    month_selector = mo.ui.dropdown(options=['January','February','March','April','May','June','July','August','September','October','November','December'])
+
+    month_selector
+    return
+
+
+@app.cell
 def _(report):
     sto_dataf = mo.sql(
         f"""
@@ -45,9 +53,10 @@ def _(report):
         FROM
             report
         WHERE
-            report_type = 'sto'
-            AND month LIKE '%December%'
-        ORDER BY starting_date ASC
+            report_type = 'sto' 
+            AND "month" LIKE '%December%'
+        ORDER BY
+            starting_date ASC
         """,
         output=False
     )
@@ -723,7 +732,6 @@ def _(
     net_dataf
 
     fork_dataf
-
     return
 
 

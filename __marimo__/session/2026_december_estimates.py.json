@@ -1,0 +1,504 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.19.4"
+  },
+  "cells": [
+    {
+      "id": "setup",
+      "code_hash": "80474ae3e4ac7b5a7f7504fc46fc3f78",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Hbol",
+      "code_hash": "600125661cbecc278bb6909ba3fd7da7",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "a2d621ae5c8f08e716841dd73b41c073",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Qmev",
+      "code_hash": "05832ab9e32ab81855e8821ef8ed4ee2",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "jAsG",
+      "code_hash": "b8d9af86e22f621bbb8edebe55f5e48b",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='jAsG-0' random-id='c9ca78f6-bc38-c311-f37c-3f009d1a1062'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-03&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;13:33:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MSFU0002762&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Dry&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;14:21:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:9.49,&#92;&quot;service&#92;&quot;:&#92;&quot;Full OSS&#92;&quot;,&#92;&quot;Price&#92;&quot;:0.0,&#92;&quot;invoice_value&#92;&quot;:0.0},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-03&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;14:38:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MSFU0000203&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Dry&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;15:18:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:9.71,&#92;&quot;service&#92;&quot;:&#92;&quot;Full OSS&#92;&quot;,&#92;&quot;Price&#92;&quot;:0.0,&#92;&quot;invoice_value&#92;&quot;:0.0},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-03&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;08:29:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;Sierra Lara&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Brine&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;16:47:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:193.15,&#92;&quot;service&#92;&quot;:&#92;&quot;Transhipment&#92;&quot;,&#92;&quot;Price&#92;&quot;:32.25,&#92;&quot;invoice_value&#92;&quot;:6229.088},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-03&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;09:20:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU0280857&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Brine&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;16:45:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:19.62,&#92;&quot;service&#92;&quot;:&#92;&quot;Basic OSS&#92;&quot;,&#92;&quot;Price&#92;&quot;:18.25,&#92;&quot;invoice_value&#92;&quot;:358.065},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-03&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;09:34:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU4452276&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Brine&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;16:16:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:27.34,&#92;&quot;service&#92;&quot;:&#92;&quot;Basic OSS&#92;&quot;,&#92;&quot;Price&#92;&quot;:18.25,&#92;&quot;invoice_value&#92;&quot;:498.955},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-03&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;10:01:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU3760762&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Brine&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;16:43:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:16.35,&#92;&quot;service&#92;&quot;:&#92;&quot;Basic OSS&#92;&quot;,&#92;&quot;Price&#92;&quot;:18.25,&#92;&quot;invoice_value&#92;&quot;:298.388},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-03&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;14:02:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;Unload to Quay&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Brine&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;15:20:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:9.48,&#92;&quot;service&#92;&quot;:&#92;&quot;Unload to Quay&#92;&quot;,&#92;&quot;Price&#92;&quot;:18.25,&#92;&quot;invoice_value&#92;&quot;:173.01},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-04&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;08:44:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU0614912&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Brine&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;10:05:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:24.05,&#92;&quot;service&#92;&quot;:&#92;&quot;Full OSS&#92;&quot;,&#92;&quot;Price&#92;&quot;:0.0,&#92;&quot;invoice_value&#92;&quot;:0.0},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-04&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;09:16:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU3580781&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Brine&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;12:24:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:26.59,&#92;&quot;service&#92;&quot;:&#92;&quot;Full OSS&#92;&quot;,&#92;&quot;Price&#92;&quot;:0.0,&#92;&quot;invoice_value&#92;&quot;:0.0},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-04&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;10:27:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU4177929&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Brine&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;12:49:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:26.87,&#92;&quot;service&#92;&quot;:&#92;&quot;Full OSS&#92;&quot;,&#92;&quot;Price&#92;&quot;:0.0,&#92;&quot;invoice_value&#92;&quot;:0.0}]&quot;' data-total-rows='6159' data-total-columns='11' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;start_time&quot;,[&quot;time&quot;,&quot;time&quot;]],[&quot;destination&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;overtime&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;storage_type&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;end_time&quot;,[&quot;time&quot;,&quot;time&quot;]],[&quot;total_tonnage&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;service&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Price&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;invoice_value&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "<sys>:0: UserWarning: Sortedness of columns cannot be checked when 'by' groups provided\n<string>:1: UserWarning: Sortedness of columns cannot be checked when 'by' groups provided\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "BCjX",
+      "code_hash": "c1e0b70d67a7e6af602e4f6c4db6db66",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='BCjX-0' random-id='8c81114a-4e0d-0373-e272-f2447fb55385'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;Timestamp&#92;&quot;:&#92;&quot;2025-12-02 10:45:29&#92;&quot;,&#92;&quot;Date&#92;&quot;:&#92;&quot;2025-12-02&#92;&quot;,&#92;&quot;Time&#92;&quot;:&#92;&quot;10:44:00&#92;&quot;,&#92;&quot;Container Number&#92;&quot;:&#92;&quot;MNBU3441507&#92;&quot;,&#92;&quot;Set Point&#92;&quot;:-20,&#92;&quot;Seal Number&#92;&quot;:&#92;&quot;MLSC0033866&#92;&quot;,&#92;&quot;Shipping Line&#92;&quot;:&#92;&quot;MAERSK&#92;&quot;,&#92;&quot;Status&#92;&quot;:&#92;&quot;Completed&#92;&quot;,&#92;&quot;Plugin Temp&#92;&quot;:&#92;&quot;SUP: -5.7 RET: 0.2&#92;&quot;,&#92;&quot;Tare Weight&#92;&quot;:&#92;&quot;4420&#92;&quot;,&#92;&quot;Remarks&#92;&quot;:&#92;&quot;&#92;&quot;,&#92;&quot;occurance&#92;&quot;:2,&#92;&quot;Date Out&#92;&quot;:&#92;&quot;06/12/2025&#92;&quot;,&#92;&quot;Location&#92;&quot;:&#92;&quot;For Export&#92;&quot;},{&#92;&quot;Timestamp&#92;&quot;:&#92;&quot;2025-12-02 10:46:22&#92;&quot;,&#92;&quot;Date&#92;&quot;:&#92;&quot;2025-12-02&#92;&quot;,&#92;&quot;Time&#92;&quot;:&#92;&quot;10:44:00&#92;&quot;,&#92;&quot;Container Number&#92;&quot;:&#92;&quot;MNBU1029240&#92;&quot;,&#92;&quot;Set Point&#92;&quot;:-20,&#92;&quot;Seal Number&#92;&quot;:&#92;&quot;MLSC0033872&#92;&quot;,&#92;&quot;Shipping Line&#92;&quot;:&#92;&quot;MAERSK&#92;&quot;,&#92;&quot;Status&#92;&quot;:&#92;&quot;Completed&#92;&quot;,&#92;&quot;Plugin Temp&#92;&quot;:&#92;&quot;SUP: -8.0 RET: 3.6&#92;&quot;,&#92;&quot;Tare Weight&#92;&quot;:&#92;&quot;4420&#92;&quot;,&#92;&quot;Remarks&#92;&quot;:&#92;&quot;&#92;&quot;,&#92;&quot;occurance&#92;&quot;:2,&#92;&quot;Date Out&#92;&quot;:&#92;&quot;06/12/2025&#92;&quot;,&#92;&quot;Location&#92;&quot;:&#92;&quot;For Export&#92;&quot;},{&#92;&quot;Timestamp&#92;&quot;:&#92;&quot;2025-12-02 10:47:17&#92;&quot;,&#92;&quot;Date&#92;&quot;:&#92;&quot;2025-12-02&#92;&quot;,&#92;&quot;Time&#92;&quot;:&#92;&quot;10:44:00&#92;&quot;,&#92;&quot;Container Number&#92;&quot;:&#92;&quot;MNBU3550220&#92;&quot;,&#92;&quot;Set Point&#92;&quot;:-20,&#92;&quot;Seal Number&#92;&quot;:&#92;&quot;MLSC0033867&#92;&quot;,&#92;&quot;Shipping Line&#92;&quot;:&#92;&quot;MAERSK&#92;&quot;,&#92;&quot;Status&#92;&quot;:&#92;&quot;Completed&#92;&quot;,&#92;&quot;Plugin Temp&#92;&quot;:&#92;&quot;SUP: -2.9 RET: -0.2&#92;&quot;,&#92;&quot;Tare Weight&#92;&quot;:&#92;&quot;4330&#92;&quot;,&#92;&quot;Remarks&#92;&quot;:&#92;&quot;&#92;&quot;,&#92;&quot;occurance&#92;&quot;:2,&#92;&quot;Date Out&#92;&quot;:&#92;&quot;06/12/2025&#92;&quot;,&#92;&quot;Location&#92;&quot;:&#92;&quot;For Export&#92;&quot;},{&#92;&quot;Timestamp&#92;&quot;:&#92;&quot;2025-12-02 10:48:12&#92;&quot;,&#92;&quot;Date&#92;&quot;:&#92;&quot;2025-12-02&#92;&quot;,&#92;&quot;Time&#92;&quot;:&#92;&quot;10:44:00&#92;&quot;,&#92;&quot;Container Number&#92;&quot;:&#92;&quot;MNBU3691471&#92;&quot;,&#92;&quot;Set Point&#92;&quot;:-20,&#92;&quot;Seal Number&#92;&quot;:&#92;&quot;MLSC0033873&#92;&quot;,&#92;&quot;Shipping Line&#92;&quot;:&#92;&quot;MAERSK&#92;&quot;,&#92;&quot;Status&#92;&quot;:&#92;&quot;Full&#92;&quot;,&#92;&quot;Plugin Temp&#92;&quot;:&#92;&quot;SUP: 3.8 RET: 10.4&#92;&quot;,&#92;&quot;Tare Weight&#92;&quot;:&#92;&quot;4330&#92;&quot;,&#92;&quot;Remarks&#92;&quot;:&#92;&quot;&#92;&quot;,&#92;&quot;occurance&#92;&quot;:1,&#92;&quot;Date Out&#92;&quot;:&#92;&quot;05/12/2025&#92;&quot;,&#92;&quot;Location&#92;&quot;:&#92;&quot;For Export&#92;&quot;},{&#92;&quot;Timestamp&#92;&quot;:&#92;&quot;2025-12-02 10:49:17&#92;&quot;,&#92;&quot;Date&#92;&quot;:&#92;&quot;2025-12-02&#92;&quot;,&#92;&quot;Time&#92;&quot;:&#92;&quot;10:44:00&#92;&quot;,&#92;&quot;Container Number&#92;&quot;:&#92;&quot;MNBU4302147&#92;&quot;,&#92;&quot;Set Point&#92;&quot;:-20,&#92;&quot;Seal Number&#92;&quot;:&#92;&quot;MLSC0033880&#92;&quot;,&#92;&quot;Shipping Line&#92;&quot;:&#92;&quot;MAERSK&#92;&quot;,&#92;&quot;Status&#92;&quot;:&#92;&quot;Full&#92;&quot;,&#92;&quot;Plugin Temp&#92;&quot;:&#92;&quot;SUP: -8.0 RET: -8.6&#92;&quot;,&#92;&quot;Tare Weight&#92;&quot;:&#92;&quot;4400&#92;&quot;,&#92;&quot;Remarks&#92;&quot;:&#92;&quot;&#92;&quot;,&#92;&quot;occurance&#92;&quot;:1,&#92;&quot;Date Out&#92;&quot;:&#92;&quot;05/12/2025&#92;&quot;,&#92;&quot;Location&#92;&quot;:&#92;&quot;For Export&#92;&quot;},{&#92;&quot;Timestamp&#92;&quot;:&#92;&quot;2025-12-02 14:10:11&#92;&quot;,&#92;&quot;Date&#92;&quot;:&#92;&quot;2025-12-02&#92;&quot;,&#92;&quot;Time&#92;&quot;:&#92;&quot;14:08:00&#92;&quot;,&#92;&quot;Container Number&#92;&quot;:&#92;&quot;SUDU8008624&#92;&quot;,&#92;&quot;Set Point&#92;&quot;:-20,&#92;&quot;Seal Number&#92;&quot;:&#92;&quot;MLSC0030412&#92;&quot;,&#92;&quot;Shipping Line&#92;&quot;:&#92;&quot;MAERSK&#92;&quot;,&#92;&quot;Status&#92;&quot;:&#92;&quot;Full&#92;&quot;,&#92;&quot;Plugin Temp&#92;&quot;:&#92;&quot;SUP: -6.7 RET: -3.6&#92;&quot;,&#92;&quot;Tare Weight&#92;&quot;:&#92;&quot;4620&#92;&quot;,&#92;&quot;Remarks&#92;&quot;:&#92;&quot;&#92;&quot;,&#92;&quot;occurance&#92;&quot;:1,&#92;&quot;Date Out&#92;&quot;:&#92;&quot;05/12/2025&#92;&quot;,&#92;&quot;Location&#92;&quot;:&#92;&quot;For Export&#92;&quot;},{&#92;&quot;Timestamp&#92;&quot;:&#92;&quot;2025-12-02 14:11:17&#92;&quot;,&#92;&quot;Date&#92;&quot;:&#92;&quot;2025-12-02&#92;&quot;,&#92;&quot;Time&#92;&quot;:&#92;&quot;14:08:00&#92;&quot;,&#92;&quot;Container Number&#92;&quot;:&#92;&quot;MNBU4163798&#92;&quot;,&#92;&quot;Set Point&#92;&quot;:-20,&#92;&quot;Seal Number&#92;&quot;:&#92;&quot;MLSC0033874&#92;&quot;,&#92;&quot;Shipping Line&#92;&quot;:&#92;&quot;MAERSK&#92;&quot;,&#92;&quot;Status&#92;&quot;:&#92;&quot;Full&#92;&quot;,&#92;&quot;Plugin Temp&#92;&quot;:&#92;&quot;SUP: -6.2 RET: -6.7&#92;&quot;,&#92;&quot;Tare Weight&#92;&quot;:&#92;&quot;4350&#92;&quot;,&#92;&quot;Remarks&#92;&quot;:&#92;&quot;&#92;&quot;,&#92;&quot;occurance&#92;&quot;:1,&#92;&quot;Date Out&#92;&quot;:&#92;&quot;05/12/2025&#92;&quot;,&#92;&quot;Location&#92;&quot;:&#92;&quot;For Export&#92;&quot;},{&#92;&quot;Timestamp&#92;&quot;:&#92;&quot;2025-12-02 14:12:35&#92;&quot;,&#92;&quot;Date&#92;&quot;:&#92;&quot;2025-12-02&#92;&quot;,&#92;&quot;Time&#92;&quot;:&#92;&quot;14:08:00&#92;&quot;,&#92;&quot;Container Number&#92;&quot;:&#92;&quot;MNBU4510876&#92;&quot;,&#92;&quot;Set Point&#92;&quot;:-20,&#92;&quot;Seal Number&#92;&quot;:&#92;&quot;MLSC0033868&#92;&quot;,&#92;&quot;Shipping Line&#92;&quot;:&#92;&quot;MAERSK&#92;&quot;,&#92;&quot;Status&#92;&quot;:&#92;&quot;Full&#92;&quot;,&#92;&quot;Plugin Temp&#92;&quot;:&#92;&quot;SUP: -8.7 RET: -8.0&#92;&quot;,&#92;&quot;Tare Weight&#92;&quot;:&#92;&quot;4400&#92;&quot;,&#92;&quot;Remarks&#92;&quot;:&#92;&quot;&#92;&quot;,&#92;&quot;occurance&#92;&quot;:1,&#92;&quot;Date Out&#92;&quot;:&#92;&quot;05/12/2025&#92;&quot;,&#92;&quot;Location&#92;&quot;:&#92;&quot;For Export&#92;&quot;},{&#92;&quot;Timestamp&#92;&quot;:&#92;&quot;2025-12-02 14:20:29&#92;&quot;,&#92;&quot;Date&#92;&quot;:&#92;&quot;2025-12-02&#92;&quot;,&#92;&quot;Time&#92;&quot;:&#92;&quot;14:08:00&#92;&quot;,&#92;&quot;Container Number&#92;&quot;:&#92;&quot;MRFU0022772&#92;&quot;,&#92;&quot;Set Point&#92;&quot;:-20,&#92;&quot;Seal Number&#92;&quot;:&#92;&quot;MLSC0033827&#92;&quot;,&#92;&quot;Shipping Line&#92;&quot;:&#92;&quot;MAERSK&#92;&quot;,&#92;&quot;Status&#92;&quot;:&#92;&quot;Full&#92;&quot;,&#92;&quot;Plugin Temp&#92;&quot;:&#92;&quot;SUP: 0.0 RET: 0.0&#92;&quot;,&#92;&quot;Tare Weight&#92;&quot;:&#92;&quot;4400&#92;&quot;,&#92;&quot;Remarks&#92;&quot;:&#92;&quot;Genset off&#92;&quot;,&#92;&quot;occurance&#92;&quot;:2,&#92;&quot;Date Out&#92;&quot;:&#92;&quot;05/12/2025&#92;&quot;,&#92;&quot;Location&#92;&quot;:&#92;&quot;For Export&#92;&quot;},{&#92;&quot;Timestamp&#92;&quot;:&#92;&quot;2025-12-02 14:26:18&#92;&quot;,&#92;&quot;Date&#92;&quot;:&#92;&quot;2025-12-02&#92;&quot;,&#92;&quot;Time&#92;&quot;:&#92;&quot;14:08:00&#92;&quot;,&#92;&quot;Container Number&#92;&quot;:&#92;&quot;MNBU4075125&#92;&quot;,&#92;&quot;Set Point&#92;&quot;:-20,&#92;&quot;Seal Number&#92;&quot;:&#92;&quot;MLSC0033877&#92;&quot;,&#92;&quot;Shipping Line&#92;&quot;:&#92;&quot;MAERSK&#92;&quot;,&#92;&quot;Status&#92;&quot;:&#92;&quot;Full&#92;&quot;,&#92;&quot;Plugin Temp&#92;&quot;:&#92;&quot;SUP: 0.0 RET: 0.0&#92;&quot;,&#92;&quot;Tare Weight&#92;&quot;:&#92;&quot;4350&#92;&quot;,&#92;&quot;Remarks&#92;&quot;:&#92;&quot;Genset off&#92;&quot;,&#92;&quot;occurance&#92;&quot;:1,&#92;&quot;Date Out&#92;&quot;:&#92;&quot;05/12/2025&#92;&quot;,&#92;&quot;Location&#92;&quot;:&#92;&quot;For Export&#92;&quot;}]&quot;' data-total-rows='707' data-total-columns='14' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;Timestamp&quot;,[&quot;datetime&quot;,&quot;datetime[\u03bcs]&quot;]],[&quot;Date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;Time&quot;,[&quot;time&quot;,&quot;time&quot;]],[&quot;Container Number&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Set Point&quot;,[&quot;integer&quot;,&quot;i64&quot;]],[&quot;Seal Number&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Shipping Line&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Status&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Plugin Temp&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Tare Weight&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Remarks&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;occurance&quot;,[&quot;integer&quot;,&quot;i64&quot;]],[&quot;Date Out&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Location&quot;,[&quot;string&quot;,&quot;str&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "f8faec7b4245c22b27da8f2d3e1a8f1e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"sto-reports\">STO Reports</h2></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "d76b511ee28a913408b00acf53de5caa",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='bkHC-0' random-id='b8d4f649-09c2-331e-aaaa-ba61910faf73'><marimo-dropdown data-initial-value='[]' data-label='null' data-options='[&quot;January&quot;,&quot;February&quot;,&quot;March&quot;,&quot;April&quot;,&quot;May&quot;,&quot;June&quot;,&quot;July&quot;,&quot;August&quot;,&quot;September&quot;,&quot;October&quot;,&quot;November&quot;,&quot;December&quot;]' data-allow-select-none='true' data-searchable='false' data-full-width='false'></marimo-dropdown></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "ca9f49cf5c267c7cdc6814d9c831b4e4",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "124b421299a7ae7208beff3318fd688a",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='PKri-0' random-id='f658719b-ec7a-d323-9da0-a0d508b530ed'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500205&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;HAWWA&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:496.801,&#92;&quot;total&#92;&quot;:14715.544},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500207&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;BERNICA&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:982.883,&#92;&quot;total&#92;&quot;:41778.554},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500216&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;TORRE ITALIA&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:682.78,&#92;&quot;total&#92;&quot;:12460.732},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500210&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EUSKADI ALAI&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:596.178,&#92;&quot;total&#92;&quot;:13146.974},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500209&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ELAI ALAI&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:670.237,&#92;&quot;total&#92;&quot;:2654.052},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500202&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;IZARO&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:1184.74,&#92;&quot;total&#92;&quot;:12369.437},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500217&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;FRANCHE TERRE&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:343.18,&#92;&quot;total&#92;&quot;:10130.256},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500211&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:44.5,&#92;&quot;total&#92;&quot;:0.0},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500215&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:1557.519,&#92;&quot;total&#92;&quot;:3080.117},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500208&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:1961.65,&#92;&quot;total&#92;&quot;:61057.28}]&quot;' data-total-rows='20' data-total-columns='4' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;tonnage&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;total&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "<sys>:0: UserWarning: Sortedness of columns cannot be checked when 'by' groups provided\n<string>:1: UserWarning: Sortedness of columns cannot be checked when 'by' groups provided\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "Xref",
+      "code_hash": "f966434aacb5fc308335c3747a270ff4",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "8ab76416e09cdfbe9897c8ba6dfba52d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "23597f1a3c1c13dac03b335aa5495f55",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='BYtC-0' random-id='5eb2da1a-1957-47f3-2e50-ee4cb49b215b'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500208&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;plugin_price&#92;&quot;:1050.0,&#92;&quot;monitoring_price&#92;&quot;:1080.0,&#92;&quot;electricity_price&#92;&quot;:17990.0,&#92;&quot;total&#92;&quot;:20120.0},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500209&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ELAI ALAI&#92;&quot;,&#92;&quot;plugin_price&#92;&quot;:25.0,&#92;&quot;monitoring_price&#92;&quot;:30.0,&#92;&quot;electricity_price&#92;&quot;:140.0,&#92;&quot;total&#92;&quot;:195.0}]&quot;' data-total-rows='2' data-total-columns='6' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;plugin_price&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;monitoring_price&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;electricity_price&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;total&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "RGSE",
+      "code_hash": "14aa1a1d37a274a8561c3838d21e6519",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Kclp",
+      "code_hash": "f6b7fdc6072ba5b6c20e6fb1f6a164c8",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='Kclp-0' random-id='49500447-a844-5ff2-795e-dbc585fb0bcb'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500214&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ITSAS TXORI&#92;&quot;,&#92;&quot;rental_price&#92;&quot;:&#92;&quot;50&#92;&quot;,&#92;&quot;calibration&#92;&quot;:&#92;&quot;100&#92;&quot;,&#92;&quot;total&#92;&quot;:&#92;&quot;150&#92;&quot;},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500222&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;DOLOMIEU&#92;&quot;,&#92;&quot;rental_price&#92;&quot;:&#92;&quot;100&#92;&quot;,&#92;&quot;calibration&#92;&quot;:&#92;&quot;100&#92;&quot;,&#92;&quot;total&#92;&quot;:&#92;&quot;200&#92;&quot;},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500206&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ATERPE ALAI&#92;&quot;,&#92;&quot;rental_price&#92;&quot;:&#92;&quot;250&#92;&quot;,&#92;&quot;calibration&#92;&quot;:&#92;&quot;500&#92;&quot;,&#92;&quot;total&#92;&quot;:&#92;&quot;750&#92;&quot;},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500209&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ELAI ALAI&#92;&quot;,&#92;&quot;rental_price&#92;&quot;:&#92;&quot;200&#92;&quot;,&#92;&quot;calibration&#92;&quot;:&#92;&quot;400&#92;&quot;,&#92;&quot;total&#92;&quot;:&#92;&quot;600&#92;&quot;},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500216&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;TORRE ITALIA&#92;&quot;,&#92;&quot;rental_price&#92;&quot;:&#92;&quot;200&#92;&quot;,&#92;&quot;calibration&#92;&quot;:&#92;&quot;200&#92;&quot;,&#92;&quot;total&#92;&quot;:&#92;&quot;400&#92;&quot;},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500207&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;BERNICA&#92;&quot;,&#92;&quot;rental_price&#92;&quot;:&#92;&quot;400&#92;&quot;,&#92;&quot;calibration&#92;&quot;:&#92;&quot;750&#92;&quot;,&#92;&quot;total&#92;&quot;:&#92;&quot;1150&#92;&quot;},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500210&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EUSKADI ALAI&#92;&quot;,&#92;&quot;rental_price&#92;&quot;:&#92;&quot;150&#92;&quot;,&#92;&quot;calibration&#92;&quot;:&#92;&quot;300&#92;&quot;,&#92;&quot;total&#92;&quot;:&#92;&quot;450&#92;&quot;},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500213&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;TXORI BERRI&#92;&quot;,&#92;&quot;rental_price&#92;&quot;:&#92;&quot;150&#92;&quot;,&#92;&quot;calibration&#92;&quot;:&#92;&quot;300&#92;&quot;,&#92;&quot;total&#92;&quot;:&#92;&quot;450&#92;&quot;},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500205&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;HAWWA&#92;&quot;,&#92;&quot;rental_price&#92;&quot;:&#92;&quot;150&#92;&quot;,&#92;&quot;calibration&#92;&quot;:&#92;&quot;250&#92;&quot;,&#92;&quot;total&#92;&quot;:&#92;&quot;400&#92;&quot;},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500223&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;IZARO&#92;&quot;,&#92;&quot;rental_price&#92;&quot;:&#92;&quot;350&#92;&quot;,&#92;&quot;calibration&#92;&quot;:&#92;&quot;650&#92;&quot;,&#92;&quot;total&#92;&quot;:&#92;&quot;1000&#92;&quot;}]&quot;' data-total-rows='21' data-total-columns='5' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;rental_price&quot;,[&quot;number&quot;,&quot;decimal[38,0]&quot;]],[&quot;calibration&quot;,[&quot;number&quot;,&quot;decimal[38,0]&quot;]],[&quot;total&quot;,[&quot;number&quot;,&quot;decimal[38,0]&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "emfo",
+      "code_hash": "c72edf40048ac1a543724af796769a35",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Hstk",
+      "code_hash": "f270c05b7498a93f96618f9c1d63110d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "nWHF",
+      "code_hash": "3d84dc440dff7d46ba97cd4ba7a1a576",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='nWHF-0' random-id='908ffd4e-3ede-3a6a-11ab-febfb6aaa1fd'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500206&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ATERPE ALAI&#92;&quot;,&#92;&quot;well_to_well&#92;&quot;:15.0,&#92;&quot;total&#92;&quot;:382.5},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500210&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EUSKADI ALAI&#92;&quot;,&#92;&quot;well_to_well&#92;&quot;:3.0,&#92;&quot;total&#92;&quot;:51.0},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500215&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;well_to_well&#92;&quot;:26.0,&#92;&quot;total&#92;&quot;:442.0},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500216&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;TORRE ITALIA&#92;&quot;,&#92;&quot;well_to_well&#92;&quot;:35.0,&#92;&quot;total&#92;&quot;:595.0}]&quot;' data-total-rows='4' data-total-columns='4' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;well_to_well&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;total&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "iLit",
+      "code_hash": "7089ef08c5067673547140a288929ea6",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='iLit-0' random-id='9576df7e-0610-e5b0-947d-7fe73e5dcd7d'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500220&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EUSKADI ALAI&#92;&quot;,&#92;&quot;total&#92;&quot;:18201.0},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500215&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;total&#92;&quot;:21593.0},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500208&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;total&#92;&quot;:26570.0},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500218&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;PLAYA DE AZKORRI&#92;&quot;,&#92;&quot;total&#92;&quot;:6675.0},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500219&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;JAI ALAI&#92;&quot;,&#92;&quot;total&#92;&quot;:9078.0},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500204&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EGALABUR&#92;&quot;,&#92;&quot;total&#92;&quot;:8916.0},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500213&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;TXORI BERRI&#92;&quot;,&#92;&quot;total&#92;&quot;:4617.0},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500221&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EGALABUR&#92;&quot;,&#92;&quot;total&#92;&quot;:26153.0},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500209&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ELAI ALAI&#92;&quot;,&#92;&quot;total&#92;&quot;:11925.0},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500203&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;PLAYA DE AZKORRI&#92;&quot;,&#92;&quot;total&#92;&quot;:2346.0}]&quot;' data-total-rows='20' data-total-columns='3' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;total&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ZHCJ",
+      "code_hash": "c25613f79f101bad4c1bb24c23d5cc1e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ROlb",
+      "code_hash": "15082403ead5b85759fb7995fb97e06a",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='ROlb-0' random-id='8a7004db-e1a7-1881-4ee5-ed914d69aaa5'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500208&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;total&#92;&quot;:&#92;&quot;744&#92;&quot;},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500218&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;PLAYA DE AZKORRI&#92;&quot;,&#92;&quot;total&#92;&quot;:&#92;&quot;416&#92;&quot;},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500214&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ITSAS TXORI&#92;&quot;,&#92;&quot;total&#92;&quot;:&#92;&quot;192&#92;&quot;},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500210&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EUSKADI ALAI&#92;&quot;,&#92;&quot;total&#92;&quot;:&#92;&quot;216&#92;&quot;},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500220&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EUSKADI ALAI&#92;&quot;,&#92;&quot;total&#92;&quot;:&#92;&quot;480&#92;&quot;},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500215&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;total&#92;&quot;:&#92;&quot;368&#92;&quot;},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500211&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;total&#92;&quot;:&#92;&quot;880&#92;&quot;}]&quot;' data-total-rows='7' data-total-columns='3' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;total&quot;,[&quot;number&quot;,&quot;decimal[38,0]&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "qnkX",
+      "code_hash": "14ed6a79c5bdaaa5b2697bbe825dcfff",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "TqIu",
+      "code_hash": "33b03ac16af33da329444e7632f628fd",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='TqIu-0' random-id='546ace17-9f6e-a210-f56c-d040cf8a450e'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500203&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;PLAYA DE AZKORRI&#92;&quot;,&#92;&quot;total&#92;&quot;:60.0},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500205&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;HAWWA&#92;&quot;,&#92;&quot;total&#92;&quot;:30.0},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500208&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;total&#92;&quot;:90.0},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500213&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;TXORI BERRI&#92;&quot;,&#92;&quot;total&#92;&quot;:60.0},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500214&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ITSAS TXORI&#92;&quot;,&#92;&quot;total&#92;&quot;:30.0},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500216&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;TORRE ITALIA&#92;&quot;,&#92;&quot;total&#92;&quot;:30.0},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500218&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;PLAYA DE AZKORRI&#92;&quot;,&#92;&quot;total&#92;&quot;:30.0},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500221&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EGALABUR&#92;&quot;,&#92;&quot;total&#92;&quot;:30.0}]&quot;' data-total-rows='8' data-total-columns='3' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;total&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Vxnm",
+      "code_hash": "b92c401206f0161807d51d2ed86378d8",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "DnEU",
+      "code_hash": "e74a2b039e4e416c01de18c37f02a46d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='DnEU-0' random-id='fd723e5a-394b-025b-d1cb-e2c6d5f56cd3'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500213&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;TXORI BERRI&#92;&quot;,&#92;&quot;total&#92;&quot;:1200.0},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500207&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;BERNICA&#92;&quot;,&#92;&quot;total&#92;&quot;:900.0},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500222&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;DOLOMIEU&#92;&quot;,&#92;&quot;total&#92;&quot;:200.0},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500218&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;PLAYA DE AZKORRI&#92;&quot;,&#92;&quot;total&#92;&quot;:2100.0},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500208&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;total&#92;&quot;:3000.0},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500217&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;FRANCHE TERRE&#92;&quot;,&#92;&quot;total&#92;&quot;:315.259},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500203&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;PLAYA DE AZKORRI&#92;&quot;,&#92;&quot;total&#92;&quot;:1200.0},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500205&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;HAWWA&#92;&quot;,&#92;&quot;total&#92;&quot;:640.0}]&quot;' data-total-rows='8' data-total-columns='3' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;total&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ulZA",
+      "code_hash": "96eda98089a648522575abd0f0736335",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ecfG",
+      "code_hash": "e6114d168bf2b09108acb3ee9af6ccb0",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "sql-error",
+          "evalue": "Binder Error: Ambiguous reference to column name \"customer\" (use: \"s.customer\" or \"f.customer\")",
+          "traceback": []
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Pvdt",
+      "code_hash": "e9591c93483748cc534fa633ade9cab5",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ZBYS",
+      "code_hash": "d842cd7d3d04f1d21851c61ad53de0a9",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='ZBYS-0' random-id='5efd10ac-7ed0-d5e2-a1ed-b0bb0929dbdf'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500205&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;HAWWA&#92;&quot;,&#92;&quot;total&#92;&quot;:5670.0},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500207&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;BERNICA&#92;&quot;,&#92;&quot;total&#92;&quot;:19845.0},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500217&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;FRANCHE TERRE&#92;&quot;,&#92;&quot;total&#92;&quot;:2430.0},{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500221&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EGALABUR&#92;&quot;,&#92;&quot;total&#92;&quot;:3915.0}]&quot;' data-total-rows='4' data-total-columns='3' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;total&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "aLJB",
+      "code_hash": "e89b012855cf395d433f9c4442e250d1",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "nHfw",
+      "code_hash": "709aac4129ff5a61ee0d9c16445043d5",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "xXTn",
+      "code_hash": "e2e5d78bb75675e9ff34ea9fb085dba0",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='xXTn-0' random-id='653bc984-ffef-1654-33cd-8282c3065b29'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;id&#92;&quot;:&#92;&quot;STO-2500208&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;total&#92;&quot;:3240.0}]&quot;' data-total-rows='1' data-total-columns='3' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;id&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;total&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "<string>:1: UserWarning: Sortedness of columns cannot be checked when 'by' groups provided\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "AjVT",
+      "code_hash": "5171e54e87f5bd2b0450fab4bf01db3b",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "exception",
+          "evalue": "Name `fork_salt_dataf` is not defined. It was expected to be defined in ",
+          "traceback": []
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "<span class=\"codehilite\"><div class=\"highlight\"><pre><span></span><span class=\"gt\">Traceback (most recent call last):</span>\n  File <span class=\"nb\">&quot;C:\\Users\\gmounac\\AppData\\Local\\uv\\cache\\archive-v0\\NP0Xj_bTbhE0GkjHDr65i\\Lib\\site-packages\\marimo\\_runtime\\executor.py&quot;</span>, line <span class=\"m\">138</span>, in <span class=\"n\">execute_cell</span>\n<span class=\"w\">    </span><span class=\"n\">exec</span><span class=\"p\">(</span><span class=\"n\">cell</span><span class=\"o\">.</span><span class=\"n\">body</span><span class=\"p\">,</span> <span class=\"n\">glbls</span><span class=\"p\">)</span>\n<span class=\"w\">    </span><span class=\"pm\">~~~~^^^^^^^^^^^^^^^^^^</span>\n  File <span class=\"nb\">&quot;C:\\Users\\gmounac\\AppData\\Local\\Temp\\marimo_24480\\__marimo__cell_AjVT_.py&quot;</span>, line <span class=\"m\">5</span>, in <span class=\"n\">&lt;module&gt;</span>\n<span class=\"w\">    </span><span class=\"n\">fork_salt_dataf</span>\n<span class=\"gr\">NameError</span>: <span class=\"n\">name &#39;fork_salt_dataf&#39; is not defined</span>\n</pre></div>\n</span>",
+          "mimetype": "application/vnd.marimo+traceback"
+        }
+      ]
+    },
+    {
+      "id": "pHFh",
+      "code_hash": "1a109e852b6b73fe9e14bbf1ebe9df93",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "sql-error",
+          "evalue": "Catalog Error: Table with name fork_salt_dataf does not exist!\nDid you mean \"pragma_database_list\"?",
+          "traceback": []
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "NCOB",
+      "code_hash": "e2a725a39e1a14efc33875eccfe1a0e6",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "exception",
+          "evalue": "An ancestor raised an exception (MarimoSQLError): ",
+          "traceback": []
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "aqbW",
+      "code_hash": null,
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    }
+  ]
+}
