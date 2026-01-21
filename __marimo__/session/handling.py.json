@@ -1,0 +1,281 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.19.4"
+  },
+  "cells": [
+    {
+      "id": "setup",
+      "code_hash": "a0b3554977b58c0354ddd50feab00650",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Hbol",
+      "code_hash": "78b4759e993c33b321828495e3721084",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "4a156599991c1d9ad12ab91770939fbc",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='MJUe-0' random-id='45021be7-5888-307f-07e5-dda97388a254'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Mon&#92;&quot;,&#92;&quot;service_date&#92;&quot;:&#92;&quot;2025-10-06&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;IZARO&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:44.338,&#92;&quot;end_time&#92;&quot;:&#92;&quot;18:48:00&#92;&quot;,&#92;&quot;hours_worked&#92;&quot;:2,&#92;&quot;num_of_stevedores&#92;&quot;:34,&#92;&quot;price&#92;&quot;:550.39325,&#92;&quot;additional_stevedores&#92;&quot;:544,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Container Front &amp; Back + CCCS Front / OT 44.338T Brine @ 150%, 34 Stevedore * 2 Hours / Extramen Sorting (16) + CCCS (6) &#92;&quot;},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Fri&#92;&quot;,&#92;&quot;service_date&#92;&quot;:&#92;&quot;2025-10-03&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALBACAN&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:91.27,&#92;&quot;end_time&#92;&quot;:&#92;&quot;23:56:00&#92;&quot;,&#92;&quot;hours_worked&#92;&quot;:7,&#92;&quot;num_of_stevedores&#92;&quot;:36,&#92;&quot;price&#92;&quot;:1768.3562499999998,&#92;&quot;additional_stevedores&#92;&quot;:2016,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Container Back only / OT 91.270T Brine @ 150%, 36 Stevedores * 7 hours / Extramen Well Support (24) &#92;&quot;},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;OT&#92;&quot;,&#92;&quot;service_date&#92;&quot;:&#92;&quot;2025-10-03&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;IZARO&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:48.65,&#92;&quot;end_time&#92;&quot;:&#92;&quot;21:57:00&#92;&quot;,&#92;&quot;hours_worked&#92;&quot;:4,&#92;&quot;num_of_stevedores&#92;&quot;:22,&#92;&quot;price&#92;&quot;:1307.46875,&#92;&quot;additional_stevedores&#92;&quot;:704,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Dry unloading in overtime&#92;&quot;},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Wed&#92;&quot;,&#92;&quot;service_date&#92;&quot;:&#92;&quot;2025-10-01&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ELAI ALAI&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:36.6,&#92;&quot;end_time&#92;&quot;:&#92;&quot;18:49:00&#92;&quot;,&#92;&quot;hours_worked&#92;&quot;:2,&#92;&quot;num_of_stevedores&#92;&quot;:23,&#92;&quot;price&#92;&quot;:709.125,&#92;&quot;additional_stevedores&#92;&quot;:368,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Container Front &amp; Back + Cargo &#x27;Salgir&#x27; Back / OT 36.600T Brine @ 150%, 23 Stevedores* 2 Hours / Extramen Cargo (12) + Cuve (8) + Winchmen (2) + Hook/Unhook (2) + Gangway (1) &#92;&quot;},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;OT&#92;&quot;,&#92;&quot;service_date&#92;&quot;:&#92;&quot;2025-10-17&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EUSKADI ALAI&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:33.26,&#92;&quot;end_time&#92;&quot;:&#92;&quot;20:45:00&#92;&quot;,&#92;&quot;hours_worked&#92;&quot;:3,&#92;&quot;num_of_stevedores&#92;&quot;:22,&#92;&quot;price&#92;&quot;:893.8625,&#92;&quot;additional_stevedores&#92;&quot;:528,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Dry unloading in overtime&#92;&quot;},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Wed&#92;&quot;,&#92;&quot;service_date&#92;&quot;:&#92;&quot;2025-10-01&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALBACAN&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:54.052,&#92;&quot;end_time&#92;&quot;:&#92;&quot;17:36:00&#92;&quot;,&#92;&quot;hours_worked&#92;&quot;:1,&#92;&quot;num_of_stevedores&#92;&quot;:34,&#92;&quot;price&#92;&quot;:764.9355,&#92;&quot;additional_stevedores&#92;&quot;:272,&#92;&quot;remarks&#92;&quot;:&#92;&quot;CCCS Back only / OT 54.052T Brine @ 150%, 34 Stevedores * 1 hour / Extramen Well Support (24) &#92;&quot;},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Thu&#92;&quot;,&#92;&quot;service_date&#92;&quot;:&#92;&quot;2025-10-02&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALBACAN&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:28.189,&#92;&quot;end_time&#92;&quot;:&#92;&quot;18:44:00&#92;&quot;,&#92;&quot;hours_worked&#92;&quot;:2,&#92;&quot;num_of_stevedores&#92;&quot;:25,&#92;&quot;price&#92;&quot;:392.959125,&#92;&quot;additional_stevedores&#92;&quot;:400,&#92;&quot;remarks&#92;&quot;:&#92;&quot;CCCS Back only / OT 28.189T Brine @ 150%, 25 Stevedores * 2 hours / Extramen Well Support (24) &#92;&quot;},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Wed&#92;&quot;,&#92;&quot;service_date&#92;&quot;:&#92;&quot;2025-10-29&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:53.92,&#92;&quot;end_time&#92;&quot;:&#92;&quot;18:42:00&#92;&quot;,&#92;&quot;hours_worked&#92;&quot;:2,&#92;&quot;num_of_stevedores&#92;&quot;:26,&#92;&quot;price&#92;&quot;:1044.7,&#92;&quot;additional_stevedores&#92;&quot;:416,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Container Back only / OT 53.920T Brine @ 150%, 26 Stevedores * 2 Hours / &#92;&quot;},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Thu&#92;&quot;,&#92;&quot;service_date&#92;&quot;:&#92;&quot;2025-10-23&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ELAI ALAI&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:2.15,&#92;&quot;end_time&#92;&quot;:&#92;&quot;17:08:00&#92;&quot;,&#92;&quot;hours_worked&#92;&quot;:1,&#92;&quot;num_of_stevedores&#92;&quot;:0,&#92;&quot;price&#92;&quot;:41.65625,&#92;&quot;additional_stevedores&#92;&quot;:0,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Container Front only / &#92;&quot;},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Mon&#92;&quot;,&#92;&quot;service_date&#92;&quot;:&#92;&quot;2025-10-20&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:8.49,&#92;&quot;end_time&#92;&quot;:&#92;&quot;17:00:37&#92;&quot;,&#92;&quot;hours_worked&#92;&quot;:1,&#92;&quot;num_of_stevedores&#92;&quot;:0,&#92;&quot;price&#92;&quot;:124.16625,&#92;&quot;additional_stevedores&#92;&quot;:0,&#92;&quot;remarks&#92;&quot;:&#92;&quot;CCCS Front &amp; Back + Container Front /  Extramen Sorting (12) + CCCS (6) &#92;&quot;}]&quot;' data-total-rows='47' data-total-columns='10' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;day_name&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;service_date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;tonnage&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;end_time&quot;,[&quot;time&quot;,&quot;time&quot;]],[&quot;hours_worked&quot;,[&quot;integer&quot;,&quot;i64&quot;]],[&quot;num_of_stevedores&quot;,[&quot;integer&quot;,&quot;i64&quot;]],[&quot;price&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;additional_stevedores&quot;,[&quot;integer&quot;,&quot;i64&quot;]],[&quot;remarks&quot;,[&quot;string&quot;,&quot;str&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "8b35a073239b31e40d778fd8ee9e8e34",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "d2c19de4492f3166b350d10604902dad",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='bkHC-0' random-id='ae6d5a64-2a6e-bf9c-ea96-0f43cb658a25'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;Date&#92;&quot;:&#92;&quot;2025-12-03&#92;&quot;,&#92;&quot;Vessel&#92;&quot;:&#92;&quot;EGALABUR&#92;&quot;,&#92;&quot;Number of Extra Men&#92;&quot;:26,&#92;&quot;Comments&#92;&quot;:&#92;&quot;Container Front &amp; Back / Extramen Sorting (16) + Brine (6) &#92;&quot;,&#92;&quot;num_as_per_comments&#92;&quot;:22,&#92;&quot;Check&#92;&quot;:false},{&#92;&quot;Date&#92;&quot;:&#92;&quot;2025-12-04&#92;&quot;,&#92;&quot;Vessel&#92;&quot;:&#92;&quot;EGALABUR&#92;&quot;,&#92;&quot;Number of Extra Men&#92;&quot;:26,&#92;&quot;Comments&#92;&quot;:&#92;&quot;Container Front &amp; Back / Extramen Sorting (16) + Brine (6) &#92;&quot;,&#92;&quot;num_as_per_comments&#92;&quot;:22,&#92;&quot;Check&#92;&quot;:false}]&quot;' data-total-rows='2' data-total-columns='6' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;Date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;Vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Number of Extra Men&quot;,[&quot;integer&quot;,&quot;i64&quot;]],[&quot;Comments&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;num_as_per_comments&quot;,[&quot;integer&quot;,&quot;i64&quot;]],[&quot;Check&quot;,[&quot;boolean&quot;,&quot;bool&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "5fd39feac5550a115c265889dd953247",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "ff7bde0cbf45b158f81b06e4bd7af9a5",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "93ed3b3cbaf71d08ec46ed4d168467e8",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='Xref-0' random-id='adf0439f-ef45-29b3-ceae-70fa75543260'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;service_date&#92;&quot;:&#92;&quot;2025-12-01&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ITSAS TXORI&#92;&quot;,&#92;&quot;operation_type&#92;&quot;:&#92;&quot;container loading from cs&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:132.208,&#92;&quot;static_loader&#92;&quot;:0,&#92;&quot;shore_crane&#92;&quot;:132.208,&#92;&quot;overtime_tonnage&#92;&quot;:0.0,&#92;&quot;invoice_amount&#92;&quot;:661.04,&#92;&quot;comments&#92;&quot;:&#92;&quot;MNBU0457984/SUDU6233101/SUDU9204621/SUDU9314146/SUDU8002307&#92;&quot;},{&#92;&quot;service_date&#92;&quot;:&#92;&quot;2025-12-02&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;TXORI BERRI&#92;&quot;,&#92;&quot;operation_type&#92;&quot;:&#92;&quot;Sorting from Unloading&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:5.518,&#92;&quot;static_loader&#92;&quot;:0,&#92;&quot;shore_crane&#92;&quot;:0.0,&#92;&quot;overtime_tonnage&#92;&quot;:0.0,&#92;&quot;invoice_amount&#92;&quot;:19.313,&#92;&quot;comments&#92;&quot;:null},{&#92;&quot;service_date&#92;&quot;:&#92;&quot;2025-12-03&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;TXORI ARGI&#92;&quot;,&#92;&quot;operation_type&#92;&quot;:&#92;&quot;container loading from cs&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:26.489,&#92;&quot;static_loader&#92;&quot;:0,&#92;&quot;shore_crane&#92;&quot;:26.489,&#92;&quot;overtime_tonnage&#92;&quot;:0.0,&#92;&quot;invoice_amount&#92;&quot;:132.445,&#92;&quot;comments&#92;&quot;:&#92;&quot;SUDU8049177&#92;&quot;},{&#92;&quot;service_date&#92;&quot;:&#92;&quot;2025-12-03&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;TXORI BERRI&#92;&quot;,&#92;&quot;operation_type&#92;&quot;:&#92;&quot;Unsorted from unloading&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:0.247,&#92;&quot;static_loader&#92;&quot;:0,&#92;&quot;shore_crane&#92;&quot;:0.0,&#92;&quot;overtime_tonnage&#92;&quot;:0.0,&#92;&quot;invoice_amount&#92;&quot;:0.8645,&#92;&quot;comments&#92;&quot;:&#92;&quot;From container loading&#92;&quot;},{&#92;&quot;service_date&#92;&quot;:&#92;&quot;2025-12-05&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;VARIOUS&#92;&quot;,&#92;&quot;operation_type&#92;&quot;:&#92;&quot;container loading from cs&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:117.256,&#92;&quot;static_loader&#92;&quot;:0,&#92;&quot;shore_crane&#92;&quot;:117.256,&#92;&quot;overtime_tonnage&#92;&quot;:117.256,&#92;&quot;invoice_amount&#92;&quot;:967.362,&#92;&quot;comments&#92;&quot;:&#92;&quot;17:00-21:43 MNBU0678820/MNBU0100960/MNBU0250277/SUDU6262500/SUDU6195110&#92;&quot;},{&#92;&quot;service_date&#92;&quot;:&#92;&quot;2025-12-06&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;VARIOUS&#92;&quot;,&#92;&quot;operation_type&#92;&quot;:&#92;&quot;container loading from cs&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:119.901,&#92;&quot;static_loader&#92;&quot;:0,&#92;&quot;shore_crane&#92;&quot;:119.901,&#92;&quot;overtime_tonnage&#92;&quot;:112.033,&#92;&quot;invoice_amount&#92;&quot;:963.61225,&#92;&quot;comments&#92;&quot;:&#92;&quot;17:00-21:57&#92;&quot;},{&#92;&quot;service_date&#92;&quot;:&#92;&quot;2025-12-07&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;TXORI BERRI&#92;&quot;,&#92;&quot;operation_type&#92;&quot;:&#92;&quot;container loading from cs&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:26.306,&#92;&quot;static_loader&#92;&quot;:0,&#92;&quot;shore_crane&#92;&quot;:26.306,&#92;&quot;overtime_tonnage&#92;&quot;:0.0,&#92;&quot;invoice_amount&#92;&quot;:197.295,&#92;&quot;comments&#92;&quot;:&#92;&quot;MNBU0351035&#92;&quot;},{&#92;&quot;service_date&#92;&quot;:&#92;&quot;2025-12-17&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;TXORI BERRI&#92;&quot;,&#92;&quot;operation_type&#92;&quot;:&#92;&quot;Sorting from Unloading&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:226.398,&#92;&quot;static_loader&#92;&quot;:0,&#92;&quot;shore_crane&#92;&quot;:0.0,&#92;&quot;overtime_tonnage&#92;&quot;:0.0,&#92;&quot;invoice_amount&#92;&quot;:792.393,&#92;&quot;comments&#92;&quot;:null},{&#92;&quot;service_date&#92;&quot;:&#92;&quot;2025-12-18&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ITSAS TXORI&#92;&quot;,&#92;&quot;operation_type&#92;&quot;:&#92;&quot;Sorting from Unloading&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:221.995,&#92;&quot;static_loader&#92;&quot;:0,&#92;&quot;shore_crane&#92;&quot;:0.0,&#92;&quot;overtime_tonnage&#92;&quot;:0.0,&#92;&quot;invoice_amount&#92;&quot;:776.9825000000001,&#92;&quot;comments&#92;&quot;:null},{&#92;&quot;service_date&#92;&quot;:&#92;&quot;2025-12-19&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;TXORI BERRI&#92;&quot;,&#92;&quot;operation_type&#92;&quot;:&#92;&quot;Sorting from Unloading&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:248.545,&#92;&quot;static_loader&#92;&quot;:0,&#92;&quot;shore_crane&#92;&quot;:0.0,&#92;&quot;overtime_tonnage&#92;&quot;:0.0,&#92;&quot;invoice_amount&#92;&quot;:869.9074999999999,&#92;&quot;comments&#92;&quot;:null}]&quot;' data-total-rows='13' data-total-columns='9' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;service_date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;operation_type&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;tonnage&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;static_loader&quot;,[&quot;integer&quot;,&quot;i64&quot;]],[&quot;shore_crane&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;overtime_tonnage&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;invoice_amount&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;comments&quot;,[&quot;string&quot;,&quot;str&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "93a0561d5ee2659b7eba4fbdd4bd95e1",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "ce159c7c1222cc95243928eba1a87ef2",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='BYtC-0' random-id='fbbdd206-7d12-d31e-1367-ac3d52295711'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;Day&#92;&quot;:&#92;&quot;Mon&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-22&#92;&quot;,&#92;&quot;Service&#92;&quot;:&#92;&quot;Static Loader&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:216.366,&#92;&quot;overtime_tonnage&#92;&quot;:12.789,&#92;&quot;price&#92;&quot;:1447.94325},{&#92;&quot;Day&#92;&quot;:&#92;&quot;Fri&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-26&#92;&quot;,&#92;&quot;Service&#92;&quot;:&#92;&quot;Static Loader&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:74.1,&#92;&quot;overtime_tonnage&#92;&quot;:49.331999999999994,&#92;&quot;price&#92;&quot;:641.979},{&#92;&quot;Day&#92;&quot;:&#92;&quot;Sat&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-27&#92;&quot;,&#92;&quot;Service&#92;&quot;:&#92;&quot;Static Loader&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:74.557,&#92;&quot;overtime_tonnage&#92;&quot;:0.0,&#92;&quot;price&#92;&quot;:484.6205},{&#92;&quot;Day&#92;&quot;:&#92;&quot;Mon&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-29&#92;&quot;,&#92;&quot;Service&#92;&quot;:&#92;&quot;Static Loader&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:50.921,&#92;&quot;overtime_tonnage&#92;&quot;:0.0,&#92;&quot;price&#92;&quot;:330.9865},{&#92;&quot;Day&#92;&quot;:&#92;&quot;Tue&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-30&#92;&quot;,&#92;&quot;Service&#92;&quot;:&#92;&quot;Shore Crane &amp; Fishloader&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:24.899,&#92;&quot;overtime_tonnage&#92;&quot;:0.0,&#92;&quot;price&#92;&quot;:124.495}]&quot;' data-total-rows='5' data-total-columns='6' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;Day&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;Service&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;total_tonnage&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;overtime_tonnage&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;price&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "<string>:1: UserWarning: Sortedness of columns cannot be checked when 'by' groups provided\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "RGSE",
+      "code_hash": "a9cbd084122713d7217413dc901e6364",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<pre class='text-xs'>73.99900000000002</pre>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Kclp",
+      "code_hash": "9a1e0af88d8b15e1cbc8c60622846e9d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "emfo",
+      "code_hash": "c5fdbfe42892893cc22aa38171e68bdb",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Hstk",
+      "code_hash": "144e2f75a75122ca669126d4da9bb882",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='Hstk-0' random-id='55126298-e47b-e17e-cbd6-4244e7485702'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-06&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;BERNICA&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:64.237,&#92;&quot;overtime_tonnage&#92;&quot;:24.724,&#92;&quot;price&#92;&quot;:268.0965},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-06&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;BERNICA&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:8.534,&#92;&quot;overtime_tonnage&#92;&quot;:0.0,&#92;&quot;price&#92;&quot;:29.869000000000003},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-07&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;BERNICA&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:123.147,&#92;&quot;overtime_tonnage&#92;&quot;:42.743,&#92;&quot;price&#92;&quot;:505.81475},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-07&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;BERNICA&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:18.504,&#92;&quot;overtime_tonnage&#92;&quot;:0.0,&#92;&quot;price&#92;&quot;:64.76400000000001},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-08&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;BERNICA&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:141.693,&#92;&quot;overtime_tonnage&#92;&quot;:26.895,&#92;&quot;price&#92;&quot;:542.99175},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-08&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;BERNICA&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:4.142,&#92;&quot;overtime_tonnage&#92;&quot;:0.0,&#92;&quot;price&#92;&quot;:14.497000000000002},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-09&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;BERNICA&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:35.558,&#92;&quot;overtime_tonnage&#92;&quot;:0.0,&#92;&quot;price&#92;&quot;:124.453},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-09&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;BERNICA&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:20.701,&#92;&quot;overtime_tonnage&#92;&quot;:3.345,&#92;&quot;price&#92;&quot;:78.30725000000001},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-10&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;BERNICA&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:23.855,&#92;&quot;overtime_tonnage&#92;&quot;:9.455,&#92;&quot;price&#92;&quot;:100.03875},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-11&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;BERNICA&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:23.573,&#92;&quot;overtime_tonnage&#92;&quot;:4.648,&#92;&quot;price&#92;&quot;:90.6395}]&quot;' data-total-rows='14' data-total-columns='5' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;total_tonnage&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;overtime_tonnage&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;price&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "nWHF",
+      "code_hash": "5acdc425e157988d18bf9b7ff276f068",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='nWHF-0' random-id='0afcfe58-4213-5c39-39bb-14b0533b9e3d'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;sum(price)&#92;&quot;:1819.4715}]&quot;' data-total-rows='1' data-total-columns='1' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;sum(price)&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "iLit",
+      "code_hash": "263b31e5cc4fe4f185af2bc70fd1e37f",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ZHCJ",
+      "code_hash": "22d7c1d6c46b68fd1247be7ce4a8986f",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ROlb",
+      "code_hash": "3d373a0e30e4266e4e5b4ff906e720dc",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "qnkX",
+      "code_hash": "100440d3e808aeceecccffeb00eff4aa",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='qnkX-0' random-id='03fc8d4f-909f-d408-9272-2b4615728dfd'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-11-14&#92;&quot;,&#92;&quot;time_start&#92;&quot;:&#92;&quot;12:32:00&#92;&quot;,&#92;&quot;time_stop&#92;&quot;:&#92;&quot;13:10:00&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;PLAYA DE AZKORRI&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;OCEAN BASKET&#92;&quot;,&#92;&quot;driver&#92;&quot;:&#92;&quot;A. Michel&#92;&quot;,&#92;&quot;truck_no&#92;&quot;:&#92;&quot;8&#92;&quot;,&#92;&quot;is_in_record&#92;&quot;:&#92;&quot;No Data...&#92;&quot;,&#92;&quot;whats_app&#92;&quot;:&#92;&quot;No Message&#92;&quot;},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-11-18&#92;&quot;,&#92;&quot;time_start&#92;&quot;:&#92;&quot;17:30:00&#92;&quot;,&#92;&quot;time_stop&#92;&quot;:&#92;&quot;18:00:00&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;PLAYA DE AZKORRI&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;OCEAN BASKET&#92;&quot;,&#92;&quot;driver&#92;&quot;:&#92;&quot;T. Joe&#92;&quot;,&#92;&quot;truck_no&#92;&quot;:&#92;&quot;7&#92;&quot;,&#92;&quot;is_in_record&#92;&quot;:&#92;&quot;No Data...&#92;&quot;,&#92;&quot;whats_app&#92;&quot;:&#92;&quot;No Message&#92;&quot;},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-11-18&#92;&quot;,&#92;&quot;time_start&#92;&quot;:&#92;&quot;17:15:00&#92;&quot;,&#92;&quot;time_stop&#92;&quot;:&#92;&quot;18:30:00&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;PLAYA DE AZKORRI&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;OCEAN BASKET&#92;&quot;,&#92;&quot;driver&#92;&quot;:&#92;&quot;B. Confiance&#92;&quot;,&#92;&quot;truck_no&#92;&quot;:&#92;&quot;4&#92;&quot;,&#92;&quot;is_in_record&#92;&quot;:&#92;&quot;No Data...&#92;&quot;,&#92;&quot;whats_app&#92;&quot;:&#92;&quot;No Message&#92;&quot;},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-11-22&#92;&quot;,&#92;&quot;time_start&#92;&quot;:&#92;&quot;12:40:00&#92;&quot;,&#92;&quot;time_stop&#92;&quot;:&#92;&quot;14:45:00&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ITSAS TXORI&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;OCEAN BASKET&#92;&quot;,&#92;&quot;driver&#92;&quot;:&#92;&quot;B. Confiance&#92;&quot;,&#92;&quot;truck_no&#92;&quot;:&#92;&quot;5&#92;&quot;,&#92;&quot;is_in_record&#92;&quot;:&#92;&quot;No Data...&#92;&quot;,&#92;&quot;whats_app&#92;&quot;:&#92;&quot;No Message&#92;&quot;},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-06&#92;&quot;,&#92;&quot;time_start&#92;&quot;:&#92;&quot;11:05:00&#92;&quot;,&#92;&quot;time_stop&#92;&quot;:&#92;&quot;12:00:00&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;HAWWA&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;OCEAN BASKET&#92;&quot;,&#92;&quot;driver&#92;&quot;:&#92;&quot;A. Michel&#92;&quot;,&#92;&quot;truck_no&#92;&quot;:&#92;&quot;8&#92;&quot;,&#92;&quot;is_in_record&#92;&quot;:&#92;&quot;No Data...&#92;&quot;,&#92;&quot;whats_app&#92;&quot;:&#92;&quot;No Message&#92;&quot;},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-18&#92;&quot;,&#92;&quot;time_start&#92;&quot;:&#92;&quot;17:25:00&#92;&quot;,&#92;&quot;time_stop&#92;&quot;:&#92;&quot;18:15:00&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EUSKADI ALAI&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;AMIRANTE&#92;&quot;,&#92;&quot;driver&#92;&quot;:&#92;&quot;B. Confiance&#92;&quot;,&#92;&quot;truck_no&#92;&quot;:&#92;&quot;7&#92;&quot;,&#92;&quot;is_in_record&#92;&quot;:&#92;&quot;No Data...&#92;&quot;,&#92;&quot;whats_app&#92;&quot;:&#92;&quot;No Message&#92;&quot;},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-12-22&#92;&quot;,&#92;&quot;time_start&#92;&quot;:&#92;&quot;17:10:00&#92;&quot;,&#92;&quot;time_stop&#92;&quot;:&#92;&quot;18:00:00&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;AMIRANTE&#92;&quot;,&#92;&quot;driver&#92;&quot;:&#92;&quot;B. Confiance&#92;&quot;,&#92;&quot;truck_no&#92;&quot;:&#92;&quot;7&#92;&quot;,&#92;&quot;is_in_record&#92;&quot;:&#92;&quot;No Data...&#92;&quot;,&#92;&quot;whats_app&#92;&quot;:&#92;&quot;No Message&#92;&quot;}]&quot;' data-total-rows='7' data-total-columns='9' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;time_start&quot;,[&quot;time&quot;,&quot;time&quot;]],[&quot;time_stop&quot;,[&quot;time&quot;,&quot;time&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;customer&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;driver&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;truck_no&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;is_in_record&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;whats_app&quot;,[&quot;string&quot;,&quot;str&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "OuIh",
+      "code_hash": "9e52846620990899fe845f15f578a9e0",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">14/11 - Has a record and even overtime.\n18/11 - No Ocean Basket record for Playa de Azkorri\n22/11 - Has a record.\n06/12 - Has a record.\n18/12 - Has a record.\n22/12 - Has a record</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "OUgz",
+      "code_hash": null,
+      "outputs": [],
+      "console": []
+    }
+  ]
+}
