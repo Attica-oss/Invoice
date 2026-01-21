@@ -19,11 +19,21 @@ def _():
 
 @app.cell
 def _(engine, net_list):
-    _df = mo.sql(
+    all_df = mo.sql(
         f"""
-        SELECT * FROM net_list WHERE destination LIKE '%CCCS%'
+        SELECT * FROM net_list
         """,
         engine=engine
+    )
+    return (all_df,)
+
+
+@app.cell
+def _(all_df):
+    _df = mo.sql(
+        f"""
+        SELECT cast(date AS DATE) FROM all_df
+        """
     )
     return
 
