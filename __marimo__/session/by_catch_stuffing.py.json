@@ -1,0 +1,222 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.19.4"
+  },
+  "cells": [
+    {
+      "id": "setup",
+      "code_hash": "e01fd0d0890d83ea61ae43df9277454f",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Hbol",
+      "code_hash": "600125661cbecc278bb6909ba3fd7da7",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "df0ddf47818d39cac7682ee211d4a91d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "727d634d4e6b6266d40595bf10bac1cc",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "c996527c39cbb261d64e5e508240bf1e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "1edc2b35c08f4dd648162ac89752048b",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='lEQa-0' random-id='e3255ab3-be1b-fe5f-1d43-7d1c8259488e'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;Timestamp&#92;&quot;:&#92;&quot;2025-02-07 13:42:29&#92;&quot;,&#92;&quot;Date&#92;&quot;:&#92;&quot;2024-12-11&#92;&quot;,&#92;&quot;Time&#92;&quot;:&#92;&quot;14:05:00&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU3566905&#92;&quot;},{&#92;&quot;Timestamp&#92;&quot;:&#92;&quot;2025-02-07 13:42:29&#92;&quot;,&#92;&quot;Date&#92;&quot;:&#92;&quot;2024-12-14&#92;&quot;,&#92;&quot;Time&#92;&quot;:&#92;&quot;16:00:00&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU3491920&#92;&quot;},{&#92;&quot;Timestamp&#92;&quot;:&#92;&quot;2025-02-07 13:42:29&#92;&quot;,&#92;&quot;Date&#92;&quot;:&#92;&quot;2024-12-14&#92;&quot;,&#92;&quot;Time&#92;&quot;:&#92;&quot;16:15:00&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU4442679&#92;&quot;},{&#92;&quot;Timestamp&#92;&quot;:&#92;&quot;2025-02-07 13:42:29&#92;&quot;,&#92;&quot;Date&#92;&quot;:&#92;&quot;2024-12-15&#92;&quot;,&#92;&quot;Time&#92;&quot;:&#92;&quot;16:06:00&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;SUDU6133695&#92;&quot;},{&#92;&quot;Timestamp&#92;&quot;:&#92;&quot;2025-02-07 13:42:29&#92;&quot;,&#92;&quot;Date&#92;&quot;:&#92;&quot;2024-12-16&#92;&quot;,&#92;&quot;Time&#92;&quot;:&#92;&quot;13:44:00&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU3180023&#92;&quot;},{&#92;&quot;Timestamp&#92;&quot;:&#92;&quot;2025-02-07 13:42:29&#92;&quot;,&#92;&quot;Date&#92;&quot;:&#92;&quot;2024-12-16&#92;&quot;,&#92;&quot;Time&#92;&quot;:&#92;&quot;14:40:00&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU0060180&#92;&quot;},{&#92;&quot;Timestamp&#92;&quot;:&#92;&quot;2025-02-07 13:42:29&#92;&quot;,&#92;&quot;Date&#92;&quot;:&#92;&quot;2024-12-16&#92;&quot;,&#92;&quot;Time&#92;&quot;:&#92;&quot;16:47:00&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU9051105&#92;&quot;},{&#92;&quot;Timestamp&#92;&quot;:&#92;&quot;2025-02-07 13:42:29&#92;&quot;,&#92;&quot;Date&#92;&quot;:&#92;&quot;2024-12-17&#92;&quot;,&#92;&quot;Time&#92;&quot;:&#92;&quot;22:42:00&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU4485644&#92;&quot;},{&#92;&quot;Timestamp&#92;&quot;:&#92;&quot;2025-02-07 13:42:29&#92;&quot;,&#92;&quot;Date&#92;&quot;:&#92;&quot;2024-12-17&#92;&quot;,&#92;&quot;Time&#92;&quot;:&#92;&quot;23:58:00&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU3780141&#92;&quot;},{&#92;&quot;Timestamp&#92;&quot;:&#92;&quot;2025-02-07 13:42:29&#92;&quot;,&#92;&quot;Date&#92;&quot;:&#92;&quot;2024-12-20&#92;&quot;,&#92;&quot;Time&#92;&quot;:&#92;&quot;12:30:00&#92;&quot;,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU3409552&#92;&quot;}]&quot;' data-total-rows='6370' data-total-columns='4' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;Timestamp&quot;,[&quot;datetime&quot;,&quot;datetime[\u03bcs]&quot;]],[&quot;Date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;Time&quot;,[&quot;time&quot;,&quot;time&quot;]],[&quot;container_number&quot;,[&quot;string&quot;,&quot;str&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "311c1ed4325118ead039f32cabb2944e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "9dc0784a657764f71458bd6068f30fbf",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='Xref-0' random-id='2bb63dfc-fe83-49a3-269d-6a0102b0ddca'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;stuffing_date&#92;&quot;:&#92;&quot;2025-03-18&#92;&quot;,&#92;&quot;plugged_date&#92;&quot;:null,&#92;&quot;plugged_time&#92;&quot;:null,&#92;&quot;container_number&#92;&quot;:&#92;&quot;TLLU1198643&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;ECHEBASTAR&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Stuffing and Plugged?&#92;&quot;},{&#92;&quot;stuffing_date&#92;&quot;:&#92;&quot;2025-03-19&#92;&quot;,&#92;&quot;plugged_date&#92;&quot;:null,&#92;&quot;plugged_time&#92;&quot;:null,&#92;&quot;container_number&#92;&quot;:&#92;&quot;SZLU9060277&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;INPESCA S.A&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Direct Transfer&#92;&quot;},{&#92;&quot;stuffing_date&#92;&quot;:&#92;&quot;2025-05-17&#92;&quot;,&#92;&quot;plugged_date&#92;&quot;:null,&#92;&quot;plugged_time&#92;&quot;:null,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU0406930&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;INPESCA S.A&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Stuffing and Plugged?&#92;&quot;},{&#92;&quot;stuffing_date&#92;&quot;:&#92;&quot;2025-05-17&#92;&quot;,&#92;&quot;plugged_date&#92;&quot;:null,&#92;&quot;plugged_time&#92;&quot;:null,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU3628308&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;INPESCA S.A&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Stuffing and Plugged?&#92;&quot;},{&#92;&quot;stuffing_date&#92;&quot;:&#92;&quot;2025-05-17&#92;&quot;,&#92;&quot;plugged_date&#92;&quot;:null,&#92;&quot;plugged_time&#92;&quot;:null,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU4566793&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;INPESCA S.A&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Stuffing and Plugged?&#92;&quot;},{&#92;&quot;stuffing_date&#92;&quot;:&#92;&quot;2025-05-17&#92;&quot;,&#92;&quot;plugged_date&#92;&quot;:null,&#92;&quot;plugged_time&#92;&quot;:null,&#92;&quot;container_number&#92;&quot;:&#92;&quot;TLLU1196620&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;INPESCA S.A&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Stuffing and Plugged?&#92;&quot;},{&#92;&quot;stuffing_date&#92;&quot;:&#92;&quot;2025-05-20&#92;&quot;,&#92;&quot;plugged_date&#92;&quot;:null,&#92;&quot;plugged_time&#92;&quot;:null,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU0435352&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;INPESCA S.A&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Stuffing and Plugged?&#92;&quot;},{&#92;&quot;stuffing_date&#92;&quot;:&#92;&quot;2025-05-29&#92;&quot;,&#92;&quot;plugged_date&#92;&quot;:null,&#92;&quot;plugged_time&#92;&quot;:null,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU3566119&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;SAPMER&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Stuffing and Plugged?&#92;&quot;},{&#92;&quot;stuffing_date&#92;&quot;:&#92;&quot;2025-10-10&#92;&quot;,&#92;&quot;plugged_date&#92;&quot;:null,&#92;&quot;plugged_time&#92;&quot;:null,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU3512154&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;OCEAN BASKET&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Direct Transfer&#92;&quot;},{&#92;&quot;stuffing_date&#92;&quot;:&#92;&quot;2025-10-10&#92;&quot;,&#92;&quot;plugged_date&#92;&quot;:null,&#92;&quot;plugged_time&#92;&quot;:null,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU4057184&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;OCEAN BASKET&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Direct Transfer&#92;&quot;}]&quot;' data-total-rows='60' data-total-columns='6' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;stuffing_date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;plugged_date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;plugged_time&quot;,[&quot;time&quot;,&quot;time&quot;]],[&quot;container_number&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;customer&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;remarks&quot;,[&quot;string&quot;,&quot;str&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Ilbe",
+      "code_hash": "70cdc32fea9a353bca30a27dc889d7b6",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='Ilbe-0' random-id='76608115-5776-6302-476a-8979863f8e7a'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;stuffing_date&#92;&quot;:&#92;&quot;2025-03-18&#92;&quot;,&#92;&quot;plugged_date&#92;&quot;:null,&#92;&quot;plugged_time&#92;&quot;:null,&#92;&quot;container_number&#92;&quot;:&#92;&quot;TLLU1198643&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;ECHEBASTAR&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Stuffing and Plugged?&#92;&quot;},{&#92;&quot;stuffing_date&#92;&quot;:&#92;&quot;2025-03-19&#92;&quot;,&#92;&quot;plugged_date&#92;&quot;:null,&#92;&quot;plugged_time&#92;&quot;:null,&#92;&quot;container_number&#92;&quot;:&#92;&quot;SZLU9060277&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;INPESCA S.A&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Direct Transfer&#92;&quot;},{&#92;&quot;stuffing_date&#92;&quot;:&#92;&quot;2025-05-17&#92;&quot;,&#92;&quot;plugged_date&#92;&quot;:null,&#92;&quot;plugged_time&#92;&quot;:null,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU0406930&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;INPESCA S.A&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Stuffing and Plugged?&#92;&quot;},{&#92;&quot;stuffing_date&#92;&quot;:&#92;&quot;2025-05-17&#92;&quot;,&#92;&quot;plugged_date&#92;&quot;:null,&#92;&quot;plugged_time&#92;&quot;:null,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU3628308&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;INPESCA S.A&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Stuffing and Plugged?&#92;&quot;},{&#92;&quot;stuffing_date&#92;&quot;:&#92;&quot;2025-05-17&#92;&quot;,&#92;&quot;plugged_date&#92;&quot;:null,&#92;&quot;plugged_time&#92;&quot;:null,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU4566793&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;INPESCA S.A&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Stuffing and Plugged?&#92;&quot;},{&#92;&quot;stuffing_date&#92;&quot;:&#92;&quot;2025-05-17&#92;&quot;,&#92;&quot;plugged_date&#92;&quot;:null,&#92;&quot;plugged_time&#92;&quot;:null,&#92;&quot;container_number&#92;&quot;:&#92;&quot;TLLU1196620&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;INPESCA S.A&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Stuffing and Plugged?&#92;&quot;},{&#92;&quot;stuffing_date&#92;&quot;:&#92;&quot;2025-05-20&#92;&quot;,&#92;&quot;plugged_date&#92;&quot;:null,&#92;&quot;plugged_time&#92;&quot;:null,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU0435352&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;INPESCA S.A&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Stuffing and Plugged?&#92;&quot;},{&#92;&quot;stuffing_date&#92;&quot;:&#92;&quot;2025-05-29&#92;&quot;,&#92;&quot;plugged_date&#92;&quot;:null,&#92;&quot;plugged_time&#92;&quot;:null,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU3566119&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;SAPMER&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Stuffing and Plugged?&#92;&quot;},{&#92;&quot;stuffing_date&#92;&quot;:&#92;&quot;2025-10-10&#92;&quot;,&#92;&quot;plugged_date&#92;&quot;:null,&#92;&quot;plugged_time&#92;&quot;:null,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU3512154&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;OCEAN BASKET&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Direct Transfer&#92;&quot;},{&#92;&quot;stuffing_date&#92;&quot;:&#92;&quot;2025-10-10&#92;&quot;,&#92;&quot;plugged_date&#92;&quot;:null,&#92;&quot;plugged_time&#92;&quot;:null,&#92;&quot;container_number&#92;&quot;:&#92;&quot;MNBU4057184&#92;&quot;,&#92;&quot;customer&#92;&quot;:&#92;&quot;OCEAN BASKET&#92;&quot;,&#92;&quot;remarks&#92;&quot;:&#92;&quot;Direct Transfer&#92;&quot;}]&quot;' data-total-rows='60' data-total-columns='6' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;stuffing_date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;plugged_date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;plugged_time&quot;,[&quot;time&quot;,&quot;time&quot;]],[&quot;container_number&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;customer&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;remarks&quot;,[&quot;string&quot;,&quot;str&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "uOAV",
+      "code_hash": "f2a29a1acdc1ee33730d70212e21511b",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"stuffed-by-vessels\">Stuffed by Vessels</h3></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "qPlN",
+      "code_hash": "33ad4ce5e6a2039e11742bb01bf1ba3c",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "hGhW",
+      "code_hash": "a77af00de6e2964b7dfc5086532ba5d6",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='hGhW-0' random-id='d9f54f6c-47d7-8dcc-a3f8-416185a3b14e'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;Date&#92;&quot;:&#92;&quot;2026-01-14&#92;&quot;,&#92;&quot;Vessel&#92;&quot;:&#92;&quot;Artza&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU4673472&#92;&quot;,&#92;&quot;Species&#92;&quot;:&#92;&quot;BON - Bonito&#92;&quot;},{&#92;&quot;Date&#92;&quot;:&#92;&quot;2026-01-15&#92;&quot;,&#92;&quot;Vessel&#92;&quot;:&#92;&quot;Artza&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU3668050&#92;&quot;,&#92;&quot;Species&#92;&quot;:&#92;&quot;BON - Bonito&#92;&quot;},{&#92;&quot;Date&#92;&quot;:&#92;&quot;2026-01-18&#92;&quot;,&#92;&quot;Vessel&#92;&quot;:&#92;&quot;Artza&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU3160222&#92;&quot;,&#92;&quot;Species&#92;&quot;:&#92;&quot;BON - Bonito&#92;&quot;},{&#92;&quot;Date&#92;&quot;:&#92;&quot;2026-01-19&#92;&quot;,&#92;&quot;Vessel&#92;&quot;:&#92;&quot;Artza&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU3160222&#92;&quot;,&#92;&quot;Species&#92;&quot;:&#92;&quot;BON - Bonito&#92;&quot;},{&#92;&quot;Date&#92;&quot;:&#92;&quot;2025-12-29&#92;&quot;,&#92;&quot;Vessel&#92;&quot;:&#92;&quot;Egalabur&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU3684364&#92;&quot;,&#92;&quot;Species&#92;&quot;:&#92;&quot;BON - Bonito&#92;&quot;},{&#92;&quot;Date&#92;&quot;:&#92;&quot;2025-12-04&#92;&quot;,&#92;&quot;Vessel&#92;&quot;:&#92;&quot;Egalabur&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU0630997&#92;&quot;,&#92;&quot;Species&#92;&quot;:&#92;&quot;BON - Bonito&#92;&quot;},{&#92;&quot;Date&#92;&quot;:&#92;&quot;2025-12-28&#92;&quot;,&#92;&quot;Vessel&#92;&quot;:&#92;&quot;Egalabur&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU1027329&#92;&quot;,&#92;&quot;Species&#92;&quot;:&#92;&quot;BON - Bonito&#92;&quot;},{&#92;&quot;Date&#92;&quot;:&#92;&quot;2026-01-17&#92;&quot;,&#92;&quot;Vessel&#92;&quot;:&#92;&quot;Artza&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU3462937&#92;&quot;,&#92;&quot;Species&#92;&quot;:&#92;&quot;BON - Bonito&#92;&quot;},{&#92;&quot;Date&#92;&quot;:&#92;&quot;2026-01-13&#92;&quot;,&#92;&quot;Vessel&#92;&quot;:&#92;&quot;Artza&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU4673472&#92;&quot;,&#92;&quot;Species&#92;&quot;:&#92;&quot;BON - Bonito&#92;&quot;},{&#92;&quot;Date&#92;&quot;:&#92;&quot;2026-01-14&#92;&quot;,&#92;&quot;Vessel&#92;&quot;:&#92;&quot;Artza&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU3908490&#92;&quot;,&#92;&quot;Species&#92;&quot;:&#92;&quot;BON - Bonito&#92;&quot;}]&quot;' data-total-rows='25' data-total-columns='4' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;Date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;Vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;destination&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Species&quot;,[&quot;string&quot;,&quot;str&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "llag",
+      "code_hash": "2f20d675c268a24dc1bc59dac9b952f9",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='llag-0' random-id='a28eed5f-13c3-5eb8-249a-391a0ae9eb64'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;start_date&#92;&quot;:&#92;&quot;2025-12-03&#92;&quot;,&#92;&quot;Vessel&#92;&quot;:&#92;&quot;Egalabur&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU0630997&#92;&quot;,&#92;&quot;&#92;&#92;&#92;&quot;first&#92;&#92;&#92;&quot;(Species)&#92;&quot;:&#92;&quot;BON - Bonito&#92;&quot;},{&#92;&quot;start_date&#92;&quot;:&#92;&quot;2025-12-03&#92;&quot;,&#92;&quot;Vessel&#92;&quot;:&#92;&quot;Egalabur&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;SUDU6277497&#92;&quot;,&#92;&quot;&#92;&#92;&#92;&quot;first&#92;&#92;&#92;&quot;(Species)&#92;&quot;:&#92;&quot;BON - Bonito&#92;&quot;},{&#92;&quot;start_date&#92;&quot;:&#92;&quot;2025-12-04&#92;&quot;,&#92;&quot;Vessel&#92;&quot;:&#92;&quot;Egalabur&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;SUDU6141052&#92;&quot;,&#92;&quot;&#92;&#92;&#92;&quot;first&#92;&#92;&#92;&quot;(Species)&#92;&quot;:&#92;&quot;BON - Bonito&#92;&quot;},{&#92;&quot;start_date&#92;&quot;:&#92;&quot;2025-12-04&#92;&quot;,&#92;&quot;Vessel&#92;&quot;:&#92;&quot;Egalabur&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU0595957&#92;&quot;,&#92;&quot;&#92;&#92;&#92;&quot;first&#92;&#92;&#92;&quot;(Species)&#92;&quot;:&#92;&quot;BON - Bonito&#92;&quot;},{&#92;&quot;start_date&#92;&quot;:&#92;&quot;2025-12-28&#92;&quot;,&#92;&quot;Vessel&#92;&quot;:&#92;&quot;Egalabur&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU3684364&#92;&quot;,&#92;&quot;&#92;&#92;&#92;&quot;first&#92;&#92;&#92;&quot;(Species)&#92;&quot;:&#92;&quot;BON - Bonito&#92;&quot;},{&#92;&quot;start_date&#92;&quot;:&#92;&quot;2025-12-28&#92;&quot;,&#92;&quot;Vessel&#92;&quot;:&#92;&quot;Egalabur&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU1027329&#92;&quot;,&#92;&quot;&#92;&#92;&#92;&quot;first&#92;&#92;&#92;&quot;(Species)&#92;&quot;:&#92;&quot;BON - Bonito&#92;&quot;},{&#92;&quot;start_date&#92;&quot;:&#92;&quot;2025-12-29&#92;&quot;,&#92;&quot;Vessel&#92;&quot;:&#92;&quot;Egalabur&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU4444075&#92;&quot;,&#92;&quot;&#92;&#92;&#92;&quot;first&#92;&#92;&#92;&quot;(Species)&#92;&quot;:&#92;&quot;BON - Bonito&#92;&quot;},{&#92;&quot;start_date&#92;&quot;:&#92;&quot;2026-01-12&#92;&quot;,&#92;&quot;Vessel&#92;&quot;:&#92;&quot;Artza&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU4664830&#92;&quot;,&#92;&quot;&#92;&#92;&#92;&quot;first&#92;&#92;&#92;&quot;(Species)&#92;&quot;:&#92;&quot;BON - Bonito&#92;&quot;},{&#92;&quot;start_date&#92;&quot;:&#92;&quot;2026-01-13&#92;&quot;,&#92;&quot;Vessel&#92;&quot;:&#92;&quot;Artza&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU4673472&#92;&quot;,&#92;&quot;&#92;&#92;&#92;&quot;first&#92;&#92;&#92;&quot;(Species)&#92;&quot;:&#92;&quot;BON - Bonito&#92;&quot;},{&#92;&quot;start_date&#92;&quot;:&#92;&quot;2026-01-14&#92;&quot;,&#92;&quot;Vessel&#92;&quot;:&#92;&quot;Artza&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU3908490&#92;&quot;,&#92;&quot;&#92;&#92;&#92;&quot;first&#92;&#92;&#92;&quot;(Species)&#92;&quot;:&#92;&quot;BON - Bonito&#92;&quot;}]&quot;' data-total-rows='15' data-total-columns='4' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;start_date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;Vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;destination&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;&#92;&quot;first&#92;&quot;(Species)&quot;,[&quot;string&quot;,&quot;str&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "zGPW",
+      "code_hash": "13faa9324d79ce45ff876e11fea3a1f2",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "JxHb",
+      "code_hash": "47b1cc00617707827dd7eeff98195eca",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='JxHb-0' random-id='fe27ebb2-4b8f-682b-e6ed-ce6786961c81'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-02-10&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:41.08},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-02-11&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:20.14},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-02-14&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EUSKADI ALAI&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:55.38},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-04-18&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EUSKADI ALAI&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:50.5},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-04-19&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EUSKADI ALAI&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:5.95},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-05-14&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:38.94},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-05-30&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;IZARO&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:25.092},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-05-31&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;IZARO&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:12.72},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-07-09&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ATERPE ALAI&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:24.37},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-08-22&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EUSKADI ALAI&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:50.22}]&quot;' data-total-rows='23' data-total-columns='3' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;tonnage&quot;,[&quot;number&quot;,&quot;f64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "AZCs",
+      "code_hash": "832b0a3090f2b3447bd9e184042460b6",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='AZCs-0' random-id='647a9630-a7c5-2965-687f-f9441eb694d5'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-02-10&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:41.08,&#92;&quot;tonnage_1&#92;&quot;:41.08,&#92;&quot;Date_1&#92;&quot;:&#92;&quot;2025-02-10&#92;&quot;,&#92;&quot;Vessel_1&#92;&quot;:&#92;&quot;Alakrana&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;18:08:00&#92;&quot;},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-02-11&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:20.14,&#92;&quot;tonnage_1&#92;&quot;:20.14,&#92;&quot;Date_1&#92;&quot;:&#92;&quot;2025-02-11&#92;&quot;,&#92;&quot;Vessel_1&#92;&quot;:&#92;&quot;Alakrana&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;17:57:00&#92;&quot;},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-02-14&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EUSKADI ALAI&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:55.38,&#92;&quot;tonnage_1&#92;&quot;:1184.2500000000002,&#92;&quot;Date_1&#92;&quot;:&#92;&quot;2025-02-14&#92;&quot;,&#92;&quot;Vessel_1&#92;&quot;:&#92;&quot;Euskadi Alai&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;18:09:00&#92;&quot;},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-04-18&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EUSKADI ALAI&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:50.5,&#92;&quot;tonnage_1&#92;&quot;:310.24,&#92;&quot;Date_1&#92;&quot;:&#92;&quot;2025-04-18&#92;&quot;,&#92;&quot;Vessel_1&#92;&quot;:&#92;&quot;Euskadi Alai&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;16:40:00&#92;&quot;},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-04-19&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EUSKADI ALAI&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:5.95,&#92;&quot;tonnage_1&#92;&quot;:55.9,&#92;&quot;Date_1&#92;&quot;:&#92;&quot;2025-04-19&#92;&quot;,&#92;&quot;Vessel_1&#92;&quot;:&#92;&quot;Euskadi Alai&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;17:20:00&#92;&quot;},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-05-14&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:38.94,&#92;&quot;tonnage_1&#92;&quot;:1237.74,&#92;&quot;Date_1&#92;&quot;:&#92;&quot;2025-05-14&#92;&quot;,&#92;&quot;Vessel_1&#92;&quot;:&#92;&quot;Alakrana&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;17:46:00&#92;&quot;},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-05-30&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;IZARO&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:25.092,&#92;&quot;tonnage_1&#92;&quot;:189.92700000000002,&#92;&quot;Date_1&#92;&quot;:&#92;&quot;2025-05-30&#92;&quot;,&#92;&quot;Vessel_1&#92;&quot;:&#92;&quot;Izaro&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;17:50:00&#92;&quot;},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-05-31&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;IZARO&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:12.72,&#92;&quot;tonnage_1&#92;&quot;:12.72,&#92;&quot;Date_1&#92;&quot;:&#92;&quot;2025-05-31&#92;&quot;,&#92;&quot;Vessel_1&#92;&quot;:&#92;&quot;Izaro&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;18:29:00&#92;&quot;},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-07-09&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ATERPE ALAI&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:24.37,&#92;&quot;tonnage_1&#92;&quot;:114.28,&#92;&quot;Date_1&#92;&quot;:&#92;&quot;2025-07-09&#92;&quot;,&#92;&quot;Vessel_1&#92;&quot;:&#92;&quot;Aterpe Alai&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;17:40:00&#92;&quot;},{&#92;&quot;date&#92;&quot;:&#92;&quot;2025-08-22&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;EUSKADI ALAI&#92;&quot;,&#92;&quot;tonnage&#92;&quot;:50.22,&#92;&quot;tonnage_1&#92;&quot;:270.0,&#92;&quot;Date_1&#92;&quot;:&#92;&quot;2025-08-22&#92;&quot;,&#92;&quot;Vessel_1&#92;&quot;:&#92;&quot;Euskadi Alai&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;17:43:00&#92;&quot;}]&quot;' data-total-rows='23' data-total-columns='7' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;tonnage&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;tonnage_1&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;Date_1&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;Vessel_1&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;start_time&quot;,[&quot;time&quot;,&quot;time&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "UrqR",
+      "code_hash": null,
+      "outputs": [],
+      "console": []
+    }
+  ]
+}
