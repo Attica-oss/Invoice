@@ -1,0 +1,255 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.19.6"
+  },
+  "cells": [
+    {
+      "id": "setup",
+      "code_hash": "14b687de1fce06e8d62e78e1a8c99c3b",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "YsBs",
+      "code_hash": "d3e6d162ea5e93409083b151dd4c5837",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bAZz",
+      "code_hash": "b5f7bd34dd9c537747f478b0a558c119",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='bAZz-0' random-id='a1cf5a91-cf13-0ecf-61c4-abdd4d5b48ee'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;Month&#92;&quot;:12,&#92;&quot;VESSEL NAME&#92;&quot;:&#92;&quot;SIERRA LEYRE&#92;&quot;,&#92;&quot;DATE IN&#92;&quot;:&#92;&quot;2025-12-01&#92;&quot;,&#92;&quot;TIME IN&#92;&quot;:&#92;&quot;1899-12-31 07:35:00&#92;&quot;,&#92;&quot;DATE OUT&#92;&quot;:&#92;&quot;2025-12-02&#92;&quot;,&#92;&quot;TIME OUT&#92;&quot;:&#92;&quot;1899-12-31 14:55:00&#92;&quot;,&#92;&quot;DURATION IN PORT&#92;&quot;:2,&#92;&quot;VALUE (&#36;)&#92;&quot;:600,&#92;&quot;DISCOUNT&#92;&quot;:null,&#92;&quot;INVOICE VALUE&#92;&quot;:600,&#92;&quot;INVOICING ENTITY&#92;&quot;:&#92;&quot;SEAWARD CO. LTD&#92;&quot;,&#92;&quot;VESSEL TYPE&#92;&quot;:&#92;&quot;CARGO REEFER&#92;&quot;,&#92;&quot;STATUS&#92;&quot;:&#92;&quot;INVOICED&#92;&quot;,&#92;&quot;COMMENTS&#92;&quot;:null,&#92;&quot;Total MTD&#92;&quot;:&#92;&quot;&#92;&quot;,&#92;&quot;Berth Dues Refund Eligibility&#92;&quot;:&#92;&quot;N&#92;&quot;},{&#92;&quot;Month&#92;&quot;:12,&#92;&quot;VESSEL NAME&#92;&quot;:&#92;&quot;PLAYA DE AZKORRI&#92;&quot;,&#92;&quot;DATE IN&#92;&quot;:&#92;&quot;2025-12-01&#92;&quot;,&#92;&quot;TIME IN&#92;&quot;:&#92;&quot;1899-12-31 06:55:00&#92;&quot;,&#92;&quot;DATE OUT&#92;&quot;:&#92;&quot;2025-12-02&#92;&quot;,&#92;&quot;TIME OUT&#92;&quot;:&#92;&quot;1899-12-31 17:35:00&#92;&quot;,&#92;&quot;DURATION IN PORT&#92;&quot;:2,&#92;&quot;VALUE (&#36;)&#92;&quot;:3000,&#92;&quot;DISCOUNT&#92;&quot;:null,&#92;&quot;INVOICE VALUE&#92;&quot;:3000,&#92;&quot;INVOICING ENTITY&#92;&quot;:&#92;&quot;BEACH FISHING LIMITED&#92;&quot;,&#92;&quot;VESSEL TYPE&#92;&quot;:&#92;&quot;FISHING VESSEL&#92;&quot;,&#92;&quot;STATUS&#92;&quot;:&#92;&quot;INVOICED&#92;&quot;,&#92;&quot;COMMENTS&#92;&quot;:&#92;&quot;2 days unloading&#92;&quot;,&#92;&quot;Total MTD&#92;&quot;:&#92;&quot;&#92;&quot;,&#92;&quot;Berth Dues Refund Eligibility&#92;&quot;:&#92;&quot;Y&#92;&quot;},{&#92;&quot;Month&#92;&quot;:12,&#92;&quot;VESSEL NAME&#92;&quot;:&#92;&quot;EGALABUR&#92;&quot;,&#92;&quot;DATE IN&#92;&quot;:&#92;&quot;2025-12-03&#92;&quot;,&#92;&quot;TIME IN&#92;&quot;:&#92;&quot;1899-12-31 07:26:00&#92;&quot;,&#92;&quot;DATE OUT&#92;&quot;:&#92;&quot;2025-12-05&#92;&quot;,&#92;&quot;TIME OUT&#92;&quot;:&#92;&quot;1899-12-31 06:50:00&#92;&quot;,&#92;&quot;DURATION IN PORT&#92;&quot;:2,&#92;&quot;VALUE (&#36;)&#92;&quot;:3000,&#92;&quot;DISCOUNT&#92;&quot;:null,&#92;&quot;INVOICE VALUE&#92;&quot;:3000,&#92;&quot;INVOICING ENTITY&#92;&quot;:&#92;&quot;ATUNSA NV&#92;&quot;,&#92;&quot;VESSEL TYPE&#92;&quot;:&#92;&quot;FISHING VESSEL&#92;&quot;,&#92;&quot;STATUS&#92;&quot;:&#92;&quot;INVOICED&#92;&quot;,&#92;&quot;COMMENTS&#92;&quot;:&#92;&quot;2 days unloading&#92;&quot;,&#92;&quot;Total MTD&#92;&quot;:&#92;&quot;&#92;&quot;,&#92;&quot;Berth Dues Refund Eligibility&#92;&quot;:&#92;&quot;Y&#92;&quot;},{&#92;&quot;Month&#92;&quot;:12,&#92;&quot;VESSEL NAME&#92;&quot;:&#92;&quot;HAWWA&#92;&quot;,&#92;&quot;DATE IN&#92;&quot;:&#92;&quot;2025-12-04&#92;&quot;,&#92;&quot;TIME IN&#92;&quot;:&#92;&quot;1899-12-31 07:16:00&#92;&quot;,&#92;&quot;DATE OUT&#92;&quot;:&#92;&quot;2025-12-06&#92;&quot;,&#92;&quot;TIME OUT&#92;&quot;:&#92;&quot;1899-12-31 15:45:00&#92;&quot;,&#92;&quot;DURATION IN PORT&#92;&quot;:3,&#92;&quot;VALUE (&#36;)&#92;&quot;:4500,&#92;&quot;DISCOUNT&#92;&quot;:null,&#92;&quot;INVOICE VALUE&#92;&quot;:4500,&#92;&quot;INVOICING ENTITY&#92;&quot;:&#92;&quot;HUNT DELTEL&#92;&quot;,&#92;&quot;VESSEL TYPE&#92;&quot;:&#92;&quot;FISHING VESSEL&#92;&quot;,&#92;&quot;STATUS&#92;&quot;:&#92;&quot;INVOICED&#92;&quot;,&#92;&quot;COMMENTS&#92;&quot;:&#92;&quot;3 days unloading&#92;&quot;,&#92;&quot;Total MTD&#92;&quot;:&#92;&quot;&#92;&quot;,&#92;&quot;Berth Dues Refund Eligibility&#92;&quot;:&#92;&quot;Y&#92;&quot;},{&#92;&quot;Month&#92;&quot;:12,&#92;&quot;VESSEL NAME&#92;&quot;:&#92;&quot;ATERPE ALAI&#92;&quot;,&#92;&quot;DATE IN&#92;&quot;:&#92;&quot;2025-12-05&#92;&quot;,&#92;&quot;TIME IN&#92;&quot;:&#92;&quot;1899-12-31 06:45:00&#92;&quot;,&#92;&quot;DATE OUT&#92;&quot;:&#92;&quot;2025-12-09&#92;&quot;,&#92;&quot;TIME OUT&#92;&quot;:&#92;&quot;1899-12-31 17:12:00&#92;&quot;,&#92;&quot;DURATION IN PORT&#92;&quot;:5,&#92;&quot;VALUE (&#36;)&#92;&quot;:6250,&#92;&quot;DISCOUNT&#92;&quot;:null,&#92;&quot;INVOICE VALUE&#92;&quot;:6250,&#92;&quot;INVOICING ENTITY&#92;&quot;:&#92;&quot;ECHEBASTAR FLEET SLU&#92;&quot;,&#92;&quot;VESSEL TYPE&#92;&quot;:&#92;&quot;FISHING VESSEL&#92;&quot;,&#92;&quot;STATUS&#92;&quot;:&#92;&quot;INVOICED&#92;&quot;,&#92;&quot;COMMENTS&#92;&quot;:&#92;&quot;5 days unloading&#92;&quot;,&#92;&quot;Total MTD&#92;&quot;:&#92;&quot;&#92;&quot;,&#92;&quot;Berth Dues Refund Eligibility&#92;&quot;:&#92;&quot;Y&#92;&quot;},{&#92;&quot;Month&#92;&quot;:12,&#92;&quot;VESSEL NAME&#92;&quot;:&#92;&quot;BERNICA&#92;&quot;,&#92;&quot;DATE IN&#92;&quot;:&#92;&quot;2025-12-06&#92;&quot;,&#92;&quot;TIME IN&#92;&quot;:&#92;&quot;1899-12-31 11:09:00&#92;&quot;,&#92;&quot;DATE OUT&#92;&quot;:&#92;&quot;2025-12-13&#92;&quot;,&#92;&quot;TIME OUT&#92;&quot;:&#92;&quot;1899-12-31 14:07:00&#92;&quot;,&#92;&quot;DURATION IN PORT&#92;&quot;:8,&#92;&quot;VALUE (&#36;)&#92;&quot;:11000,&#92;&quot;DISCOUNT&#92;&quot;:null,&#92;&quot;INVOICE VALUE&#92;&quot;:11000,&#92;&quot;INVOICING ENTITY&#92;&quot;:&#92;&quot;SAPMER&#92;&quot;,&#92;&quot;VESSEL TYPE&#92;&quot;:&#92;&quot;FISHING VESSEL&#92;&quot;,&#92;&quot;STATUS&#92;&quot;:&#92;&quot;INVOICED&#92;&quot;,&#92;&quot;COMMENTS&#92;&quot;:&#92;&quot;8 days unloading&#92;&quot;,&#92;&quot;Total MTD&#92;&quot;:&#92;&quot;&#92;&quot;,&#92;&quot;Berth Dues Refund Eligibility&#92;&quot;:&#92;&quot;Y&#92;&quot;},{&#92;&quot;Month&#92;&quot;:12,&#92;&quot;VESSEL NAME&#92;&quot;:&#92;&quot;JANVIER LOUIS RAPHAEL&#92;&quot;,&#92;&quot;DATE IN&#92;&quot;:&#92;&quot;2025-12-09&#92;&quot;,&#92;&quot;TIME IN&#92;&quot;:&#92;&quot;1899-12-31 07:10:00&#92;&quot;,&#92;&quot;DATE OUT&#92;&quot;:&#92;&quot;2025-12-09&#92;&quot;,&#92;&quot;TIME OUT&#92;&quot;:&#92;&quot;1899-12-31 19:05:00&#92;&quot;,&#92;&quot;DURATION IN PORT&#92;&quot;:1,&#92;&quot;VALUE (&#36;)&#92;&quot;:200,&#92;&quot;DISCOUNT&#92;&quot;:null,&#92;&quot;INVOICE VALUE&#92;&quot;:200,&#92;&quot;INVOICING ENTITY&#92;&quot;:&#92;&quot;SAPMER&#92;&quot;,&#92;&quot;VESSEL TYPE&#92;&quot;:&#92;&quot;SUPPLY BOAT&#92;&quot;,&#92;&quot;STATUS&#92;&quot;:&#92;&quot;INVOICED&#92;&quot;,&#92;&quot;COMMENTS&#92;&quot;:null,&#92;&quot;Total MTD&#92;&quot;:&#92;&quot;&#92;&quot;,&#92;&quot;Berth Dues Refund Eligibility&#92;&quot;:&#92;&quot;N&#92;&quot;},{&#92;&quot;Month&#92;&quot;:12,&#92;&quot;VESSEL NAME&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;DATE IN&#92;&quot;:&#92;&quot;2025-12-10&#92;&quot;,&#92;&quot;TIME IN&#92;&quot;:&#92;&quot;1899-12-31 17:35:00&#92;&quot;,&#92;&quot;DATE OUT&#92;&quot;:&#92;&quot;2025-12-18&#92;&quot;,&#92;&quot;TIME OUT&#92;&quot;:&#92;&quot;1899-12-31 16:57:00&#92;&quot;,&#92;&quot;DURATION IN PORT&#92;&quot;:8,&#92;&quot;VALUE (&#36;)&#92;&quot;:11000,&#92;&quot;DISCOUNT&#92;&quot;:null,&#92;&quot;INVOICE VALUE&#92;&quot;:11000,&#92;&quot;INVOICING ENTITY&#92;&quot;:&#92;&quot;ATUNSA NV&#92;&quot;,&#92;&quot;VESSEL TYPE&#92;&quot;:&#92;&quot;FISHING VESSEL&#92;&quot;,&#92;&quot;STATUS&#92;&quot;:&#92;&quot;INVOICED&#92;&quot;,&#92;&quot;COMMENTS&#92;&quot;:&#92;&quot;8 days unloading&#92;&quot;,&#92;&quot;Total MTD&#92;&quot;:&#92;&quot;&#92;&quot;,&#92;&quot;Berth Dues Refund Eligibility&#92;&quot;:&#92;&quot;Y&#92;&quot;},{&#92;&quot;Month&#92;&quot;:12,&#92;&quot;VESSEL NAME&#92;&quot;:&#92;&quot;ELAI ALAI&#92;&quot;,&#92;&quot;DATE IN&#92;&quot;:&#92;&quot;2025-12-12&#92;&quot;,&#92;&quot;TIME IN&#92;&quot;:&#92;&quot;1899-12-31 09:20:00&#92;&quot;,&#92;&quot;DATE OUT&#92;&quot;:&#92;&quot;2025-12-16&#92;&quot;,&#92;&quot;TIME OUT&#92;&quot;:&#92;&quot;1899-12-31 06:50:00&#92;&quot;,&#92;&quot;DURATION IN PORT&#92;&quot;:4,&#92;&quot;VALUE (&#36;)&#92;&quot;:5000,&#92;&quot;DISCOUNT&#92;&quot;:null,&#92;&quot;INVOICE VALUE&#92;&quot;:5000,&#92;&quot;INVOICING ENTITY&#92;&quot;:&#92;&quot;ECHEBASTAR FLEET SLU&#92;&quot;,&#92;&quot;VESSEL TYPE&#92;&quot;:&#92;&quot;FISHING VESSEL&#92;&quot;,&#92;&quot;STATUS&#92;&quot;:&#92;&quot;INVOICED&#92;&quot;,&#92;&quot;COMMENTS&#92;&quot;:&#92;&quot;4 days unloading&#92;&quot;,&#92;&quot;Total MTD&#92;&quot;:&#92;&quot;&#92;&quot;,&#92;&quot;Berth Dues Refund Eligibility&#92;&quot;:&#92;&quot;Y&#92;&quot;},{&#92;&quot;Month&#92;&quot;:12,&#92;&quot;VESSEL NAME&#92;&quot;:&#92;&quot;EUSKADI ALAI&#92;&quot;,&#92;&quot;DATE IN&#92;&quot;:&#92;&quot;2025-12-16&#92;&quot;,&#92;&quot;TIME IN&#92;&quot;:&#92;&quot;1899-12-31 09:25:00&#92;&quot;,&#92;&quot;DATE OUT&#92;&quot;:&#92;&quot;2025-12-18&#92;&quot;,&#92;&quot;TIME OUT&#92;&quot;:&#92;&quot;1899-12-31 21:38:00&#92;&quot;,&#92;&quot;DURATION IN PORT&#92;&quot;:3,&#92;&quot;VALUE (&#36;)&#92;&quot;:3750,&#92;&quot;DISCOUNT&#92;&quot;:null,&#92;&quot;INVOICE VALUE&#92;&quot;:3750,&#92;&quot;INVOICING ENTITY&#92;&quot;:&#92;&quot;HARTSWATER LIMITED&#92;&quot;,&#92;&quot;VESSEL TYPE&#92;&quot;:&#92;&quot;FISHING VESSEL&#92;&quot;,&#92;&quot;STATUS&#92;&quot;:&#92;&quot;INVOICED&#92;&quot;,&#92;&quot;COMMENTS&#92;&quot;:&#92;&quot;3 days unloading&#92;&quot;,&#92;&quot;Total MTD&#92;&quot;:&#92;&quot;&#92;&quot;,&#92;&quot;Berth Dues Refund Eligibility&#92;&quot;:&#92;&quot;Y&#92;&quot;}]&quot;' data-total-rows='29' data-total-columns='16' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;Month&quot;,[&quot;integer&quot;,&quot;i64&quot;]],[&quot;VESSEL NAME&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;DATE IN&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;TIME IN&quot;,[&quot;datetime&quot;,&quot;datetime[ms]&quot;]],[&quot;DATE OUT&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;TIME OUT&quot;,[&quot;datetime&quot;,&quot;datetime[ms]&quot;]],[&quot;DURATION IN PORT&quot;,[&quot;integer&quot;,&quot;i64&quot;]],[&quot;VALUE (&#36;)&quot;,[&quot;integer&quot;,&quot;i64&quot;]],[&quot;DISCOUNT&quot;,[&quot;integer&quot;,&quot;i64&quot;]],[&quot;INVOICE VALUE&quot;,[&quot;integer&quot;,&quot;i64&quot;]],[&quot;INVOICING ENTITY&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;VESSEL TYPE&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;STATUS&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;COMMENTS&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Total MTD&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Berth Dues Refund Eligibility&quot;,[&quot;string&quot;,&quot;str&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Hbol",
+      "code_hash": "1948accd5d94dbd022f0611fc867ade6",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "9ace27bbe9d761cf9d4043c88bfc8033",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "3b6d09da6d0795b664a13e086472d823",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "429d362b14e249807517979eacec1302",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "a94962794321a327bbdf910b56aa440c",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "0bb07c06bf908e2c17047119d77d8392",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "93adc29398b025859d3b2b506daa9c04",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "ead98e1a7001f1d7c0c9c2d1306b6c50",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "431d2f44232fc56277a53f44ff5cfa16",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "RGSE",
+      "code_hash": "6768c379f49a83fa38fdb13d6115c63f",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Kclp",
+      "code_hash": "591ad59c0e143cc4cf5b8fc225bd3683",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<pre class='text-xs'>&lt;class &#x27;polars.dataframe.frame.DataFrame&#x27;&gt;</pre>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "emfo",
+      "code_hash": "c30d9a9e0fca5ed307a2d84a2edfb7f4",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='emfo-0' random-id='52718d00-5016-0f0b-fb3b-7b13704c9e8e'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;max(date)&#92;&quot;:&#92;&quot;2026-01-22&#92;&quot;}]&quot;' data-total-rows='1' data-total-columns='1' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;max(date)&quot;,[&quot;date&quot;,&quot;date&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Hstk",
+      "code_hash": "70868be36f9c858105011dfc191d0370",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "nWHF",
+      "code_hash": "bfe8f22071f644c976b4c84c8b18f43c",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='nWHF-0' random-id='9fd0c221-e89b-d0de-19e6-d8dc4682023d'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;click here&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "iLit",
+      "code_hash": "e5731a04a7bc089f3770d372b4a9bcb4",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='iLit-0' random-id='7f4ceb46-3973-5b0b-b0ba-deb67c4f1f8b'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Fri&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-03&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;13:33:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MSFU0002762&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Dry&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;14:21:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:9.49,&#92;&quot;service&#92;&quot;:&#92;&quot;Full OSS&#92;&quot;,&#92;&quot;unit_price&#92;&quot;:0.0,&#92;&quot;total_price&#92;&quot;:0.0,&#92;&quot;remarks&#92;&quot;:null},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Fri&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-03&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;14:38:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MSFU0000203&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Dry&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;15:18:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:9.71,&#92;&quot;service&#92;&quot;:&#92;&quot;Full OSS&#92;&quot;,&#92;&quot;unit_price&#92;&quot;:0.0,&#92;&quot;total_price&#92;&quot;:0.0,&#92;&quot;remarks&#92;&quot;:null},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Fri&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-03&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;08:29:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;Sierra Lara&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Brine&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;16:47:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:193.15,&#92;&quot;service&#92;&quot;:&#92;&quot;Transhipment&#92;&quot;,&#92;&quot;unit_price&#92;&quot;:32.25,&#92;&quot;total_price&#92;&quot;:6229.088,&#92;&quot;remarks&#92;&quot;:null},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Fri&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-03&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;09:20:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU0280857&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Brine&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;16:45:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:19.62,&#92;&quot;service&#92;&quot;:&#92;&quot;Basic OSS&#92;&quot;,&#92;&quot;unit_price&#92;&quot;:18.25,&#92;&quot;total_price&#92;&quot;:358.065,&#92;&quot;remarks&#92;&quot;:null},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Fri&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-03&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;09:34:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU4452276&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Brine&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;16:16:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:27.34,&#92;&quot;service&#92;&quot;:&#92;&quot;Basic OSS&#92;&quot;,&#92;&quot;unit_price&#92;&quot;:18.25,&#92;&quot;total_price&#92;&quot;:498.955,&#92;&quot;remarks&#92;&quot;:null},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Fri&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-03&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;10:01:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU3760762&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Brine&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;16:43:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:16.35,&#92;&quot;service&#92;&quot;:&#92;&quot;Basic OSS&#92;&quot;,&#92;&quot;unit_price&#92;&quot;:18.25,&#92;&quot;total_price&#92;&quot;:298.388,&#92;&quot;remarks&#92;&quot;:null},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Fri&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-03&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ARTZA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;14:02:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;Unload to Quay&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Brine&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;15:20:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:9.48,&#92;&quot;service&#92;&quot;:&#92;&quot;Unload to Quay&#92;&quot;,&#92;&quot;unit_price&#92;&quot;:18.25,&#92;&quot;total_price&#92;&quot;:173.01,&#92;&quot;remarks&#92;&quot;:null},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Sat&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-04&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;08:44:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU0614912&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Brine&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;10:05:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:24.05,&#92;&quot;service&#92;&quot;:&#92;&quot;Full OSS&#92;&quot;,&#92;&quot;unit_price&#92;&quot;:0.0,&#92;&quot;total_price&#92;&quot;:0.0,&#92;&quot;remarks&#92;&quot;:null},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Sat&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-04&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;09:16:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU3580781&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Brine&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;12:24:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:26.59,&#92;&quot;service&#92;&quot;:&#92;&quot;Full OSS&#92;&quot;,&#92;&quot;unit_price&#92;&quot;:0.0,&#92;&quot;total_price&#92;&quot;:0.0,&#92;&quot;remarks&#92;&quot;:null},{&#92;&quot;day_name&#92;&quot;:&#92;&quot;Sat&#92;&quot;,&#92;&quot;date&#92;&quot;:&#92;&quot;2025-01-04&#92;&quot;,&#92;&quot;vessel&#92;&quot;:&#92;&quot;ALAKRANA&#92;&quot;,&#92;&quot;start_time&#92;&quot;:&#92;&quot;10:27:00&#92;&quot;,&#92;&quot;destination&#92;&quot;:&#92;&quot;MNBU4177929&#92;&quot;,&#92;&quot;overtime&#92;&quot;:&#92;&quot;normal hours&#92;&quot;,&#92;&quot;storage_type&#92;&quot;:&#92;&quot;Brine&#92;&quot;,&#92;&quot;end_time&#92;&quot;:&#92;&quot;12:49:00&#92;&quot;,&#92;&quot;total_tonnage&#92;&quot;:26.87,&#92;&quot;service&#92;&quot;:&#92;&quot;Full OSS&#92;&quot;,&#92;&quot;unit_price&#92;&quot;:0.0,&#92;&quot;total_price&#92;&quot;:0.0,&#92;&quot;remarks&#92;&quot;:null}]&quot;' data-total-rows='6278' data-total-columns='13' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;day_name&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;date&quot;,[&quot;date&quot;,&quot;date&quot;]],[&quot;vessel&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;start_time&quot;,[&quot;time&quot;,&quot;time&quot;]],[&quot;destination&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;overtime&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;storage_type&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;end_time&quot;,[&quot;time&quot;,&quot;time&quot;]],[&quot;total_tonnage&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;service&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;unit_price&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;total_price&quot;,[&quot;number&quot;,&quot;f64&quot;]],[&quot;remarks&quot;,[&quot;string&quot;,&quot;str&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ZHCJ",
+      "code_hash": null,
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    }
+  ]
+}

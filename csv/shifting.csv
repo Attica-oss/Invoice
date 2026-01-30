@@ -403,6 +403,8 @@ Tue,2025-09-16,MNBU3447980,RAWANQ,Shifted to acces unit MNBU3515596 for transfer
 Tue,2025-09-16,MNBU4590608,RAWANQ,Shifted to acces unit MNBU3515596 for transfer,35.0
 Tue,2025-09-16,MNBU4535278,RAWANQ,Shifted to acces unit MNBU3515596 for transfer,35.0
 Tue,2025-09-16,MWCU5334731,RAWANQ,Shifted to acces unit MNBU3515596 for transfer,35.0
+Wed,2025-10-01,SUDU8068916,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Wed,2025-10-01,SUDU8237132,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
 Fri,2025-10-03,MNBU4421059,SOCOMEP,Shifted to access unit MNBU3811556/MNBU0334676 for inspection,35.0
 Fri,2025-10-03,MNBU4108738,SOCOMEP,Shifted to access unit MNBU3811556/MNBU0334676 for inspection,35.0
 Fri,2025-10-03,MNBU4348410,SOCOMEP,Shifted to access unit MNBU3811556/MNBU0334676 for inspection,35.0
@@ -433,8 +435,14 @@ Fri,2025-10-10,MNBU0674022,CCCS,Requesting stacker to twist this MIL container c
 Fri,2025-10-10,TCNU7891058,PEVASA,Re-position container TCNU7891058 for unloading,35.0
 PH,2025-10-13,TTNU8204293,IOT,Shifted to access TTNU8192823 for transfer,52.5
 Tue,2025-10-14,MNBU3426930,MAERSKLINE,Grounded for repairs,35.0
+Thu,2025-10-16,SUDU6089993,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Thu,2025-10-16,SUDU6083450,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
 Tue,2025-10-21,MNBU3556337,MAERSKLINE,Grounded for repairs,35.0
 Tue,2025-10-21,MNBU9139686,MAERSKLINE,Grounded for repairs,35.0
+Wed,2025-10-29,MCAU6052916,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Tue,2025-11-04,MCAU6011096,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Tue,2025-11-04,MNBU4041824,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Tue,2025-11-04,MNBU0013887,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
 Fri,2025-11-07,TCLU1253399,CCCS,Shifting OB container South for plugin - Overtime,35.0
 Sat,2025-11-08,TCLU1253399,CCCS,Shifting OB container North,35.0
 Tue,2025-11-11,TLLU1033330,CMA CGM,Shifted to access unit TCLU1196473 for repairs by tech,35.0
@@ -444,13 +452,57 @@ Tue,2025-11-11,TCLU1269414,CMA CGM,Shifted to access unit TCLU1196473 for repair
 Tue,2025-11-11,TLLU1030768,CMA CGM,Shifted to access unit TCLU1196473 for repairs by tech,35.0
 Tue,2025-11-11,TLLU1034280,CMA CGM,Shifted to access unit TCLU1196473 for repairs by tech,35.0
 Tue,2025-11-11,TCLU1196473,CMA CGM,Grounded for repairs,35.0
+Fri,2025-11-14,SUDU6205732,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Fri,2025-11-14,SUDU6087250,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Fri,2025-11-14,SUDU6289440,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Fri,2025-11-14,MCAU6069138,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Fri,2025-11-14,SUDU6088913,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Fri,2025-11-14,SUDU6058919,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Fri,2025-11-14,MCAU6062642,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Fri,2025-11-14,MCAU6040140,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Fri,2025-11-14,SUDU8221007,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Fri,2025-11-14,MCAU6005750,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
 Mon,2025-11-17,MRKU9666774,CCCS,Shifting IFS container to make space,35.0
 Mon,2025-11-17,MRKU2153039,CCCS,Shifting IFS container to make space,35.0
 Mon,2025-11-17,MMAU1120767,CCCS,Shifting IFS container to make space,35.0
+Mon,2025-11-17,MCAU6004158,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
 Tue,2025-11-18,TLLU2306315,CCCS,Shifting Dry container south,35.0
+Tue,2025-11-18,MNBU3251702,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Tue,2025-11-18,MCAU6037697,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Tue,2025-11-18,MNBU3760464,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Wed,2025-11-19,SUDU6120770,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
 Mon,2025-11-24,SUDU8018875,CCCS,Shifting for plugin,35.0
+Wed,2025-12-03,SUDU6162374,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Wed,2025-12-03,MCAU6018104,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Wed,2025-12-03,SUDU6285105,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Wed,2025-12-03,SUDU8228439,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Wed,2025-12-03,SUDU8246643,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Wed,2025-12-10,MSWU0067989,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Fri,2025-12-12,SUDU8226734,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Fri,2025-12-12,SUDU8226821,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Mon,2025-12-15,SUDU8237981,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Mon,2025-12-15,MSWU0103216,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Mon,2025-12-29,MSWU0101126,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Mon,2025-12-29,MNBU3665404,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
 Tue,2025-12-30,CGMU5549932,CCCS,Shifting for Access,35.0
-Tue,2026-01-06,MRSU3637724,PEVASA,Shifted for Unstuffing to dry storage at CCCS,35.0
+Mon,2026-01-05,MNBU3408556,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
 Tue,2026-01-06,SUDU8011000,CCCS,Rotating OB container,35.0
+Wed,2026-01-07,MRSU3637724,PEVASA,Shifted for Unstuffing to dry storage at CCCS,35.0
+Thu,2026-01-08,MNBU1021634,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Thu,2026-01-08,MNBU4169841,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Fri,2026-01-09,MNBU3186968,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Fri,2026-01-09,SUDU8093225,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
 Wed,2026-01-14,CGMU6524184,CCCS,Rotating full GSC container,35.0
 Thu,2026-01-15,CGMU5365093,CCCS,Shifting GSC container further inside closer to canteen,35.0
+Thu,2026-01-15,MSWU1001311,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Tue,2026-01-20,SUDU8124202,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Wed,2026-01-21,MNBU0023191,MAERSKLINE,shifting to position at IPHS at Gate in,35.0
+Wed,2026-01-21,MNBU0023191,MAERSKLINE,shifting to position at IPHS at Gate out,35.0
+Wed,2026-01-21,SUDU6152210,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Wed,2026-01-21,SUDU6051175,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Wed,2026-01-21,MCAU6044700,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Wed,2026-01-21,SUDU6171627,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Wed,2026-01-21,MNBU0388939,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Wed,2026-01-21,TLLU1170970,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Wed,2026-01-21,MNBU3107104,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0
+Tue,2026-01-27,MNBU0024177,MAERSKLINE,Positioned at PTI area; PTI not run.,35.0

@@ -160,9 +160,9 @@ cccs_adjusted_records = (
                 .str.replace(",", "")
                 .cast(pl.Int64)
                 * 0.001  # Convert to Tons from Kilos
-            )
+            ).round(3)
             .cast(pl.Float64)
-            .round(3)
+           
             .alias("total_tonnage"),
             pl.col("Container (Destination)").alias("destination"),
             pl.col("Species"),
@@ -205,10 +205,10 @@ cccs_adjusted_records = (
     .agg(
         start_time=pl.col("Time").min(),
         end_time=pl.col("Time").max(),
-        total_tonnage=pl.col("adjusted_tonnage").sum(),
+        total_tonnage=pl.col("adjusted_tonnage").sum().round(3),
     )
     .select(
-        [
+        ["Day",
             "date",
             "vessel",
             "start_time",
@@ -218,7 +218,7 @@ cccs_adjusted_records = (
             "end_time",
             "total_tonnage",
         ]
-    )
+    ).sort(by="date")
 )
 
 
