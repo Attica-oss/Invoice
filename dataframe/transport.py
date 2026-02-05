@@ -21,7 +21,7 @@ from type_casting.dates import (
     LOWER_BOUND,
     UPPER_BOUND_SPECIAL_DAY,
     public_holiday,
-    Days
+    Days,
 )
 from type_casting.containers import containers_enum
 from type_casting.validations import STATUS_TYPE, OvertimePerc, Status
@@ -33,8 +33,16 @@ SHIFTING_PRICE = (
     get_price(["Shifting"]).select(pl.col("Price")).collect().to_series()[0]
 )
 
+SHORE_CRANE_PRICE: float = (
+    get_price(["Shore Crane"]).select(pl.col("Price")).collect().to_series()[0]
+)
+
 TRANSFER_PRICE = get_price(["Haulage FEU", "Haulage TEU"])
 
+# Shore crane overtime increase by 10%
+
+INCREASE_10_PERCENT = 1.10
+CUT_OFF_DATE = date(2026, 1, 1)
 
 shore_crane: pl.LazyFrame = (
     load_gsheet_data(TRANSPORT_SHEET_ID, shore_crane_sheet)
@@ -49,12 +57,76 @@ shore_crane: pl.LazyFrame = (
         # .str.to_time(format="%H:%M")
         .dt.hour(),  # .str.to_time(format="%H:%M")
         pl.col("customer").cast(pl.Utf8),
+        pl.col("location").cast(pl.Utf8),
         pl.col("operation_type"),
         pl.col("remarks"),
         pl.col("invoiced_to"),
-        pl.col("price").cast(pl.Float64),
-        pl.col("total_price").str.replace_many(["$", ","], "").cast(pl.Float64),
+        # pl.col("price").cast(pl.Float64),
+        # pl.col("total_price").str.replace_many(["$", ","], "").cast(pl.Float64),
     )
+    .with_columns(
+        pl.when(
+            (pl.col("day").is_in(SPECIAL_DAYS)).and_(pl.col("date").ge(CUT_OFF_DATE))
+        )
+        .then(SHORE_CRANE_PRICE * OvertimePerc.overtime_150 * INCREASE_10_PERCENT)
+        .when((pl.col("day").is_in(SPECIAL_DAYS)))
+        .then(SHORE_CRANE_PRICE * OvertimePerc.overtime_150)
+        .otherwise(SHORE_CRANE_PRICE)
+        .round(3)
+        .alias("unit_price")
+    )
+    .with_columns((pl.col("hours") - pl.col("overtime_hours")).alias("normal_hours"))
+    .with_columns(
+        pl.when(pl.col("day").is_in(SPECIAL_DAYS).and_(pl.col("date").ge(CUT_OFF_DATE)))
+        .then(
+            (
+                pl.col("normal_hours")
+                * SHORE_CRANE_PRICE
+                * OvertimePerc.overtime_150
+                * INCREASE_10_PERCENT
+            )
+            + (
+                pl.col("overtime_hours")
+                * SHORE_CRANE_PRICE
+                * OvertimePerc.overtime_200
+                * INCREASE_10_PERCENT
+            )
+        )
+        .when(pl.col("day").is_in(SPECIAL_DAYS))
+        .then(
+            (pl.col("normal_hours") * SHORE_CRANE_PRICE * OvertimePerc.overtime_150)
+            + (pl.col("overtime_hours") * SHORE_CRANE_PRICE * OvertimePerc.overtime_200)
+        )
+        .when(pl.col("date").ge(date(2026, 1, 1)))
+        .then(
+            (pl.col("normal_hours") * SHORE_CRANE_PRICE * OvertimePerc.normal_hour)
+            + (
+                pl.col("overtime_hours")
+                * SHORE_CRANE_PRICE
+                * OvertimePerc.overtime_150
+                * INCREASE_10_PERCENT
+            )
+        )
+        .otherwise(
+            (pl.col("normal_hours") * SHORE_CRANE_PRICE * OvertimePerc.normal_hour)
+            + (pl.col("overtime_hours") * SHORE_CRANE_PRICE * OvertimePerc.overtime_150)
+        ).round(3)
+        .alias("total_price")
+    ).select(
+        pl.col("day").alias("day_name"),
+        pl.col("date"),
+        pl.col("start_time"),
+        pl.col("end_time"),
+        pl.col("hours"),
+        pl.col("overtime_hours"),
+        pl.col("customer"),
+        pl.col("location"),
+        pl.col("operation_type"),
+        pl.col("remarks"),
+        pl.col("invoiced_to"),
+        pl.col("unit_price"),
+        pl.col("total_price"),
+    ).sort(by=["date", "start_time"])
 )
 
 transfer = (
@@ -69,8 +141,8 @@ transfer = (
         pl.col("driver").cast(
             dtype=pl.Enum(["NA", "IPHS", "THIRD PARTY", "IPHS (Third Party)"])
         ),
-        pl.col("time_out"), # .str.to_time(format="%H:%M")
-        pl.col("time_in"), # .str.to_time(format="%H:%M")
+        pl.col("time_out"),  # .str.to_time(format="%H:%M")
+        pl.col("time_in"),  # .str.to_time(format="%H:%M")
     )
     .select(pl.all().exclude("invoice_to"))
     .with_columns(
@@ -85,7 +157,8 @@ transfer = (
         .when(pl.col("movement_type") == "Delivery")
         .then(pl.col("time_out"))
         .otherwise(pl.time()),
-    ).sort(by="date")
+    )
+    .sort(by="date")
     .join_asof(
         TRANSFER_PRICE,
         by="Service",

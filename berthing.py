@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.19.6"
+__generated_with = "0.19.7"
 app = marimo.App(width="medium")
 
 with app.setup:
@@ -525,7 +525,7 @@ def _():
 def _(engine, net_list):
     _df = mo.sql(
         f"""
-        SELECT * FROM net_list
+        SELECT * FROM net_list WHERE date = '2025-10-27'
         """,
         engine=engine
     )
