@@ -22,9 +22,15 @@ WELL_TO_WELL: pl.LazyFrame = get_price(["Well to Well Transfer"]).with_columns(
     date=pl.col("Date")
 )
 
-TARE_RATE: pl.LazyFrame = get_price(
-    ["Rental of Calibration", "Tare Calibration"]
-).with_columns(date=pl.col("Date"))
+TARE_RATE: pl.LazyFrame = (
+    get_price(["Rental of Calibration", "Tare Calibration"])
+    .with_columns(date=pl.col("Date"))
+    .select(
+        pl.col("Date").alias("effective_date"),
+        pl.col("Service").alias("service"),
+        pl.col("Price").alias("unit_price"),
+    )
+)
 
 
 ADDITIONAL_OVERTIME: pl.LazyFrame = (
@@ -32,7 +38,7 @@ ADDITIONAL_OVERTIME: pl.LazyFrame = (
 )
 
 
-OPS_ACTIVITY_PATH = r"C:\Users\gmounac\Dropbox\! OPERATION SUPPORTING DOCUMENTATION\2025\2025 IPHS operation activity.xlsx"
+OPS_ACTIVITY_PATH = r"C:\Users\gmounac\Dropbox\! OPERATION SUPPORTING DOCUMENTATION\2026\2026 IPHS operation activity.xlsx"
 
 
 # Operations Activity Unloading Lazyframe
@@ -185,7 +191,7 @@ hatch_to_hatch: pl.LazyFrame = (
             OvertimePerc.normal_hour * pl.col("Price") * pl.col("Well-to-Well Transfer")
         )
     )
-     .with_columns(
+    .with_columns(
         price=pl.when(pl.col("day_name").is_in(SPECIAL_DAYS))
         .then(OvertimePerc.overtime_150 * pl.col("Price"))
         .otherwise(OvertimePerc.normal_hour * pl.col("Price"))
@@ -202,104 +208,83 @@ hatch_to_hatch: pl.LazyFrame = (
 
 # Rental of Calibration Weight Service
 
-tare: pl.DataFrame = (
-    main_file.filter(pl.col("DAY") != "OT")
-    .select(
-        pl.col("DATE").alias("date"),
-        pl.col("VESSEL NAME").alias("vessel"),
-        pl.col("Comments").str.to_lowercase(),
-    )
-    .with_columns(
-        rental_of_weight=pl.lit(1),
-        sides_working=pl.when(
-            (pl.col("Comments").str.contains("front"))
-            & (pl.col("Comments").str.contains("back"))
-            & (pl.col("Comments").str.contains("middle"))
-        )
-        .then(pl.lit(3))
-        .when(
+tare: pl.LazyFrame = (
+    (
+        (
             (
-                (pl.col("Comments").str.contains("front"))
-                & (pl.col("Comments").str.contains("back"))
-            )
-            | (
-                (
-                    (pl.col("Comments").str.contains("front"))
-                    & (pl.col("Comments").str.contains("middle"))
+                load_gsheet_data(OPS_SHEET_ID, raw_sheet)
+                .select(
+                    pl.col("Date").alias("date"),
+                    pl.col("Vessel").str.to_uppercase().alias("vessel"),
+                    pl.col("Side Working").alias("side_working"),
+                )
+                .unique()
+                .sort(by="date")
+                .group_by(["date", "vessel"], maintain_order=True)
+                .agg(
+                    pl.col("side_working")
+                    .unique()
+                    .sort()
+                    .str.join(", ")
+                    .alias("side_working")
                 )
             )
-            | (
-                (
-                    (pl.col("Comments").str.contains("back"))
-                    & (pl.col("Comments").str.contains("middle"))
+            .with_columns(
+                [
+                    pl.lit(1, dtype=pl.Int64).alias("rental_of_weight"),
+                    pl.col("side_working")
+                    .str.split(", ")
+                    .list.len()
+                    .alias("number_of_sides"),
+                    pl.lit("Rental of Calibration").alias("service"),
+                ]
+            )
+            .join_asof(
+                other=TARE_RATE,
+                by_left="service",
+                by_right="service",
+                left_on="date",
+                right_on="effective_date",
+                strategy="backward",
+            )
+            .drop(["service", "effective_date"])
+        )
+        .with_columns(
+            [
+                (pl.col("unit_price") * pl.col("rental_of_weight")).alias(
+                    "price_per_rental"
                 )
-            )
-            | (pl.col("Comments").str.contains("both sides"))
+            ]
         )
-        .then(pl.lit(2))
-        .otherwise(pl.lit(1)),
+        .drop(pl.col("unit_price"))
     )
+    .with_columns(pl.lit("Tare Calibration").alias("service"))
+    .join_asof(
+        other=TARE_RATE,
+        by_left="service",
+        by_right="service",
+        left_on="date",
+        right_on="effective_date",
+        strategy="backward",
+    )
+    .drop(["service", "effective_date"])
     .with_columns(
-        sides_remarks=pl.when(
-            (pl.col("Comments").str.contains("front"))
-            & (pl.col("Comments").str.contains("back"))
-            & (pl.col("Comments").str.contains("middle"))
-        )
-        .then(pl.lit("Front, Middle and Back"))
-        .when(
-            (
-                (pl.col("Comments").str.contains("front"))
-                & (pl.col("Comments").str.contains("back"))
+        [
+            (pl.col("unit_price") * pl.col("number_of_sides")).alias(
+                "price_per_calibrations"
             )
-            | (pl.col("Comments").str.contains("both sides"))
-        )
-        .then(pl.lit("Front and Back"))
-        .when(
-            (
-                (pl.col("Comments").str.contains("front"))
-                & (pl.col("Comments").str.contains("middle"))
-            )
-        )
-        .then(pl.lit("Front and Middle"))
-        .when(
-            (
-                (pl.col("Comments").str.contains("back"))
-                & (pl.col("Comments").str.contains("middle"))
-            )
-        )
-        .then(pl.lit("Middle and Back"))
-        .when((pl.col("Comments").str.contains("front")))
-        .then(pl.lit("Front"))
-        .when((pl.col("Comments").str.contains("back")))
-        .then(pl.lit("Back"))
-        .when((pl.col("Comments").str.contains("middle")))
-        .then(pl.lit("Middle"))
-        .otherwise(pl.lit("One Side"))
+        ]
     )
-    .with_columns(Service=pl.lit("Rental of Calibration"))
-    .sort(by="date")
-    .join_asof(TARE_RATE, by="Service", on="date", strategy="backward")
-    .select(pl.all().exclude(["Service", "Date"]))
+    .drop(pl.col("unit_price"))
     .with_columns(
-        Service=pl.lit("Tare Calibration"),
-        rental_price=pl.col("Price").alias("rental_price"),
-    )
-    .drop("Price")
-    .join_asof(TARE_RATE, by="Service", on="date", strategy="backward")
-    .select(pl.all().exclude(["Service", "Date"]))
-    .with_columns(calibration_price=pl.col("Price") * pl.col("sides_working"))
-    .with_columns(total_price=pl.col("rental_price") + pl.col("calibration_price"))
-    .select(
-        pl.col("date"),
-        pl.col("vessel"),
-        pl.col("rental_of_weight"),
-        pl.col("sides_remarks").alias("sides_working"),
-        pl.col("rental_price"),
-        pl.col("calibration_price"),
-        pl.col("total_price"),
-        pl.col("sides_working").alias("number_of_sides"),
+        [
+            (pl.col("price_per_rental") + pl.col("price_per_calibrations")).alias(
+                "total_price"
+            )
+        ]
     )
 )
+
 
 # Additional Stevedores (Overtime)
 

@@ -26,6 +26,8 @@ from type_casting.validations import (
 from type_casting.containers import iot_soc
 from type_casting.customers import cargo
 
+from type_casting.dates import Days
+
 from dataframe.stuffing import coa
 from data.price import FREE, get_price
 
@@ -120,6 +122,7 @@ cccs_record = (
         .with_columns(
             destination="CCCS ("
             + pl.col("customer")
+            .str.replace(" S.A.", "")  # For CFTO
             .str.replace(" S.A", "")  # For INPESCA
             .str.replace(" SA", "")  # For ALBACORA
             .cast(pl.Utf8)
@@ -230,6 +233,7 @@ netList = (
             load_gsheet_data(OPS_SHEET_ID, net_list_sheet)
             .filter(~pl.col("Container (Destination)").str.contains("CCCS"))
             .select(
+                pl.col("Date").days.add_day_name().cast(pl.Utf8).alias("Day"),
                 pl.col("Date").alias("date"),
                 pl.col("Vessel").str.to_uppercase().alias("vessel"),
                 pl.col("startTime").alias("start_time"),

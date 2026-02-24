@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.19.7"
+__generated_with = "0.19.11"
 app = marimo.App(width="medium")
 
 with app.setup:
@@ -17,7 +17,9 @@ with app.setup:
         ALL_CCCS_DATA_SHEET,
         STUFFING_SHEET_ID,
         plugin_sheet,
-    MASTER_ID,price_sheet
+        MASTER_ID,
+        price_sheet,
+    INVOICING,INVOICE_STATUS
     )
     from type_casting.dates import public_holiday
     from type_casting.containers import iot_soc
@@ -26,15 +28,75 @@ with app.setup:
 
 @app.cell
 def _():
-    berth = load_excel(ExcelFiles.BERTH_DUES)
-    return (berth,)
+    invoice_df = load_gsheet_data(sheet_id=INVOICING,sheet_name=INVOICE_STATUS)
+    return (invoice_df,)
 
 
-@app.cell
+app._unparsable_cell(
+    r"""
+    berth = load_excel(ExcelFiles.)
+    """,
+    name="_"
+)
+
+
+@app.cell(hide_code=True)
 def _(berth):
     _df = mo.sql(
         f"""
-        FROM berth WHERE Month = 12
+        FROM berth
+        """
+    )
+    return
+
+
+@app.cell
+def _(berth, invoice_df):
+    _df = mo.sql(
+        f"""
+        WITH
+            berthing AS (
+                FROM
+                    berth
+                SELECT
+                    "VESSEL NAME" AS vessel,
+                    "DATE IN" AS date_in,
+                    CAST("TIME IN" AS TIME) AS time_in,
+                    "DATE OUT" AS date_out,
+                    CAST("TIME OUT" AS TIME) AS time_out,
+                    "INVOICING ENTITY" AS customer,
+                    "VESSEL TYPE" AS vessel_type,
+                    "COMMENTS" AS remarks
+                WHERE
+                    Month >= 11
+
+                    AND vessel_type = 'FISHING VESSEL'
+            ),
+            sto_number AS (
+                FROM
+                    invoice_df
+                SELECT
+                    "month",
+                    sub_type,
+                    report_name,
+                    customer,
+                    starting_date,
+                    ending_date
+                WHERE
+                    report_type = 'sto'
+                    AND starting_date BETWEEN '2025-12-01' AND '2025-12-31'
+            --AND report_status <> 'Closed'
+            )
+
+        SELECT
+            s.sub_type,
+            b.* EXCLUDE(vessel_type),
+            s.*
+        FROM
+            berthing b
+            LEFT JOIN sto_number s ON b.vessel = s.report_name
+            AND b.date_in = s.starting_date
+        ORDER BY date_in,time_in
         """
     )
     return
@@ -215,7 +277,7 @@ def _(cccs, raw_df):
                 SELECT
                     day AS day_name,
                     date,
-                    'CCCS (' || REPLACE(REPLACE(customer, ' S.A', ''), ' SA', '') || ')' AS destination,
+                    'CCCS (' || REPLACE(REPLACE(REPLACE(customer, ' S.A.', ''), ' SA', ''),' S.A','') || ')' AS destination,
                     vessel,
                     storage_type,
                     total_tonnage,
@@ -366,6 +428,7 @@ def _(
                         OR (destination LIKE '%Unload to Quay%')
                         OR (
                             destination IN (
+             SELECT CAST(r.container_number AS VARCHAR)
                                 FROM
                                     iot_soc_df
                             )
@@ -388,6 +451,7 @@ def _(
                 ORDER BY
                     l.date,
                     l.vessel
+            -- 2545377
             ),
             price AS (
                 FROM
@@ -501,6 +565,22 @@ def _(net_list_dataf):
     return
 
 
+@app.cell(hide_code=True)
+def _(net_list_dataf):
+    _df = mo.sql(
+        f"""
+        FROM net_list_dataf WHERE vessel = 'BERNICA' AND date = '2025-12-11'
+        """
+    )
+    return
+
+
+@app.cell
+def _():
+    80.404 + 18.504 + 69.128 + 42.743 +19.456
+    return
+
+
 @app.cell
 def _(net_list_dataf):
     _df = mo.sql(
@@ -522,12 +602,445 @@ def _():
 
 
 @app.cell
-def _(engine, net_list):
+def _():
+    ops = load_excel(ExcelFiles.OPERATIONS_ACTIVITY)
+    ops_2026 = load_excel(ExcelFiles.OPERATIONS_ACTIVITY_2026)
+    return ops, ops_2026
+
+
+@app.cell(hide_code=True)
+def _(ops):
     _df = mo.sql(
         f"""
-        SELECT * FROM net_list WHERE date = '2025-10-27'
+        FROM
+            ops
+        SELECT
+            DATE,
+            "VESSEL NAME" AS vessel,
+            CAST("TOTAL TONNAGE" AS DECIMAL)AS tonnage
+        WHERE
+            DATE IS NOT NULL
+            AND DATE > '2025-10-01'
+        ORDER BY DATE
+        """
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(net_list_dataf):
+    _df = mo.sql(
+        f"""
+        FROM net_list_dataf WHERE date = '2025-12-09' AND vessel = 'BERNICA'
+        """
+    )
+    return
+
+
+@app.cell
+def _():
+    17.45 + 26.895
+    return
+
+
+@app.cell
+def _():
+    27.686 - 27.736
+    return
+
+
+@app.cell
+def _(engine, net_list_dataf, ops_2026):
+    _df = mo.sql(
+        f"""
+        WITH
+            o AS (
+                FROM
+                    ops_2026
+                SELECT
+                    DATE,
+                    "VESSEL NAME" AS vessel,
+                    SUM(CAST("TOTAL TONNAGE" AS DECIMAL)) AS tonnage
+                WHERE
+                    DATE IS NOT NULL
+                    -- AND DATE > '2025-10-01'
+                GROUP BY
+                    DATE,
+                    vessel
+                ORDER BY
+                    DATE
+            ),
+            n AS (
+                SELECT
+                    date,
+                    CAST(SUM(total_tonnage) AS DECIMAL) AS tonnage,
+                    vessel
+                FROM
+                    net_list_dataf
+                WHERE
+                    date > '2025-12-31'
+                GROUP BY
+                    date,
+                    vessel
+                ORDER BY
+                    date
+            )
+
+
+
+        FROM o LEFT JOIN n ON n.date = o.date AND n.vessel = o.vessel
+        SELECT *, (o.tonnage - n.tonnage) AS difference
+        WHERE n.date IS NOT NULL AND difference <> 0
         """,
         engine=engine
+    )
+    return
+
+
+@app.cell
+def _():
+    from dataframe.netlist import netList
+
+    return
+
+
+@app.cell(hide_code=True)
+def _(net_list_dataf):
+    _df = mo.sql(
+        f"""
+        SELECT 
+            date,
+            CAST(SUM(total_tonnage) AS DECIMAL) AS tonnage
+
+        FROM
+            net_list_dataf
+        WHERE
+            vessel = 'PLAYA DE AZKORRI'
+            AND MONTH(date) = 12
+        GROUP BY 
+        	date
+        ORDER BY 
+        	date
+        """
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(net_list_dataf):
+    _df = mo.sql(
+        f"""
+        FROM net_list_dataf WHERE YEAR(date) = 2026 AND vessel = 'BERNICA'
+        """
+    )
+    return
+
+
+@app.cell
+def _():
+    23.370 + 17.97 + 14.23
+    return
+
+
+@app.cell
+def _():
+    from dataframe.shore_handling import salt,forklift_salt
+    from dataframe.transport import forklift
+
+
+    return forklift, forklift_salt, salt
+
+
+@app.cell(hide_code=True)
+def _(forklift):
+    _df = mo.sql(
+        f"""
+        FROM forklift WHERE customer LIKE '%INTERTUNA%'
+        """
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(salt):
+    _df = mo.sql(
+        f"""
+        FROM salt WHERE customer LIKE '%HARTSWATER%' AND date >= '2025-12-01'
+        """
+    )
+    return
+
+
+@app.cell
+def _():
+    76 + 44.869565217391305 + 80 + 80
+    return
+
+
+@app.cell
+def _():
+    return
+
+
+@app.cell
+def _(forklift_salt):
+    f_salt = forklift_salt()
+    return (f_salt,)
+
+
+@app.cell(hide_code=True)
+def _(f_salt):
+    _df = mo.sql(
+        f"""
+        FROM f_salt WHERE customer LIKE '%HARTSWATER%' AND MONTH(date) = 12 AND YEAR(date) = 2025
+        """
+    )
+    return
+
+
+@app.cell
+def _():
+    from dataframe.transport import shore_crane,transfer
+
+    return shore_crane, transfer
+
+
+@app.cell
+def _(transfer):
+    _df = mo.sql(
+        f"""
+        FROM
+            transfer
+        WHERE
+            container_number IN (
+                'MNBU3735646',
+
+            )
+            AND date BETWEEN '2025-12-01' AND '2025-12-31'
+        AND status = 'Full'
+        """
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(shore_crane):
+    _df = mo.sql(
+        f"""
+        FROM shore_crane WHERE date BETWEEN '2025-12-01' AND '2025-12-31'
+        """
+    )
+    return
+
+
+@app.cell
+def _():
+    from dataframe.miscellaneous import cross_stuffing
+
+    return (cross_stuffing,)
+
+
+@app.cell(hide_code=True)
+def _(cross_stuffing):
+    _df = mo.sql(
+        f"""
+        FROM cross_stuffing WHERE MONTH(date) = 12
+        """
+    )
+    return
+
+
+@app.cell
+def _():
+    from dataframe.stuffing import coa 
+
+    return (coa,)
+
+
+@app.cell(hide_code=True)
+def _(coa):
+    _df = mo.sql(
+        f"""
+        SELECT
+            *
+        FROM
+            coa
+        WHERE
+            date_plugged BETWEEN '2025-12-01' AND '2026-12-31'
+            AND container_number = 'SUDU8108177'
+        	-- AND operation_type = 'Basic OSS'
+        """
+    )
+    return
+
+
+@app.cell
+def _():
+    (17*70) *3
+    return
+
+
+@app.cell(hide_code=True)
+def _(net_list_dataf):
+    _df = mo.sql(
+        f"""
+        FROM net_list_dataf WHERE remarks = 'AMIRANTE'
+        """
+    )
+    return
+
+
+@app.cell
+def _():
+    stuffing_log = load_excel(file_path=ExcelFiles.CONTAINER_OPERATIONS)
+    return
+
+
+@app.cell(hide_code=True)
+def _(stuffing):
+    _df = mo.sql(
+        f"""
+        FROM stuffing WHERE container_number = 'TTNU8056832' --WHERE "Date affected" BETWEEN '2025-12-01' AND '2025-12-31' AND "Shipping Line" = 'IOT'
+        """
+    )
+    return
+
+
+@app.cell
+def _():
+    from dataframe.miscellaneous import cccs_stuffing
+
+    return (cccs_stuffing,)
+
+
+@app.cell(hide_code=True)
+def _(cccs_stuffing):
+    _df = mo.sql(
+        f"""
+        FROM cccs_stuffing WHERE "date" BETWEEN '2025-12-01' AND '2025-12-31'
+        """
+    )
+    return
+
+
+@app.cell
+def _():
+    stuffing_cccs  = pl.read_excel(source=r"A:\INVOICING!!\2025\ShippingLines\MAERSK\12 - December\OSS\16 - S.I. Maersk OSS AMIRANTE - CCCS - December '25\AMIRANTE CCCS - December '25.xlsx",sheet_name="CCCS Container Stuffing",schema_overrides={"Tonnage":pl.Float64,"Overtime Tonnage":pl.Float64})
+    return (stuffing_cccs,)
+
+
+@app.cell(hide_code=True)
+def _(stuffing_cccs):
+    _df = mo.sql(
+        f"""
+        WITH
+            base AS (
+                SELECT
+                    "Day",
+                    "Date affected" AS date_affected,
+                    "Container Ref. No." AS container_ref,
+                    "Stuffing Method" AS stuffing_method,
+                    Price,
+                    COALESCE("Tonnage", 0) AS tonnage,
+                    COALESCE("Overtime Tonnage", 0) AS overtime_tonnage,
+                    total_price
+                FROM
+                    stuffing_cccs
+                WHERE
+                    date_affected IS NOT NULL
+            ),
+            result AS (
+                SELECT
+                    "Day",
+                    date_affected,
+                    container_ref,
+                    stuffing_method,
+                    Price,
+                    tonnage_type,
+                    tonnage_value AS tonnage,
+                FROM
+                    base
+                    CROSS JOIN LATERAL (
+                        VALUES
+                            ('Normal', tonnage - overtime_tonnage),
+                            ('Overtime', overtime_tonnage)
+                    ) v (tonnage_type, tonnage_value)
+                    -- optional: drop zero lines (common for overtime=0)
+                WHERE
+                    tonnage_value <> 0
+                ORDER BY
+                    date_affected,
+                    container_ref,
+                    tonnage_type
+            ),
+            add_ot_text AS (
+                SELECT
+                    *,
+                    CASE
+                        WHEN Day IN ('Sun', 'PH')
+                        AND tonnage_type = 'Overtime' THEN 'Overtime 200%'
+                        WHEN (
+                            Day IN ('Sun', 'PH')
+                            AND tonnage_type = 'Normal'
+                        )
+                        OR (
+                            Day NOT IN ('Sun', 'PH')
+                            AND tonnage_type = 'Overtime'
+                        ) THEN 'Overtime 150%'
+                        WHEN (
+                            Day NOT IN ('Sun', 'PH')
+                            AND tonnage_type = 'Normal'
+                        ) THEN 'Normal Hours'
+                        ELSE 'Error'
+                    END AS overtime,
+                FROM
+                    result
+            ),add_total_price AS (
+
+
+        SELECT
+            *,
+            CASE
+                WHEN overtime = 'Normal Hours' THEN CAST(Price * tonnage * 1.0 AS DECIMAL)
+                WHEN overtime = 'Overtime 150%' THEN CAST(Price * tonnage * 1.5 AS DECIMAL)
+                WHEN overtime = 'Overtime 200%' THEN CAST(Price * tonnage * 2.0 AS DECIMAL)
+                ELSE 0.0::DECIMAL
+            END AS total_price
+        FROM
+            add_ot_text)
+
+        SELECT
+          stuffing_method,
+          overtime,
+          CAST(SUM(tonnage) AS DECIMAL(18,3))      AS tonnage,
+          CAST(SUM(total_price) AS DECIMAL(18,2))  AS total_usd
+        FROM add_total_price
+        GROUP BY stuffing_method, overtime
+        ORDER BY
+          stuffing_method,
+          CASE overtime
+            WHEN 'Normal Tonnage' THEN 1
+            WHEN 'Overtime 150%'  THEN 2
+            WHEN 'Overtime 200%'  THEN 3
+            ELSE 9
+          END;
+        """
+    )
+    return
+
+
+@app.cell
+def _():
+    scow_tranfer = load_excel(ExcelFiles.SCOW_TRANSFER)
+    return (scow_tranfer,)
+
+
+@app.cell(hide_code=True)
+def _(scow_tranfer):
+    _df = mo.sql(
+        f"""
+        FROM scow_tranfer WHERE YEAR(Date) = 2026 AND MONTH(Date) = 2
+        """
     )
     return
 

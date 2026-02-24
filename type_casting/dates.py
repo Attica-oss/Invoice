@@ -252,6 +252,10 @@ def stop_over_date_range(start_date: date, end_date: date) -> tuple[date, date]:
     """
     return start_date, end_date
 
+NEW_FIXED_HOLIDAY_START: int = 2026
+NEW_FIXED_HOLIDAY_MONTH: int = 2
+NEW_FIXED_HOLIDAY_DAY: int = 1
+
 
 def __get_public_holidays(year: int) -> list[date]:
 
@@ -269,6 +273,12 @@ def __get_public_holidays(year: int) -> list[date]:
         date(year, 12, 8),
         date(year, 12, 25),
     }
+
+
+    if year >= NEW_FIXED_HOLIDAY_START:
+        fixed_holidays.add(date(year, NEW_FIXED_HOLIDAY_MONTH, NEW_FIXED_HOLIDAY_DAY))
+
+
     holidays |= fixed_holidays
 
     # One-time holidays (only add for that year)

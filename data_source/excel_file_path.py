@@ -48,6 +48,20 @@ class ExcelFiles(Enum):
         "HANDLING ACTIVITY",
     )
 
+    OPERATIONS_ACTIVITY_2026 = (
+        Path(
+            rf"{Path.home()}/Dropbox\! OPERATION SUPPORTING DOCUMENTATION\2026\2026 IPHS operation activity.xlsx"
+        ),
+        "HANDLING ACTIVITY",
+    )
+
+    BERTH_DUES_2026 = (
+        Path(
+            rf"{Path.home()}/Dropbox\! OPERATION SUPPORTING DOCUMENTATION\2026\2026 IPHS operation activity.xlsx"
+        ),
+        "BERTH DUES IPHS",
+    )
+
     ADDITIONAL_OVERTIME = (
         Path(
             rf"{Path.home()}/Dropbox\! OPERATION SUPPORTING DOCUMENTATION\2025\2025 IPHS operation activity.xlsx"

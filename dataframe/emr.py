@@ -35,8 +35,9 @@ shifting: pl.LazyFrame = (
     # Add the day name column to invoice overtime calculation
     .with_columns(
         pl.col("date").days.add_day_name()
-    # Filter invalid invoices
-    ).filter(pl.col("invoice_to").ne("INVALID"))
+        # Filter invalid invoices
+    )
+    .filter(pl.col("invoice_to").ne("INVALID"))
     .select(
         pl.col("day_name"),
         pl.col("date"),
@@ -47,7 +48,8 @@ shifting: pl.LazyFrame = (
     .with_columns(
         pl.when(pl.col("day_name").is_in(SPECIAL_DAYS))
         .then(SHIFTING * OVERTIME_150)
-        .otherwise(SHIFTING).alias("price")
+        .otherwise(SHIFTING)
+        .alias("price")
     )
 )
 
@@ -62,19 +64,26 @@ _pti: pl.LazyFrame = (
         pl.col("unit_manufacturer"),
         pl.col("datetime_end"),
         pl.col("status").cast(dtype=pl.Enum(["PASSED", "FAILED"])),
-        pl.col("invoice_to").cast(dtype=pl.Enum(["MAERSKLINE", "IOT", "INVALID", "CMA CGM"])),
+        pl.col("invoice_to").cast(
+            dtype=pl.Enum(["MAERSKLINE", "IOT", "INVALID", "CMA CGM"])
+        ),
         pl.col("plugged_on").alias("generator"),
     )
     .with_columns(
-        hours=(pl.col("datetime_end") - pl.col("datetime_start")).dt.total_minutes() / 60,
+        hours=(pl.col("datetime_end") - pl.col("datetime_start")).dt.total_minutes()
+        / 60,
         plugin_price=PLUGIN,
     )
-    .with_columns(above_8_hours=pl.when(pl.col("hours").gt(pl.lit(8))).then(2).otherwise(1))
+    .with_columns(
+        above_8_hours=pl.when(pl.col("hours").gt(pl.lit(8))).then(2).otherwise(1)
+    )
     .with_columns(
         electricity_price=(
             pl.when(pl.col("invoice_to").eq(pl.lit("IOT")))
             .then(
-                (pl.col("datetime_end") - pl.col("datetime_start")).dt.total_hours() / 24 + 1
+                (pl.col("datetime_end") - pl.col("datetime_start")).dt.total_hours()
+                / 24
+                + 1
             )
             .when(pl.col("set_point").eq(SetPoint.s_freezer))
             .then(S_FREEZER_PTI_ELECTRICITY)
@@ -144,7 +153,7 @@ pti: pl.LazyFrame = (
 # Washing Data Set
 washing = (
     load_gsheet_data(EMR_SHEET_ID, washing_sheet)
-    .filter(pl.col("date").dt.year().ge(CURRENT_YEAR -1))
+    .filter(pl.col("date").dt.year().ge(CURRENT_YEAR - 1))
     .select(
         pl.col("date"),
         pl.col("container_number").cast(dtype=containers_enum),
@@ -155,6 +164,7 @@ washing = (
                     "ECHEBASTAR",
                     "ATUNSA",
                     "INPESCA",
+                    "INPESCA S.A",
                     "INVALID",
                     "IPHS",
                     "IOT",
@@ -169,7 +179,7 @@ washing = (
                     "CCCS",
                     "AMIRANTE",
                     "JMARR",
-                    "HARTSWATER"
+                    "HARTSWATER",
                 ]
             )
         ),
