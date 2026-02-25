@@ -16,21 +16,15 @@ with app.setup:
 
 @app.cell
 def _():
-    netList
-    return
+    berth_2025 = load_excel(file_path=ExcelFiles.BERTH_DUES)
+    return (berth_2025,)
 
 
 @app.cell(hide_code=True)
-def _(netlist):
+def _(berth_2025):
     _df = mo.sql(
         f"""
-        FROM
-            netList
-        SELECT date,vessel,SUM(total_tonnage) as tonnage
-        WHERE
-            YEAR(date) = 2026
-        GROUP BY date,vessel
-        ORDER BY date
+        FROM berth_2025 WHERE "VESSEL NAME" = 'EGALABUR'
         """
     )
     return
@@ -169,7 +163,7 @@ def _(berth_df, netlist):
 
 @app.cell
 def _():
-    1500 + 4500 + 1500
+    1500 * 6
     return
 
 
