@@ -7,13 +7,12 @@ from data.price import FREE, get_price
 from data_source.make_dataset import load_gsheet_data
 from data_source.sheet_ids import (
     TRANSPORT_SHEET_ID,
-    transfer_sheet,
+    TRANSFER,
     shore_crane_sheet,
     forklift_sheet,
     scow_sheet,
 )
 from type_casting.dates import (
-    CURRENT_YEAR,
     DAY_NAMES,
     SPECIAL_DAYS,
     UPPER_BOUND,
@@ -26,15 +25,15 @@ from type_casting.dates import (
 from type_casting.containers import containers_enum
 from type_casting.validations import STATUS_TYPE, OvertimePerc, Status
 
-ph_list: list[date] = public_holiday()
+ph_list:pl.Series = public_holiday()
 
 # Need to make this as a LazyFrame and do a joinasof incase there is a change in price
 SHIFTING_PRICE = (
-    get_price(["Shifting"]).select(pl.col("Price")).collect().to_series()[0]
+    get_price(["Shifting"]).select(pl.col("Price")).to_series()[0]
 )
 
 SHORE_CRANE_PRICE: float = (
-    get_price(["Shore Crane"]).select(pl.col("Price")).collect().to_series()[0]
+    get_price(["Shore Crane"]).select(pl.col("Price")).to_series()[0]
 )
 
 TRANSFER_PRICE = get_price(["Haulage FEU", "Haulage TEU"])
@@ -45,7 +44,7 @@ INCREASE_10_PERCENT = 1.10
 CUT_OFF_DATE = date(2026, 1, 1)
 
 shore_crane: pl.LazyFrame = (
-    load_gsheet_data(TRANSPORT_SHEET_ID, shore_crane_sheet)
+    load_gsheet_data(TRANSPORT_SHEET_ID, shore_crane_sheet).unwrap()
     # .filter(pl.col("date").dt.year().eq(CURRENT_YEAR))
     .select(
         pl.col("day").cast(dtype=pl.Enum(DAY_NAMES)),
@@ -130,7 +129,7 @@ shore_crane: pl.LazyFrame = (
 )
 
 transfer = (
-    load_gsheet_data(TRANSPORT_SHEET_ID, transfer_sheet)
+    load_gsheet_data(TRANSPORT_SHEET_ID, TRANSFER).unwrap()
     .with_columns(
         pl.col("date"),
         pl.col("container_number").cast(dtype=containers_enum),
@@ -160,7 +159,7 @@ transfer = (
     )
     .sort(by="date")
     .join_asof(
-        TRANSFER_PRICE,
+        TRANSFER_PRICE.lazy(),
         by="Service",
         right_on="Date",
         left_on="date",
@@ -223,7 +222,7 @@ transfer = (
 )
 
 
-scow_transfer: pl.LazyFrame = load_gsheet_data(TRANSPORT_SHEET_ID, scow_sheet).select(
+scow_transfer: pl.LazyFrame = load_gsheet_data(TRANSPORT_SHEET_ID, scow_sheet).unwrap().select(
     pl.col("date"),
     pl.col("container_number").cast(dtype=pl.Enum(["STDU6536343", "STDU6536338"])),
     pl.col("customer"),
@@ -240,7 +239,7 @@ scow_transfer: pl.LazyFrame = load_gsheet_data(TRANSPORT_SHEET_ID, scow_sheet).s
 
 
 forklift: pl.LazyFrame = (
-    load_gsheet_data(TRANSPORT_SHEET_ID, forklift_sheet)
+    load_gsheet_data(TRANSPORT_SHEET_ID, forklift_sheet).unwrap()
     .filter(
         ~pl.col("service_type").is_in(["Salt Loading", "Gangway", "Invalid"]),
         pl.col("day") != "",

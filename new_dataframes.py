@@ -6,32 +6,50 @@ app = marimo.App(width="medium")
 with app.setup:
     import polars as pl
     import marimo as mo
-    # from dataframe.operations import tare
-    from data_source.make_dataset import load_gsheet_data
-    from data_source.make_dataset import ExcelFiles,load_excel
-    from data_source.sheet_ids import OPS_SHEET_ID, raw_sheet
+    # # from dataframe.operations import tare
+    # from data_source.make_dataset import load_gsheet_data
+    # from data_source.make_dataset import ExcelFiles,load_excel
+    # from data_source.sheet_ids import OPS_SHEET_ID, raw_sheet
     from dataframe.netlist import netList
-    from data.price import get_price
+    # from data.price import get_price
+
+    from read_google_sheet import read_google_sheet
 
 
 @app.cell
 def _():
-    berth_2025 = load_excel(file_path=ExcelFiles.BERTH_DUES)
-    return (berth_2025,)
+    from data_source.make_dataset import load_gsheet_data
+
+    return (load_gsheet_data,)
 
 
-@app.cell(hide_code=True)
-def _(berth_2025):
-    _df = mo.sql(
-        f"""
-        FROM berth_2025 WHERE "VESSEL NAME" = 'EGALABUR'
-        """
-    )
+@app.cell
+def _():
+    read_google_sheet(sheet_id="1L9qkq9WlIa2j5DcvoLvxkqYogRg76S-e8OxAIyLruAE",sheet_name="ContainerGateOut")
+    return
+
+
+@app.cell
+def _(load_gsheet_data):
+    load_gsheet_data(sheet_id="1L9qkq9WlIa2j5DcvoLvxkqYogRg76S-e8OxAIyLruAE",sheet_name="ContainerGateOut")
     return
 
 
 @app.cell
 def _():
+    from type_casting.containers import container_list,containers_enum
+
+    return (containers_enum,)
+
+
+@app.cell
+def _(containers_enum):
+    containers_enum
+    return
+
+
+@app.cell
+def _(ExcelFiles, load_excel):
     berth_df = load_excel(file_path=ExcelFiles.BERTH_DUES_2026).select(
         pl.col("VESSEL NAME").alias("vessel"),
         pl.col("DATE IN").dt.combine(pl.col("TIME IN").dt.time()).alias("date_in"),
@@ -174,7 +192,7 @@ def _():
 
 
 @app.cell
-def _():
+def _(get_price):
     TARE_RATE: pl.LazyFrame = get_price(
         ["Rental of Calibration", "Tare Calibration"]
     ).select(pl.col("Date").alias("effective_date"),pl.col("Service").alias("service"),pl.col("Price").alias("unit_price"),)
@@ -182,7 +200,7 @@ def _():
 
 
 @app.cell
-def _():
+def _(OPS_SHEET_ID, load_gsheet_data, raw_sheet):
     test_tare = load_gsheet_data(OPS_SHEET_ID, raw_sheet).select(
                 pl.col("Date").alias("date"),
                 pl.col("Vessel").str.to_uppercase().alias("vessel"),
@@ -203,7 +221,7 @@ def _(test_tare):
 
 
 @app.cell
-def _(TARE_RATE: pl.LazyFrame):
+def _(OPS_SHEET_ID, TARE_RATE: pl.LazyFrame, load_gsheet_data, raw_sheet):
     tare_dataf = (
         (
             (

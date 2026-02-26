@@ -12,9 +12,10 @@ from data_source.all_dataframe import (
 from type_casting.dates import SPECIAL_DAYS
 from type_casting.customers import bycatch, client_shore_cost
 from type_casting.validations import (
-    MOVEMENT_TYPE,
+
     UNLOADING_SERVICE,
     CARGO_DISPATCH_SERVICE,
+    MovementType,
     OvertimePerc,
 )
 from data.price import (
@@ -27,7 +28,7 @@ from data.price import (
 TRUCK_PRICE = get_price(["Tipping Truck"])
 CARGO_LOADING_PRICE = get_price(["Loading to Cargo"])
 CCCS_MOVEMENT_FEE = (
-    get_price(["CCCS Movement in/out"]).select(pl.col("Price")).collect().to_series()[0]
+    get_price(["CCCS Movement in/out"]).select(pl.col("Price")).to_series()[0]
 )
 CROSS_STUFFING_PRICE = get_price(
     [
@@ -125,7 +126,7 @@ dispatch_to_cargo: pl.LazyFrame = (
     .with_columns(Service=pl.lit("Tipping Truck"))
     .sort(by="date")
     .join_asof(
-        TRUCK_PRICE,
+        TRUCK_PRICE.lazy(),
         by="Service",
         left_on="date",
         right_on="Date",
@@ -139,7 +140,7 @@ dispatch_to_cargo: pl.LazyFrame = (
     )
     .sort(by="date")
     .join_asof(
-        CARGO_LOADING_PRICE,
+        CARGO_LOADING_PRICE.lazy(),
         by="Service",
         left_on="date",
         right_on="Date",
@@ -186,7 +187,7 @@ dispatch_to_cargo: pl.LazyFrame = (
     .select(
         pl.col("day").alias("day_name"),
         pl.col("date"),
-        pl.col("movement_type").cast(dtype=pl.Enum(MOVEMENT_TYPE)),
+        pl.col("movement_type").cast(dtype=MovementType.enum_dtype()),
         pl.col("customer"),
         pl.col("vessel"),
         pl.col("operation_type"),
@@ -217,7 +218,7 @@ from_cccs_to_vessel = (
     .sort(by="date", descending=False)
     .with_columns(Service=pl.lit("Tipping Truck", dtype=pl.Utf8))
     .join_asof(
-        TRUCK_PRICE,
+        TRUCK_PRICE.lazy(),
         by="Service",
         left_on="date",
         right_on="Date",
@@ -285,7 +286,7 @@ truck_to_cccs = (
     .sort(by="date", descending=False)
     .with_columns(Service=pl.lit("Tipping Truck", dtype=pl.Utf8))
     .join_asof(
-        TRUCK_PRICE,
+        TRUCK_PRICE.lazy(),
         by="Service",
         left_on="date",
         right_on="Date",
@@ -353,7 +354,7 @@ truck_to_cccs = (
 cross_stuffing: pl.LazyFrame = (
     cross_stuffing()
     .join_asof(
-        CROSS_STUFFING_PRICE,
+        CROSS_STUFFING_PRICE.lazy(),
         by="Service",
         left_on="date",
         right_on="Date",
@@ -524,7 +525,7 @@ by_catch = (
     .with_columns(pl.col("operation_type").alias("Service"))
     .sort(by="date")
     .join_asof(
-        BY_CATCH_PRICE,
+        BY_CATCH_PRICE.lazy(),
         by="Service",
         left_on="date",
         right_on="Date",
@@ -549,7 +550,7 @@ by_catch = (
 cccs_stuffing: pl.LazyFrame = (
     cccs_container_stuffing()
     .join_asof(
-        CCCS_STUFFING_PRICE,
+        CCCS_STUFFING_PRICE.lazy(),
         by="Service",
         left_on="date",
         right_on="Date",

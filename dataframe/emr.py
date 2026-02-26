@@ -14,24 +14,24 @@ from type_casting.containers import containers_enum
 # Price
 
 MAGNUM_PTI_ELECTRICITY = (
-    get_price(["PTI Magnum"]).select(pl.col("Price")).collect().to_series()[0]
+    get_price(["PTI Magnum"]).select(pl.col("Price")).to_series()[0]
 )
-PLUGIN = get_price(["Plugin"]).select(pl.col("Price")).collect().to_series()[0]
+PLUGIN = get_price(["Plugin"]).select(pl.col("Price")).to_series()[0]
 S_FREEZER_PTI_ELECTRICITY = (
-    get_price(["PTI S Freezer"]).select(pl.col("Price")).collect().to_series()[0]
+    get_price(["PTI S Freezer"]).select(pl.col("Price")).to_series()[0]
 )
-SHIFTING = get_price(["Shifting"]).select(pl.col("Price")).collect().to_series()[0]
+SHIFTING = get_price(["Shifting"]).select(pl.col("Price")).to_series()[0]
 STANDARD_PTI_ELECTRICITY = (
-    get_price(["PTI Standard"]).select(pl.col("Price")).collect().to_series()[0]
+    get_price(["PTI Standard"]).select(pl.col("Price")).to_series()[0]
 )
 WASHING = (
-    get_price(["Container Cleaning"]).select(pl.col("Price")).collect().to_series()[0]
+    get_price(["Container Cleaning"]).select(pl.col("Price")).to_series()[0]
 )
 
 
 # Shifting Data Set
 shifting: pl.LazyFrame = (
-    load_gsheet_data(sheet_id=EMR_SHEET_ID, sheet_name=shifting_sheet)
+    load_gsheet_data(sheet_id=EMR_SHEET_ID, sheet_name=shifting_sheet).unwrap()
     # Add the day name column to invoice overtime calculation
     .with_columns(
         pl.col("date").days.add_day_name()
@@ -56,7 +56,7 @@ shifting: pl.LazyFrame = (
 
 # PTI staging Data Set
 _pti: pl.LazyFrame = (
-    load_gsheet_data(EMR_SHEET_ID, pti_sheet)
+    load_gsheet_data(EMR_SHEET_ID, pti_sheet).unwrap()
     .select(
         pl.col("datetime_start"),
         pl.col("container_number").cast(dtype=containers_enum),
@@ -152,7 +152,7 @@ pti: pl.LazyFrame = (
 
 # Washing Data Set
 washing = (
-    load_gsheet_data(EMR_SHEET_ID, washing_sheet)
+    load_gsheet_data(EMR_SHEET_ID, washing_sheet).unwrap()
     .filter(pl.col("date").dt.year().ge(CURRENT_YEAR - 1))
     .select(
         pl.col("date"),

@@ -1,6 +1,8 @@
 """Main application"""
+
 import os
 import sys
+import subprocess
 from time import sleep
 
 from dataclasses import dataclass
@@ -10,19 +12,22 @@ from typing import Optional
 from app.logger import logger
 from app.save import save_df_to_csv
 from app.view import forklift_logistics_dataset, view_data
-# from app.check import check_data
 
+# from app.check import check_data
 
 
 class MenuOption(Enum):
     """Menu options enumeration"""
+
     SAVE = 1
     VIEW = 2
     CHECK = 3
     EXIT = 4
 
+
 class DataFrameType(Enum):
     """Available dataframe types"""
+
     ALL = "all"
     EMR = "emr"
     OPERATIONS = "operations"
@@ -33,13 +38,16 @@ class DataFrameType(Enum):
     TRANSPORT = "transport"
     MISCELLANEOUS = "miscellaneous"
 
+
 @dataclass
 class AppConfig:
     """Application configuration"""
+
     version: str = "0.0.3"
     title: str = "Attica Invoice"
     author: str = "gmounac<at>outlook<dot>com"
     year: str = "2024"
+
 
 class App:
     """main application"""
@@ -50,7 +58,7 @@ class App:
     def clear_screen(self) -> None:
         """clears the screen based on the OS"""
         logger.info("Clearing screen")
-        os.system("cls" if os.name == "nt" else "clear")
+        subprocess.run("cls" if os.name == "nt" else "clear", shell=True, check=False)
 
     def exit_application(self) -> None:
         """Gracefully exits the application"""
@@ -72,7 +80,6 @@ class App:
             ----- 3. Check Logistics Record
             ----- 4. Exit Application
             """
-
 
     def get_dataframe_selection(self) -> Optional[str]:
         """Prompts user for dataframe selection with validation"""
@@ -102,8 +109,8 @@ class App:
             DataFrameType.BIN_DISPATCH: "IOT Scow transfer data",
             DataFrameType.SHORE_HANDLING: "Salt and Bin Tipping data",
             DataFrameType.STUFFING: "Plugging including stuffing of containers",
-            DataFrameType.TRANSPORT:"Haulage,Shore Crane and Forklift data",
-            DataFrameType.MISCELLANEOUS:"CCCS and Cross stuffing data"
+            DataFrameType.TRANSPORT: "Haulage,Shore Crane and Forklift data",
+            DataFrameType.MISCELLANEOUS: "CCCS and Cross stuffing data",
         }
         return descriptions.get(df_type, "")
 
@@ -113,21 +120,20 @@ class App:
         self.clear_screen()
         while True:
             choice = input("Continue Saving the file [Y/n] ").lower()
-            if choice in ('y', 'yes'):
+            if choice in ("y", "yes"):
                 data = self.get_dataframe_selection()
                 if data:
                     logger.info("Initiating save operation for %s", data)
                     save_df_to_csv(data)
                 menu = input("Return to the main menu [Y/n]").lower()
-                if menu in ('y', 'yes'):
+                if menu in ("y", "yes"):
                     self.run()
                 else:
                     self.exit_application()
-            elif choice in ('n', 'no'):
+            elif choice in ("n", "no"):
                 return
             else:
                 print("Invalid choice. Please enter Y or N.")
-
 
     def run(self) -> None:
         """Main application loop with improved error handling"""
@@ -154,7 +160,7 @@ class App:
                     case MenuOption.VIEW:
                         logger.info("Selected: View dataframe")
                         self.clear_screen()
-                     
+
                         view_data(forklift_logistics_dataset())
 
                         # Implement view functionality

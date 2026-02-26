@@ -1,33 +1,19 @@
-[build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
-
 [project]
-name = "attica"
-version = "0.0.1"
+name = "invoice"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
 dependencies = [
-    "polars",
-    "python-dateutil",
-    "tqdm",
-    "xlsx2csv",
-    "requests",
-    'importlib-metadata; python_version<"3.10"',
-    "python-dotenv>=1.2.1",
-    "fastexcel>=0.18.0",
-]
-
-[tool.setuptools]
-packages = [
-    "all_dataframes",
-    "app",
-    "data",
-    "data_source",
-    "dataframe",
-    "type_casting",
-    "utils",
+    "fastexcel>=0.19.0",
+    "polars>=1.38.1",
+    "polars-result>=0.2.0",
+    "python-dateutil>=2.9.0.post0",
+    "read-google-sheet",
 ]
 
 [dependency-groups]
 dev = [
+    "ruff>=0.15.2",
     "ty>=0.0.10",
 ]

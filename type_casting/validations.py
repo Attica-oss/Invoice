@@ -2,8 +2,21 @@
 
 from dataclasses import dataclass
 
-# Stuffing Metrics
-PALLET_TYPE: list[str] = ["Pallet", "Liner & Pallet", "Liner"]
+
+import polars as pl
+
+from .polars_enum import PolarsEnum
+
+# Paller types
+
+class PalletType(PolarsEnum):
+    """Pallet Type"""
+
+    PALLET: str = "Pallet"
+    LINER_PALLET: str = "Liner & Pallet"
+    LINER: str = "Liner"
+
+
 
 
 # Miscellaneous / CCCS Metrics
@@ -13,8 +26,7 @@ BIN_DISPATCH_SERVICE: list[str] = ["Bin Dispatch to IOT", "Bin Dispatch from IOT
 UNLOADING_SERVICE:list[str] = ['Sorting from Unloading','Unsorted from Unloading']
 CARGO_DISPATCH_SERVICE:list[str] = ["Dispatch to Cargo Vessel", "Dispatch from Cargo Vessel"]
 
-@dataclass
-class MovementType:
+class MovementType(PolarsEnum):
     """Classification of Movement"""
 
     delivery: str = "Delivery"

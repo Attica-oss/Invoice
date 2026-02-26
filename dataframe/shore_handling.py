@@ -157,7 +157,7 @@ durations = pl.col("date").dt.combine(pl.col("end_time")) - pl.col("date").dt.co
 
 
 salt: pl.LazyFrame = (
-    load_gsheet_data(sheet_id=SHORE_HANDLING_ID, sheet_name=salt_sheet)
+    load_gsheet_data(sheet_id=SHORE_HANDLING_ID, sheet_name=salt_sheet).unwrap()
     .select(
         pl.col("day_name").cast(dtype=pl.Enum(DAY_NAMES)),
         pl.col("date"),
@@ -267,41 +267,6 @@ salt: pl.LazyFrame = (
         + (pl.col("overtime_200") * SALT_PRICE * OvertimePerc.overtime_200)
     )
     .select(pl.all().exclude(["normal_150", "sun_150", "total_duration"]))
-
-    # .with_columns(
-    #     normal=pl.when(is_not_special_day & end_time_after_cut_off)
-    #     .then(normal_duration)
-    #     .when(is_not_special_day & before_cut_off_normal_day)
-    #     .then(durations)
-    #     .otherwise(pl.duration()),
-    #     normal_150=pl.when(is_not_special_day & start_after_cut_off_normal_day)
-    #     .then(durations)
-    #     .when(is_not_special_day & stop_after_cut_off_normal_day)
-    #     .then(hours_after_cut_off_normal_day)
-    #     .otherwise(pl.duration()),
-    #     sun_150=pl.when(is_special_day & stop_after_cut_off_special_day)
-    #     .then(normal_duration_special_day)
-    #     .when(is_special_day & stop_before_cut_off_special_day)
-    #     .then(durations)
-    #     .otherwise(pl.duration()),
-    #     overtime_200=pl.when(is_special_day & start_after_cut_off_special_day)
-    #     .then(durations)
-    #     .when(is_special_day & stop_after_cut_off_special_day)
-    #     .then(hours_after_cut_off_special_day)
-    #     .otherwise(pl.duration()),
-    # )
-    # .with_columns(
-    #     normal=(pl.col("normal") / durations) * pl.col("tonnage"),
-    #     overtime_150=(pl.col("normal_150") / durations) * pl.col("tonnage")
-    #     + (pl.col("sun_150") / durations) * pl.col("tonnage"),
-    #     overtime_200=(pl.col("overtime_200") / durations) * pl.col("tonnage"),
-    # )
-    # .with_columns(
-    #     price=(pl.col("normal") * SALT_PRICE * OvertimePerc.normal_hour)
-    #     + (pl.col("overtime_150") * SALT_PRICE * OvertimePerc.overtime_150)
-    #     + (pl.col("overtime_200") * SALT_PRICE * OvertimePerc.overtime_200)
-    # )
-    # .select(pl.all().exclude(["normal_150", "sun_150"]))
 )
 
 

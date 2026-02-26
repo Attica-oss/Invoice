@@ -31,7 +31,7 @@ from type_casting.dates import Days
 from dataframe.stuffing import coa
 from data.price import FREE, get_price
 
-ph_list: list[date] = public_holiday()
+ph_list: pl.Series = public_holiday()
 
 
 # Price
@@ -62,11 +62,11 @@ oss_service_list: list[str] = [
 
 
 UNLOADING_PRICE: pl.LazyFrame = get_price(service_list).with_columns(
-    date=pl.col("Date")
+    date=pl.col("end")
 )
 
 OSS_STUFFING_PRICE: pl.LazyFrame = get_price(oss_service_list).with_columns(
-    date=pl.col("Date")
+    date=pl.col("end")
 )
 
 
@@ -149,7 +149,7 @@ cccs_record = (
 
 cccs_adjusted_records = (
     (
-        load_gsheet_data(OPS_SHEET_ID, raw_sheet)
+        load_gsheet_data(sheet_id=OPS_SHEET_ID,sheet_name= raw_sheet).unwrap()
         .filter(pl.col("Container (Destination)").str.contains("CCCS"))
         .select(
             pl.col("Day"),
@@ -230,7 +230,7 @@ cccs_adjusted_records = (
 netList = (
     pl.concat(
         [
-            load_gsheet_data(OPS_SHEET_ID, net_list_sheet)
+            load_gsheet_data(OPS_SHEET_ID, net_list_sheet).unwrap()
             .filter(~pl.col("Container (Destination)").str.contains("CCCS"))
             .select(
                 pl.col("Date").days.add_day_name().cast(pl.Utf8).alias("Day"),
@@ -316,8 +316,8 @@ netList = (
     )
     .with_columns(Service=pl.col("service") + " - " + pl.col("storage_type"))
     .sort(by="date")
-    .join_asof(UNLOADING_PRICE, by="Service", on="date", strategy="backward")
-    .select(pl.all().exclude(["Service", "Date"]))
+    .join_asof(UNLOADING_PRICE.lazy(), by="Service", on="date", strategy="backward")
+    .select(pl.all().exclude(["Service", "date"]))
     .with_columns(
         Price=pl.when(pl.col("overtime") == Overtime.overtime_200_text)
         .then(pl.col("Price") * OvertimePerc.overtime_200)
@@ -363,8 +363,8 @@ oss = (
         .then(pl.lit("Container Stuffing") + " - " + pl.col("storage_type"))
         .otherwise(pl.lit("Stuffing"))
     )
-    .join_asof(OSS_STUFFING_PRICE, by="Service", on="date", strategy="backward")
-    .select(pl.all().exclude(["Service", "Date"]))
+    .join_asof(OSS_STUFFING_PRICE.lazy(), by="Service", on="date", strategy="backward")
+    .select(pl.all().exclude(["Service", "date"]))
     .with_columns(
         Price=pl.when(pl.col("overtime") == Overtime.overtime_200_text)
         .then(pl.col("Price") * OvertimePerc.overtime_200)
@@ -412,7 +412,7 @@ iot_coa = (
 
 iot_cargo = (
     (
-        load_gsheet_data(OPS_SHEET_ID, net_list_sheet)
+        load_gsheet_data(OPS_SHEET_ID, net_list_sheet).unwrap()
         .select(
             pl.col("Date").alias("date"),
             pl.col("Vessel").str.to_uppercase().alias("vessel"),
@@ -465,7 +465,7 @@ iot_cargo = (
 
 # IOT SOC Stuffing DataFrame
 iot_stuffing = (
-    load_gsheet_data(OPS_SHEET_ID, net_list_sheet)
+    load_gsheet_data(OPS_SHEET_ID, net_list_sheet).unwrap()
     .select(
         pl.col("Date").alias("date"),
         pl.col("Vessel").str.to_uppercase().alias("vessel"),

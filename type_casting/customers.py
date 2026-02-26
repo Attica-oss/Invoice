@@ -5,7 +5,7 @@ from data_source.make_dataset import load_gsheet_data
 from data_source.sheet_ids import MASTER_ID, client_sheet
 
 
-CUSTOMERS: pl.LazyFrame = load_gsheet_data(MASTER_ID, client_sheet)
+CUSTOMERS: pl.LazyFrame = load_gsheet_data(MASTER_ID, client_sheet).unwrap()
 
 
 def enum_customer() -> pl.Enum:

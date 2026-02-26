@@ -10,56 +10,58 @@ from type_casting.validations import OvertimePerc
 from type_casting.dates import SPECIAL_DAYS, public_holiday, DAY_NAMES
 
 # from dataframe import invoice
-
+from data_source.excel_file_path import ExcelFiles
 from data.price import get_price
 
 
 # To move the Price to the Price module
 
-EXTRAMEN: float = get_price(["Extra Men"]).with_columns(date=pl.col("Date"))
+EXTRAMEN: pl.DataFrame = get_price(["Extra Men"]).with_columns(date=pl.col("end"))
 
-WELL_TO_WELL: pl.LazyFrame = get_price(["Well to Well Transfer"]).with_columns(
-    date=pl.col("Date")
+WELL_TO_WELL: pl.DataFrame = get_price(["Well to Well Transfer"]).with_columns(
+    date=pl.col("end")
 )
 
-TARE_RATE: pl.LazyFrame = (
+TARE_RATE: pl.DataFrame = (
     get_price(["Rental of Calibration", "Tare Calibration"])
-    .with_columns(date=pl.col("Date"))
+    .with_columns(date=pl.col("end"))
     .select(
-        pl.col("Date").alias("effective_date"),
+        pl.col("date").alias("effective_date"),
         pl.col("Service").alias("service"),
         pl.col("Price").alias("unit_price"),
     )
 )
 
 
-ADDITIONAL_OVERTIME: pl.LazyFrame = (
-    get_price(["Additional Overtime"]).with_columns(date=pl.col("Date")).drop("Date")
+ADDITIONAL_OVERTIME: pl.DataFrame = (
+    get_price(["Additional Overtime"]).with_columns(date=pl.col("end")).drop("end")
 )
 
-
-OPS_ACTIVITY_PATH = r"C:\Users\gmounac\Dropbox\! OPERATION SUPPORTING DOCUMENTATION\2026\2026 IPHS operation activity.xlsx"
+# Path to the operations activity file
+OPS_ACTIVITY_PATH = ExcelFiles.OPERATIONS_ACTIVITY_2026.value
 
 
 # Operations Activity Unloading Lazyframe
-ops: pl.LazyFrame = load_gsheet_data(
-    sheet_id=OPS_SHEET_ID, sheet_name=raw_sheet
-).select(
-    pl.col("Day"),
-    pl.col("Date"),
-    pl.col("Time"),
-    pl.col("Vessel").str.to_uppercase(),
-    pl.col("Species").str.extract(r"^(.*?)(\s-\s)"),
-    pl.col("Details").str.to_uppercase(),
-    pl.col("Scale Reading(-Fish Net) (Cal)")
-    .str.replace(",", "")
-    .cast(pl.Int64)
-    .alias("tonnage")
-    * 0.001,
-    pl.col("Storage").cast(dtype=pl.Enum(FISH_STORAGE)),
-    pl.col("Container (Destination)").alias("destination"),
-    pl.col("overtime"),
-    pl.col("Side Working"),
+ops: pl.LazyFrame = (
+    load_gsheet_data(sheet_id=OPS_SHEET_ID, sheet_name=raw_sheet)
+    .unwrap()
+    .select(
+        pl.col("Day"),
+        pl.col("Date"),
+        pl.col("Time"),
+        pl.col("Vessel").str.to_uppercase(),
+        pl.col("Species").str.extract(r"^(.*?)(\s-\s)"),
+        pl.col("Details").str.to_uppercase(),
+        pl.col("Scale Reading(-Fish Net) (Cal)")
+        .str.replace(",", "")
+        .cast(pl.Int64)
+        .alias("tonnage")
+        * 0.001,
+        pl.col("Storage").cast(dtype=pl.Enum(FISH_STORAGE)),
+        pl.col("Container (Destination)").alias("destination"),
+        pl.col("overtime"),
+        pl.col("Side Working"),
+    )
 )
 
 
@@ -73,8 +75,10 @@ def add_day_name_column(date_col: pl.Expr) -> pl.Expr:
     ).cast(dtype=pl.Enum(DAY_NAMES))
 
 
-main_file = (
-    pl.read_excel(OPS_ACTIVITY_PATH, sheet_name="HANDLING ACTIVITY", engine="calamine")
+main_file: pl.LazyFrame = (
+    pl.read_excel(
+        OPS_ACTIVITY_PATH[0], sheet_name=OPS_ACTIVITY_PATH[1], engine="calamine"
+    )
     .filter(pl.col("DAY") != "", pl.col("DAY") != "Total")
     .lazy()
 )
@@ -179,7 +183,7 @@ hatch_to_hatch: pl.LazyFrame = (
         pl.col("Well-to-Well Transfer"),
     )
     .with_columns(Service=pl.lit("Well to Well Transfer"))
-    .join_asof(WELL_TO_WELL, by="Service", on="date", strategy="backward")
+    .join_asof(WELL_TO_WELL.lazy(), by="Service", on="date", strategy="backward")
     .with_columns(
         total_price=pl.when(pl.col("day_name").is_in(SPECIAL_DAYS))
         .then(
@@ -212,7 +216,7 @@ tare: pl.LazyFrame = (
     (
         (
             (
-                load_gsheet_data(OPS_SHEET_ID, raw_sheet)
+                load_gsheet_data(OPS_SHEET_ID, raw_sheet).unwrap()
                 .select(
                     pl.col("Date").alias("date"),
                     pl.col("Vessel").str.to_uppercase().alias("vessel"),
@@ -240,7 +244,7 @@ tare: pl.LazyFrame = (
                 ]
             )
             .join_asof(
-                other=TARE_RATE,
+                other=TARE_RATE.lazy(),
                 by_left="service",
                 by_right="service",
                 left_on="date",
@@ -260,7 +264,7 @@ tare: pl.LazyFrame = (
     )
     .with_columns(pl.lit("Tare Calibration").alias("service"))
     .join_asof(
-        other=TARE_RATE,
+        other=TARE_RATE.lazy(),
         by_left="service",
         by_right="service",
         left_on="date",
