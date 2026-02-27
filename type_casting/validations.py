@@ -1,7 +1,6 @@
 """Validations"""
 
-from dataclasses import dataclass
-
+import polars as pl
 
 from .polars_enum import PolarsEnum
 
@@ -19,15 +18,18 @@ class PalletType(PolarsEnum):
 class ServiceType(PolarsEnum):
     """Cold Store Services"""
 
-    BIN_DISPATCH_SERVICE: list[str] = ["Bin Dispatch to IOT", "Bin Dispatch from IOT"]
-    UNLOADING_SERVICE: list[str] = ["Sorting from Unloading", "Unsorted from Unloading"]
-    CARGO_DISPATCH_SERVICE: list[str] = [
-        "Dispatch to Cargo Vessel",
-        "Dispatch from Cargo Vessel",
-    ]
-    UNSTUFFING_TO_COLD_STORE: list[str] = ["Unstuffing to CCCS"]
-    COLD_STORE_STUFFING: list[str] = ["Container loading from CCCS"]
-    VESSEL_DISPATCH_SERVICE: list[str] = ["From CCCS to Vessel"]
+    BIN_DISPATCH_TO_IOT: str = "Bin Dispatch to IOT"
+    BIN_DISPATCH_FROM_IOT: str = "Bin Dispatch from IOT"
+    UNLOADING_SORTED: str = "Sorting from Unloading"
+    UNLOADING_UNSORTED: str = "Unsorted from Unloading"
+    DISPATCH_TO_CARGO: str = "Dispatch to Cargo Vessel"
+    DISPATCH_FROM_CARGO: str = "Dispatch from Cargo Vessel"
+    UNSTUFFING_TO_COLD_STORE: str = "Unstuffing to CCCS"
+    COLD_STORE_STUFFING: str = "Container loading from CCCS"
+    VESSEL_DISPATCH_SERVICE: str = "From CCCS to Vessel"
+
+    def bin_dispatch(self) -> list[str]:
+        return [self.BIN_DISPATCH_TO_IOT, self.BIN_DISPATCH_FROM_IOT]
 
 
 class ColdStoreFishOriginType(PolarsEnum):
@@ -38,6 +40,20 @@ class ColdStoreFishOriginType(PolarsEnum):
     COLD_STORE: str = "CCCS COLDSTORE"
     CONTAINER: str = "CONTAINER"
     CARGO: str = "CARGO"
+
+
+# Transportation Validation Type
+# --------------------------------
+class ShoreCraneLocationType(PolarsEnum):
+    """Location of the shore crane"""
+
+    REAR: str = "IOT FACTORY"
+    FRONT: str = "VESSEL"
+    COLD_STORE: str = "CCCS"
+    NORTH: str = "NORTH"
+    SOUTH: str = "SOUTH"
+    VIA_SKIFF: str = "VIA SKIFF"
+    OTHER: str = "N/A"
 
 
 class MovementType(PolarsEnum):
@@ -52,9 +68,9 @@ class MovementType(PolarsEnum):
     INTERNAL: str = "INTERNAL"
 
     @classmethod
-    def cold_store_perspective(cls) -> list[str]:
+    def cold_store_perspective(cls) -> pl.Enum:
         """Returns the movement type from the perspective of the cold store"""
-        return [cls.IN, cls.OUT]
+        return pl.Enum([cls.IN, cls.OUT], dtype=pl.Utf8)
 
 
 class ContainerStatusType(PolarsEnum):

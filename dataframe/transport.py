@@ -1,43 +1,45 @@
 """Transport Lazyframe"""
 
 from datetime import date
+
 import polars as pl
 import polars.selectors as cs
-from price_utils.price import FREE, get_price
+
 from data_source.make_dataset import load_gsheet_data
 from data_source.sheet_ids import (
-    TRANSPORT_SHEET_ID,
     TRANSFER,
-    shore_crane_sheet,
+    TRANSPORT_SHEET_ID,
     forklift_sheet,
     scow_sheet,
+    shore_crane_sheet,
 )
-from type_casting.dates import (
-    DAY_NAMES,
-    SPECIAL_DAYS,
-    UPPER_BOUND,
-    MIDNIGHT,
-    LOWER_BOUND,
-    UPPER_BOUND_SPECIAL_DAY,
-    public_holiday,
-    Days,
-)
+from price_utils import Overtime
+from price_utils.price import FREE, get_price
+from type_casting import DayNameType
 from type_casting.containers import containers_enum
-from type_casting.validations import STATUS_TYPE, OvertimePerc, Status
+from type_casting.dates import (
+    LOWER_BOUND,
+    MIDNIGHT,
+    UPPER_BOUND,
+    UPPER_BOUND_SPECIAL_DAY,
+    Days,
+    public_holiday,
+)
+from type_casting.validations import ContainerStatusType, ShoreCraneLocationType
 
 ph_list: pl.Series = public_holiday()
 
-# Need to make this as a LazyFrame and do a joinasof incase there is a change in price
-SHIFTING_PRICE = get_price(["Shifting"]).select(pl.col("Price")).to_series()[0]
 
-SHORE_CRANE_PRICE: float = (
-    get_price(["Shore Crane"]).select(pl.col("Price")).to_series()[0]
-)
+def _price_table() -> pl.DataFrame:
+    """
+    Fetch price table rows needed for scow transfer.
+    Runs only when build_* is called.
+    """
+    # get_price() is cached via price_table() already (in your data.price module)
+    return get_price(["Shifting", "Shore Crane", "Haulage FEU", "Haulage TEU"])
 
-TRANSFER_PRICE = get_price(["Haulage FEU", "Haulage TEU"])
 
-# Shore crane overtime increase by 10%
-
+# Shore crane overtime increase by 10% starting from 2026-01-01
 INCREASE_10_PERCENT = 1.10
 CUT_OFF_DATE = date(2026, 1, 1)
 
@@ -46,28 +48,25 @@ shore_crane: pl.LazyFrame = (
     .unwrap()
     # .filter(pl.col("date").dt.year().eq(CURRENT_YEAR))
     .select(
-        pl.col("day").cast(dtype=pl.Enum(DAY_NAMES)),
-        cs.contains("date"),
+        pl.col("day").cast(dtype=DayNameType.enum_dtype()).alias("day_name"),
+        pl.col("date"),
         pl.col("start_time"),
         pl.col("end_time"),
-        pl.col("hours").dt.hour(),  # str.to_time(format="%H:%M:%S")
-        pl.col("overtime_hours")
-        # .str.to_time(format="%H:%M")
-        .dt.hour(),  # .str.to_time(format="%H:%M")
+        pl.col("hours").dt.hour().cast(pl.Int32).alias("hours"),
+        pl.col("overtime_hours").dt.hour().cast(pl.Int32).alias("overtime_hours"),
         pl.col("customer").cast(pl.Utf8),
-        pl.col("location").cast(pl.Utf8),
+        pl.col("location").cast(ShoreCraneLocationType.enum_dtype()),
         pl.col("operation_type"),
-        pl.col("remarks"),
         pl.col("invoiced_to"),
-        # pl.col("price").cast(pl.Float64),
-        # pl.col("total_price").str.replace_many(["$", ","], "").cast(pl.Float64),
     )
     .with_columns(
         pl.when(
-            (pl.col("day").is_in(SPECIAL_DAYS)).and_(pl.col("date").ge(CUT_OFF_DATE))
+            (pl.col("day_name").is_in(DayNameType.special_day())).and_(
+                pl.col("date").ge(CUT_OFF_DATE)
+            )
         )
-        .then(SHORE_CRANE_PRICE * OvertimePerc.overtime_150 * INCREASE_10_PERCENT)
-        .when((pl.col("day").is_in(SPECIAL_DAYS)))
+        .then(get_price() * Overtime.overtime_150 * INCREASE_10_PERCENT)
+        .when((pl.col("day_name").is_in(DayNameType.special_day())))
         .then(SHORE_CRANE_PRICE * OvertimePerc.overtime_150)
         .otherwise(SHORE_CRANE_PRICE)
         .round(3)
@@ -137,12 +136,8 @@ transfer = (
         pl.col("date"),
         pl.col("container_number").cast(dtype=containers_enum),
         pl.col("line"),
-        pl.col("movement_type").cast(
-            dtype=pl.Enum(["Collection", "Shifting", "Delivery"])
-        ),
-        pl.col("driver").cast(
-            dtype=pl.Enum(["NA", "IPHS", "THIRD PARTY", "IPHS (Third Party)"])
-        ),
+        pl.col("movement_type").cast(dtype=pl.Enum(["Collection", "Shifting", "Delivery"])),
+        pl.col("driver").cast(dtype=pl.Enum(["NA", "IPHS", "THIRD PARTY", "IPHS (Third Party)"])),
         pl.col("time_out"),  # .str.to_time(format="%H:%M")
         pl.col("time_in"),  # .str.to_time(format="%H:%M")
     )
@@ -179,8 +174,7 @@ transfer = (
         )
         .then(FREE)
         .when(
-            (pl.col("day_name").is_in(SPECIAL_DAYS))
-            & (pl.col("time") > UPPER_BOUND_SPECIAL_DAY)
+            (pl.col("day_name").is_in(SPECIAL_DAYS)) & (pl.col("time") > UPPER_BOUND_SPECIAL_DAY)
         )
         .then(SHIFTING_PRICE * OvertimePerc.overtime_200)
         .when((pl.col("day_name").is_in(SPECIAL_DAYS)) | (pl.col("time") > UPPER_BOUND))
@@ -189,15 +183,13 @@ transfer = (
         haulage_price=pl.when((~pl.col("driver").cast(pl.Utf8).str.contains("IPHS")))
         .then(pl.lit(0))
         .when(
-            (pl.col("day_name").is_in(SPECIAL_DAYS))
-            & (pl.col("time") > UPPER_BOUND_SPECIAL_DAY)
+            (pl.col("day_name").is_in(SPECIAL_DAYS)) & (pl.col("time") > UPPER_BOUND_SPECIAL_DAY)
         )
         .then(pl.col("Price") * OvertimePerc.overtime_200)
         .when(
-            (
-                (pl.col("day_name").is_in(SPECIAL_DAYS))
-                | (pl.col("time") > UPPER_BOUND)
-            ).or_(pl.col("time").is_between(MIDNIGHT, LOWER_BOUND))
+            ((pl.col("day_name").is_in(SPECIAL_DAYS)) | (pl.col("time") > UPPER_BOUND)).or_(
+                pl.col("time").is_between(MIDNIGHT, LOWER_BOUND)
+            )
         )
         .then(pl.col("Price") * OvertimePerc.overtime_150)
         .otherwise(pl.col("Price")),
@@ -265,9 +257,7 @@ forklift: pl.LazyFrame = (
     .with_columns(
         overtime_150=pl.when(
             (pl.col("day").is_in(SPECIAL_DAYS).not_()).and_(
-                (pl.col("end_time").gt(UPPER_BOUND)).and_(
-                    pl.col("start_time").gt(UPPER_BOUND)
-                )
+                (pl.col("end_time").gt(UPPER_BOUND)).and_(pl.col("start_time").gt(UPPER_BOUND))
             )
         )
         .then(
@@ -319,10 +309,7 @@ forklift: pl.LazyFrame = (
                 - pl.col("date").dt.combine(pl.col("start_time"))
             ).dt.total_minutes()
         )
-        .when(
-            (pl.col("day").is_in(SPECIAL_DAYS))
-            & (pl.col("end_time") > UPPER_BOUND_SPECIAL_DAY)
-        )
+        .when((pl.col("day").is_in(SPECIAL_DAYS)) & (pl.col("end_time") > UPPER_BOUND_SPECIAL_DAY))
         .then(
             (
                 pl.col("date").dt.combine(pl.col("end_time"))

@@ -52,7 +52,7 @@ def build_bin_dispatch() -> Result[pl.LazyFrame, Exception]:
     return load_gsheet_data(MISC_SHEET_ID, ALL_CCCS_DATA_SHEET).map(
         lambda lf: (
             lf.filter(
-                pl.col("operation_type").is_in(ServiceType.BIN_DISPATCH_SERVICE),
+                pl.col("operation_type").is_in(ServiceType().bin_dispatch()),
                 pl.col("date").dt.year().eq(CURRENT_YEAR),
             )
             .select(
@@ -86,6 +86,8 @@ def build_bin_dispatch() -> Result[pl.LazyFrame, Exception]:
 
 
 bin_dispatch = build_bin_dispatch().unwrap()
+
+
 
 
 full_scows: pl.LazyFrame = (

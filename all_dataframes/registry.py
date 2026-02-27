@@ -3,18 +3,19 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+
 import polars as pl
 from polars_result import Result
 
 from dataframe import (
-    emr,
-    operations,
-    netlist,
     bin_dispatch,
+    emr,
+    miscellaneous,
+    netlist,
+    operations,
     shore_handling,
     stuffing,
     transport,
-    miscellaneous,
 )
 
 DatasetBuilder = Callable[[], Result[pl.LazyFrame, Exception]]
