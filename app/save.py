@@ -1,7 +1,9 @@
 """Save dataframes to CSV files"""
 
+from __future__ import annotations
+
+from dataclasses import dataclass
 from pathlib import Path
-from functools import cache
 
 
 import polars as pl
@@ -20,119 +22,113 @@ from all_dataframes.all_dataframes import (
 )
 
 
+df_dict = {
+    "emr": emr_dataframes,
+    "operations": operations_dataframes,
+    "netlist": netlist_dataframes,
+    "bin_dispatch": bin_dispatch_dataframes,
+    "shore_handling": shore_handling_dataframes,
+    "stuffing": stuffing_dataframes,
+    "transport": transport_dataframes,
+    "miscellaneous": miscellaneous_dataframes,
+}
+
+# Save Location
+OUTPUT_DIR = Path.home() / "Invoice" / "csv"
+
+
+@dataclass(frozen=True)
+class SaveResult:
+    """Data class to represent the result of a save operation"""
+
+    name: str
+    path: Path
+    error: Exception | None = None
+
+
 def save_to_csv(
-    dataframe_info: tuple[str, pl.LazyFrame],
-) -> tuple[str, Exception | None]:
-    """Process the dataframes to CSV file
-    Args:
-        dataframe_info: Tuple containing the dataframe name and dataframe
-    Returns:
-        tuple: Tuple containing the dataframe name and error if any
-    """
-
-    if not isinstance(dataframe_info, tuple) or len(dataframe_info) != 2:
-        return "Invalid data format", TypeError("Invalid data format")
-
-    dataframe_name, dataframe = dataframe_info
+    name: str, lf: pl.LazyFrame, output_dir: Path = OUTPUT_DIR
+) -> SaveResult:
+    """Save a LazyFrame to CSV and return a result object."""
+    output_dir.mkdir(parents=True, exist_ok=True)
+    path = output_dir / f"{name}.csv"
 
     try:
-        # Add explicit path and ensure directory exists
-        # output_path = (
-        #     rf"P:\Verification & Invoicing\Validation Report\csv\{dataframe_name}.csv"
-        # )
-        output_path = rf"{Path.home()}\Invoice\csv\{dataframe_name}.csv"
-        dataframe.collect().write_csv(output_path)
-        logger.info("Successfully wrote %s to file", dataframe_name)
-        return dataframe_name, None
-    except (FileExistsError, FileNotFoundError) as e:
-        error_msg = f"Error writing {dataframe_name}: {str(e)}"
-        logger.error(error_msg)
-        return dataframe_name, e
+        # Prefer streaming write if available
+        if hasattr(lf, "sink_csv"):
+            lf.sink_csv(path)  # Polars streaming write
+        else:
+            lf.collect(streaming=True).write_csv(path)
+
+        logger.info("Wrote %s -> %s", name, path)
+        return SaveResult(name=name, path=path)
+
+    except (PermissionError, OSError, FileExistsError, FileNotFoundError) as e:
+        logger.exception("Failed writing %s -> %s", name, path)
+        return SaveResult(name=name, path=path, error=e)
 
 
-@cache
-def save_df_to_csv(dataframes: str | None):
+def _save_category(
+    category_name: str, category_dfs: dict[str, pl.LazyFrame]
+) -> tuple[list[str], list[tuple[str, Exception]]]:
+    logger.info("Processing category: %s", category_name)
+
+    successes: list[str] = []
+    failures: list[tuple[str, Exception]] = []
+
+    for name, lf in category_dfs.items():
+        result = save_to_csv(name, lf)
+        if result.error:
+            failures.append((result.name, result.error))
+        else:
+            successes.append(result.name)
+
+    return successes, failures
+
+
+def save_df_to_csv(category: str | None) -> None:
     """
-    Save the dataframes
-
-    Args:
-        dataframes: Category of dataframes to save ('all' or specific category name)
-
+    Save dataframes by category name or 'all'.
     """
+    if category == "all":
+        all_successes: list[str] = []
+        all_failures: list[tuple[str, Exception]] = []
 
-    df_dict = {
-        "emr": emr_dataframes,
-        "operations": operations_dataframes,
-        "netlist": netlist_dataframes,
-        "bin_dispatch": bin_dispatch_dataframes,
-        "shore_handling": shore_handling_dataframes,
-        "stuffing": stuffing_dataframes,
-        "transport": transport_dataframes,
-        "miscellaneous": miscellaneous_dataframes,
-        # "all": all_dataframes,
-    }
+        for cat_name, cat_dfs in df_dict.items():
+            s, f = _save_category(cat_name, cat_dfs)
+            all_successes.extend(s)
+            all_failures.extend(f)
 
-    if dataframes == "all":
-        # Process all dictionaries
-        logger.info("Processing all dataframe categories")
-        for category, category_dfs in df_dict.items():
-            logger.info("Processing category: %s", category)
-            for name, df in category_dfs.items():
-                try:
-                    result = save_to_csv((name, df))
-                    if result is None:
-                        logger.error("No result returned for %s", name)
-                        continue
-
-                    message, error = result
-                    if error:
-                        logger.error("Error saving %s: %s", message, str(error))
-                    else:
-                        logger.info("Successfully saved %s", message)
-                except (ValueError, IOError) as e:
-                    logger.error("Unexpected error processing %s: %s", name, str(e))
-
-        logger.info("Completed processing all categories")
+        logger.info(
+            "Save completed. Success: %d, Failed: %d",
+            len(all_successes),
+            len(all_failures),
+        )
+        if all_failures:
+            logger.error(
+                "Failed: %s",
+                ", ".join(f"{name}: {err!s}" for name, err in all_failures),
+            )
         return
 
-    # Handle single category case
-    data = df_dict.get(dataframes)
-
-    print(data)
-    if data is None:
-        logger.error("Invalid dataframe option: %s", dataframes)
+    if not category or category not in df_dict:
+        logger.error(
+            "Invalid dataframe option: %s. Options: %s",
+            category,
+            list(df_dict.keys()) + ["all"],
+        )
         return
 
-    logger.info("Processing dataframe category: %s", dataframes)
-    logger.info("Processing dataframes: %s", list(data.keys()))
+    successes, failures = _save_category(category, df_dict[category])
 
-    # Process each dataframe
-    successes = []
-    failures = []
-
-    for name, df in data.items():
-        try:
-            result = save_to_csv((name, df))
-            if result is None:
-                logger.error("No result returned for %s", name)
-                continue
-
-            message, error = result
-            if error:
-                failures.append((message, error))
-                logger.error("Error saving %s: %s", message, str(error))
-            else:
-                successes.append(message)
-                logger.info("Successfully saved %s", message)
-        except (IOError, ValueError) as e:
-            logger.error("Unexpected error processing %s: %s", name, str(e))
-            failures.append((name, e))
-
-    # Summary
-    logger.info("Save completed")
-    logger.info("Successfully saved: %s", ", ".join(successes))
+    logger.info(
+        "Save completed for %s. Success: %d, Failed: %d",
+        category,
+        len(successes),
+        len(failures),
+    )
     if failures:
         logger.error(
-            "Failed to save: %s",
-            ", ".join(f"{name}: {str(err)}" for name, err in failures),
+            "Failed: %s",
+            ", ".join(f"{name}: {err!s}" for name, err in failures),
         )

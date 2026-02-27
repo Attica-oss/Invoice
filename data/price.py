@@ -1,27 +1,46 @@
 """Pricing Module"""
 
-from typing import Union
+from __future__ import annotations
+from functools import lru_cache
+
+
 import polars as pl
-from data_source.make_dataset import load_gsheet_data
+
+from read_google_sheet import read_google_sheet
+
 from data_source.sheet_ids import MASTER_ID, price_sheet
 
-from utils.google_sheet import GoogleSheetsLoader
-from utils.result import Result
+VALIDATION_ID = MASTER_ID
+PRICE_SHEET_NAME = price_sheet
 
-gs = GoogleSheetsLoader()
+DATE_FMT = "%d/%m/%Y"
 
-def filter_price_services(ldf:Result,service:str) -> pl.LazyFrame:
-    """Filter price services from google sheet data"""
-    if ldf.success:
-        ldf = ldf.data.filter(pl.col("Service") == service).select(
-            # pl.col("Service"),
-            pl.col("Price"),
-            pl.col("StartingDate").alias("Date"),
+
+@lru_cache(maxsize=1)
+def price_table() -> pl.DataFrame:
+    """
+    Load + clean the price sheet once (small table → keep in memory).
+    """
+    lf = read_google_sheet(sheet_id=MASTER_ID, sheet_name=PRICE_SHEET_NAME).unwrap()
+
+    return (
+        lf.with_columns(
+            pl.col("StartingDate").alias("start"),
+            pl.col("EndingDate").alias("end"),
+            pl.col("Price").cast(pl.Float64),
         )
-    else:
-        ldf.error("Failed to load price data")
-        return pl.LazyFrame()
-    return ldf
+        .select(["Service", "Price", "start", "end"])
+        .collect()
+    )
+
+
+def get_price(services: list[str] | None = None) -> pl.DataFrame:
+    """Get the price table, optionally filtered by a list of services."""
+    df = price_table()
+    if services is None:
+        return df
+    return df.filter(pl.col("Service").is_in(services))
+
 
 # from type_casting.dates import SPECIAL_DAYS
 
@@ -29,47 +48,6 @@ def filter_price_services(ldf:Result,service:str) -> pl.LazyFrame:
 OVERTIME_150: float = 1.5
 OVERTIME_200: float = 2.0
 NORMAL_HOUR: float = 1.0
-
-
-VALIDATION_ID: str = MASTER_ID
-PRICE_SHEET_NAME: str = price_sheet
-
-
-# Function to load unique services
-def __load_unique_services(sheet_id: str, sheet_name: str):
-    """Loads unique service name from a specific gsheet"""
-    return (
-        load_gsheet_data(sheet_id, sheet_name)
-        .select(pl.col("Service").unique())
-        .collect()
-        .to_series()
-        .to_list()
-    )
-
-
-# Load unique services at runtime
-services = __load_unique_services(VALIDATION_ID, PRICE_SHEET_NAME)
-
-
-# Function to get the price based on service class and optional service
-def get_price(service: Union[list[str], None] = None) -> pl.LazyFrame:
-    """Gets the price"""
-    df = (
-        load_gsheet_data(VALIDATION_ID, PRICE_SHEET_NAME)
-        .with_columns(
-            pl.col("StartingDate").alias("Date"),
-            pl.col("EndingDate")
-            .str.to_date(format="%d/%m/%Y", strict=False)
-            .alias("end"),
-        )
-        .filter(
-            pl.col("Service").is_in(services)
-            if service is None
-            else pl.col("Service").is_in(service)
-        )
-        .select(["Service", "Price", "Date"])
-    )
-    return df
 
 
 list_of_services = [
@@ -104,7 +82,7 @@ list_of_services = [
     "Plastic Liner Installation",  # LINER_PRICE
     "Pallets(+ Wedges) Usage",  # PALLET_IOT_PRICE
     "Haulage FEU",  # TRANSFER_PRICE
-    "Haulage TEU"  # TRANSFER_PRICE
+    "Haulage TEU",  # TRANSFER_PRICE
     "Container Stuffing - Brine",  # OSS_PRICE
     "Container Stuffing - Dry",  # OSS_PRICE
 ]

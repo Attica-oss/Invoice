@@ -1,7 +1,6 @@
 """iso check for container numbers"""
 
 import re
-# import polars as pl
 
 
 class ContainerValidator:

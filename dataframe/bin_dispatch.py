@@ -1,6 +1,5 @@
-"Bin dispatch to and from IOT"
+"Bin dispatch (Scow Transfer) to and from IOT"
 
-from datetime import date
 import polars as pl
 from data.price import ALL_PRICE, OVERTIME_150, OVERTIME_200, NORMAL_HOUR
 
@@ -21,14 +20,13 @@ from type_casting.dates import (
 )
 from type_casting.validations import (
     BIN_DISPATCH_SERVICE,
-    MOVEMENT_TYPE,
     Status,
     MovementType,
     Overtime,
 )
 
 # Prepare the list of Public Holiday dates in the Current Year
-ph_list: list[date] = public_holiday()
+ph_list: pl.Series = public_holiday()
 
 
 # Price
@@ -37,7 +35,7 @@ SCOW_TRANSFER = ALL_PRICE.filter(pl.col("Service").eq(pl.lit("CCCS Movement in/o
 
 # Full Scows
 bin_dispatch: pl.LazyFrame = (
-    load_gsheet_data(MISC_SHEET_ID, ALL_CCCS_DATA_SHEET)
+    load_gsheet_data(MISC_SHEET_ID, ALL_CCCS_DATA_SHEET).unwrap()
     .filter(
         pl.col("operation_type").is_in(BIN_DISPATCH_SERVICE),
         pl.col("date").dt.year() >= CURRENT_YEAR - 1,
@@ -45,7 +43,7 @@ bin_dispatch: pl.LazyFrame = (
     .select(
         pl.col("day").cast(pl.Enum(DAY_NAMES)).alias("day_name"),
         pl.col("date"),
-        pl.col("movement_type").cast(dtype=pl.Enum(MOVEMENT_TYPE)),
+        pl.col("movement_type").cast(MovementType.enum_dtype()),
         pl.col("customer"),
         pl.col("operation_type"),
         pl.col("total_tonnage").abs().cast(pl.Float64).round(3),
@@ -64,7 +62,7 @@ full_scows: pl.LazyFrame = (
         movement_type=pl.when(pl.col("movement_type") == MovementType.delivery)
         .then(pl.lit(MovementType.out))
         .otherwise(pl.lit(MovementType.in_))
-        .cast(dtype=pl.Enum(MOVEMENT_TYPE)),
+        .cast(dtype=MovementType.enum_dtype()),
         storage_type=pl.lit("Dry", dtype=pl.Utf8),
         day_name=pl.when(pl.col("date").is_in(ph_list))
         .then(pl.lit("PH"))
@@ -167,7 +165,7 @@ empty_scows: pl.LazyFrame = (
         movement_type=pl.when(pl.col("movement_type") == MovementType.delivery)
         .then(pl.lit(MovementType.out))
         .otherwise(pl.lit(MovementType.in_))
-        .cast(dtype=pl.Enum(MOVEMENT_TYPE)),
+        .cast(dtype=MovementType.enum_dtype()),
         day_name=pl.when(pl.col("date").is_in(ph_list))
         .then(pl.lit("PH"))
         .otherwise(pl.col("date").dt.to_string(format="%a")),

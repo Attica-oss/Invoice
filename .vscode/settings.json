@@ -1,3 +1,6 @@
 {
-    "python.analysis.typeCheckingMode": "on"
+    "python.analysis.typeCheckingMode": "on",
+    "powerquery.client.additionalSymbolsDirectories": [
+        "c:/Users/gmounac/Invoice/.vscode/excel-pq-symbols"
+    ]
 }

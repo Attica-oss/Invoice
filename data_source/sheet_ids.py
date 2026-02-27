@@ -28,7 +28,7 @@ BY_CATCH_TRANSFER_SHEET:str = "ByCatchTransfer"
 TRANSPORT_SHEET_ID:str = '1O8K26c7CqLSdLr-f2gvZliDpBn9ArxXvj9tEJy-ElUg'
 
 shore_crane_sheet="ShoreCrane"
-transfer_sheet="Transfer"
+TRANSFER="Transfer"
 forklift_sheet="ForkliftRecord"
 scow_sheet="ScowTransfer"
 

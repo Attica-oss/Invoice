@@ -26,10 +26,12 @@ from type_casting.validations import (
 from type_casting.containers import iot_soc
 from type_casting.customers import cargo
 
+from type_casting.dates import Days
+
 from dataframe.stuffing import coa
 from data.price import FREE, get_price
 
-ph_list: list[date] = public_holiday()
+ph_list: pl.Series = public_holiday()
 
 
 # Price
@@ -60,11 +62,11 @@ oss_service_list: list[str] = [
 
 
 UNLOADING_PRICE: pl.LazyFrame = get_price(service_list).with_columns(
-    date=pl.col("Date")
+    date=pl.col("end")
 )
 
 OSS_STUFFING_PRICE: pl.LazyFrame = get_price(oss_service_list).with_columns(
-    date=pl.col("Date")
+    date=pl.col("end")
 )
 
 
@@ -106,6 +108,7 @@ stuffing_type = (
     )
     .select(pl.all().exclude("operation_type"))
     .unique()
+    .sort(by="date_plugged")
 )
 
 # CCCS record from the Miscellaneous Activity
@@ -119,8 +122,9 @@ cccs_record = (
         .with_columns(
             destination="CCCS ("
             + pl.col("customer")
-            .str.replace(" S.A", "") # For INPESCA
-            .str.replace(" SA", "") # For ALBACORA
+            .str.replace(" S.A.", "")  # For CFTO
+            .str.replace(" S.A", "")  # For INPESCA
+            .str.replace(" SA", "")  # For ALBACORA
             .cast(pl.Utf8)
             + ")"
         )
@@ -145,7 +149,7 @@ cccs_record = (
 
 cccs_adjusted_records = (
     (
-        load_gsheet_data(OPS_SHEET_ID, raw_sheet)
+        load_gsheet_data(sheet_id=OPS_SHEET_ID,sheet_name= raw_sheet).unwrap()
         .filter(pl.col("Container (Destination)").str.contains("CCCS"))
         .select(
             pl.col("Day"),
@@ -159,9 +163,10 @@ cccs_adjusted_records = (
                 .str.replace(",", "")
                 .cast(pl.Int64)
                 * 0.001  # Convert to Tons from Kilos
-            )
+            ).round(3)
             .cast(pl.Float64)
-            .round(3).alias("total_tonnage"),
+           
+            .alias("total_tonnage"),
             pl.col("Container (Destination)").alias("destination"),
             pl.col("Species"),
         )
@@ -203,10 +208,10 @@ cccs_adjusted_records = (
     .agg(
         start_time=pl.col("Time").min(),
         end_time=pl.col("Time").max(),
-        total_tonnage=pl.col("adjusted_tonnage").sum(),
+        total_tonnage=pl.col("adjusted_tonnage").sum().round(3),
     )
     .select(
-        [
+        ["Day",
             "date",
             "vessel",
             "start_time",
@@ -216,20 +221,19 @@ cccs_adjusted_records = (
             "end_time",
             "total_tonnage",
         ]
-    )
+    ).sort(by="date")
 )
 
 
 # The Net List
 
-# str.to_date(format="%d/%m/%Y",strict=False)
-
 netList = (
     pl.concat(
         [
-            load_gsheet_data(OPS_SHEET_ID, net_list_sheet)
+            load_gsheet_data(OPS_SHEET_ID, net_list_sheet).unwrap()
             .filter(~pl.col("Container (Destination)").str.contains("CCCS"))
             .select(
+                pl.col("Date").days.add_day_name().cast(pl.Utf8).alias("Day"),
                 pl.col("Date").alias("date"),
                 pl.col("Vessel").str.to_uppercase().alias("vessel"),
                 pl.col("startTime").alias("start_time"),
@@ -253,19 +257,36 @@ netList = (
         strategy="forward",
         # tolerance="1d",
     )
-    # .join(
-    #     other=stuffing_type,
-    #     left_on=["destination", "date", "vessel"],
-    #     right_on=["container_number", "date_plugged", "vessel_client"],
-    #     how="left",
-    # ).fill_null(strategy="max")
+    .join(
+        other=stuffing_type,
+        left_on=["destination", "date"],
+        right_on=["container_number", "date_plugged"],
+        how="left",
+        suffix="_ox",
+    )
+    # .fill_null(strategy="max")
     .with_columns(
         service=pl.when(
+            pl.col("stuffing_ox")
+            .eq(pl.lit("Basic OSS"))
+            .and_(pl.col("vessel_client").is_in(["OCEAN BASKET", "AMIRANTE"]))
+        )
+        .then(pl.col("stuffing_ox"))
+        .when(
             (pl.col("destination").str.contains("IOT"))
             | (
                 (pl.col("destination").str.contains("DARDANEL")).and_(
-                    pl.col("date").lt(pl.lit(date(2025, 9, 1)))
+                    pl.col("date").lt(
+                        pl.lit(date(2025, 9, 1))
+                    )  # Dardanel not getting discount after 1st September 2025
                 )
+            )
+            | (
+                pl.col("destination")
+                .str.contains("Asian Marine Reefer")
+                .and_(
+                    pl.col("date").is_between(date(2025, 11, 3), date(2025, 11, 15))
+                )  # Asian Marine Reefer is for IOT
             )
             | (pl.col("destination").str.contains("Unload to Quay"))
             | (
@@ -286,17 +307,64 @@ netList = (
             [
                 "operation_type",
                 "stuffing",
-                "operation_type_right",
                 "customer",
-                "stuffing_right",
+                "operation_type_ox",
+                "stuffing_ox",
                 "date_plugged",
             ]
         )
     )
     .with_columns(Service=pl.col("service") + " - " + pl.col("storage_type"))
     .sort(by="date")
-    .join_asof(UNLOADING_PRICE, by="Service", on="date", strategy="backward")
-    .select(pl.all().exclude(["Service", "Date"]))
+    .join_asof(UNLOADING_PRICE.lazy(), by="Service", on="date", strategy="backward")
+    .select(pl.all().exclude(["Service", "date"]))
+    .with_columns(
+        Price=pl.when(pl.col("overtime") == Overtime.overtime_200_text)
+        .then(pl.col("Price") * OvertimePerc.overtime_200)
+        .when(pl.col("overtime") == Overtime.overtime_150_text)
+        .then(pl.col("Price") * OvertimePerc.overtime_150)
+        .otherwise(pl.col("Price"))
+    )
+    .with_columns(
+        pl.when(pl.col("vessel_client").ne(pl.col("vessel")))
+        .then(pl.col("vessel_client"))
+        .otherwise(pl.lit(None))
+        .alias("remarks")
+    )
+    .with_columns(invoice_value=(pl.col("Price") * pl.col("total_tonnage")).round(3))
+    .select(
+        pl.col("date"),
+        pl.col("vessel"),
+        pl.col("start_time"),
+        pl.col("destination"),
+        pl.col("overtime"),
+        pl.col("storage_type"),
+        pl.col("end_time"),
+        pl.col("total_tonnage"),
+        pl.col("service"),
+        pl.col("Price"),
+        pl.col("invoice_value"),
+        pl.col("remarks"),
+    )
+)
+
+
+# Maersk OSS stuffing list ; Separated between Full and Basic OSS
+oss = (
+    netList.select(pl.all().exclude(["Price", "invoice_value"]))
+    .filter(pl.col("service").str.contains("OSS"))
+    .with_columns(
+        vessel=pl.when(pl.col("remarks").is_null())
+        .then(pl.col("vessel"))
+        .otherwise(pl.col("remarks"))
+    )
+    .with_columns(
+        Service=pl.when(pl.col("service") == pl.lit("Full OSS"))
+        .then(pl.lit("Container Stuffing") + " - " + pl.col("storage_type"))
+        .otherwise(pl.lit("Stuffing"))
+    )
+    .join_asof(OSS_STUFFING_PRICE.lazy(), by="Service", on="date", strategy="backward")
+    .select(pl.all().exclude(["Service", "date"]))
     .with_columns(
         Price=pl.when(pl.col("overtime") == Overtime.overtime_200_text)
         .then(pl.col("Price") * OvertimePerc.overtime_200)
@@ -305,28 +373,7 @@ netList = (
         .otherwise(pl.col("Price"))
     )
     .with_columns(invoice_value=(pl.col("Price") * pl.col("total_tonnage")).round(3))
-    # .select(pl.all().exclude(["customer"]))
-)
-
-# Maersk OSS stuffing list ; Separated between Full and Basic OSS
-oss = (
-    netList.select(pl.all().exclude(["Price", "invoice_value"]))
-    .filter(pl.col("service").str.contains("OSS"))
-    .with_columns(
-        Service=pl.when(pl.col("service") == pl.lit("Full OSS"))
-        .then(pl.lit("Container Stuffing") + " - " + pl.col("storage_type"))
-        .otherwise(pl.lit("Stuffing"))
-    )
-    .join_asof(OSS_STUFFING_PRICE, by="Service", on="date", strategy="backward")
-    .select(pl.all().exclude(["Service", "Date"]))
-    .with_columns(
-        Price=pl.when(pl.col("overtime") == Overtime.overtime_200_text)
-        .then(pl.col("Price") * OvertimePerc.overtime_200)
-        .when(pl.col("overtime") == Overtime.overtime_150_text)
-        .then(pl.col("Price") * OvertimePerc.overtime_150)
-        .otherwise(pl.col("Price"))
-    )
-    .with_columns(invoice_value=pl.col("Price") * pl.col("total_tonnage"))
+    .select(pl.all().exclude("remarks"))
 )
 
 
@@ -341,7 +388,6 @@ get_iot_cargo: pl.Expr = (
 
 
 # Create an IOT list of containers stuffed on IOT account.
-
 iot_coa = (
     coa.with_columns(
         pl.col("vessel_client").cast(pl.Utf8), pl.col("container_number").cast(pl.Utf8)
@@ -366,7 +412,7 @@ iot_coa = (
 
 iot_cargo = (
     (
-        load_gsheet_data(OPS_SHEET_ID, net_list_sheet)
+        load_gsheet_data(OPS_SHEET_ID, net_list_sheet).unwrap()
         .select(
             pl.col("Date").alias("date"),
             pl.col("Vessel").str.to_uppercase().alias("vessel"),
@@ -419,7 +465,7 @@ iot_cargo = (
 
 # IOT SOC Stuffing DataFrame
 iot_stuffing = (
-    load_gsheet_data(OPS_SHEET_ID, net_list_sheet)
+    load_gsheet_data(OPS_SHEET_ID, net_list_sheet).unwrap()
     .select(
         pl.col("Date").alias("date"),
         pl.col("Vessel").str.to_uppercase().alias("vessel"),

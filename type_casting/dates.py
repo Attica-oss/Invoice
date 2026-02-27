@@ -10,12 +10,12 @@ This module provides utilities for working with dates, including:
 - Month name to number conversions
 """
 
-from datetime import date, datetime, timedelta, time
+from datetime import date, datetime, time, timedelta, timezone
 from enum import Enum
-from typing import List, Literal, Union
+from typing import Literal, Union
+
 import polars as pl
 from dateutil.relativedelta import relativedelta
-
 
 MonthName = Literal[
     "JANUARY",
@@ -32,14 +32,12 @@ MonthName = Literal[
     "DECEMBER",
 ]
 
-# SPECIAL_DAY: list[str] = ['Sun', 'PH']
-
 # Maximum Time
 UPPER_BOUND_SPECIAL_DAY: time = time(16, 0, 0)
 UPPER_BOUND: time = time(17, 0, 0)
 MIDNIGHT: time = time(0, 0, 0)
 LOWER_BOUND: time = time(7, 59, 59)
-NULL_DURATION: pl.Duration = pl.duration(days=0, hours=0, minutes=0, seconds=0)
+NULL_DURATION: pl.Expr = pl.duration(days=0, hours=0, minutes=0, seconds=0)
 
 
 class Year(int):
@@ -200,9 +198,7 @@ def create_weekly_table(year: Year) -> pl.DataFrame:
     )
 
 
-def month_range(
-    month_name: str, year: Year = Year(datetime.now().year)
-) -> tuple[date, date]:
+def month_range(month_name: str, year: Year = Year(datetime.now().year)) -> tuple[date, date]:
     """
     Calculates the start and end date of a given month within a specified year.
 
@@ -253,42 +249,43 @@ def stop_over_date_range(start_date: date, end_date: date) -> tuple[date, date]:
     return start_date, end_date
 
 
-def __get_public_holidays(year: Year | int) -> list[date]:
-    """
-    Get a list of public holidays for a given year.
+NEW_FIXED_HOLIDAY_START: int = 2026
+NEW_FIXED_HOLIDAY_MONTH: int = 2
+NEW_FIXED_HOLIDAY_DAY: int = 1
 
-    Args:
-        year (int): The year for which to get the public holidays.
 
-    Returns:
-        list[date]: A list of dates representing public holidays for the given year.
-    """
-    public_holidays = []
+def __get_public_holidays(year: int) -> list[date]:
+    """Calculates the public holidays for a given year."""
+    holidays: set[date] = set()
 
-    # Add fixed public holidays
-    fixed_holidays = [
-        date(year, 1, 1),  # New Year's Day
-        date(year, 1, 2),  # New Year's Day
-        date(year, 5, 1),  # Labor Day
-        date(year, 6, 18),  # Constitutional Day
-        date(year, 6, 29),  # Independance Day
-        date(year, 8, 15),  # Assumption Day
-        date(year, 11, 1),  # All Saints Day
-        date(year, 12, 8),  # Imaculate Conception
-        date(year, 12, 25),  # Christmas Day
-    ]
-    public_holidays.extend(fixed_holidays)
+    fixed_holidays = {
+        date(year, 1, 1),
+        date(year, 1, 2),
+        date(year, 5, 1),
+        date(year, 6, 18),
+        date(year, 6, 29),
+        date(year, 8, 15),
+        date(year, 11, 1),
+        date(year, 12, 8),
+        date(year, 12, 25),
+    }
 
-    # One time holidays
-    election_dates = [
-        date(2025, 10, 13),  # Election Celebration
-        date(2025, 10, 11),  # Election Day
-        date(2025,10,27),  # Celebration Election Day
-    ]
+    if year >= NEW_FIXED_HOLIDAY_START:
+        fixed_holidays.add(date(year, NEW_FIXED_HOLIDAY_MONTH, NEW_FIXED_HOLIDAY_DAY))
 
-    public_holidays.extend(election_dates)
+    holidays |= fixed_holidays
 
-    # Calculate Easter Sunday date
+    # One-time holidays (only add for that year)
+    one_time = {
+        2025: {
+            date(2025, 10, 11),
+            date(2025, 10, 13),
+            date(2025, 10, 27),
+        }
+    }
+    holidays |= one_time.get(year, set())
+
+    # Easter calculation (same logic you had)
     a = year % 19
     b = year // 100
     c = year % 100
@@ -298,35 +295,40 @@ def __get_public_holidays(year: Year | int) -> list[date]:
     month = f // 31
     day = f % 31 + 1
 
-    easter_date = date(year, month, day)
-    public_holidays.append(easter_date)  # Easter Sunday
-    public_holidays.append(easter_date + timedelta(days=1))  # Easter Monday
-    public_holidays.append(easter_date - timedelta(days=1))  # Holy Saturday
-    public_holidays.append(easter_date - timedelta(days=2))  # Good Friday
+    easter = date(year, month, day)
+    holidays |= {
+        easter,  # Easter Sunday
+        easter + timedelta(days=1),  # Easter Monday
+        easter - timedelta(days=1),  # Holy Saturday
+        easter - timedelta(days=2),  # Good Friday
+        easter + timedelta(days=60),  # Corpus Christi
+    }
 
-    # Add Corpus Christi
-    corpus_christi_date = easter_date + timedelta(days=60)
-    public_holidays.append(corpus_christi_date)
+    # Monday-after if fixed holiday is Sunday
+    for h in fixed_holidays:
+        if h.weekday() == 6:  # Sunday
+            holidays.add(h + timedelta(days=1))
 
-    # Check if a fixed holiday falls on a Sunday and add the following Monday
-    for holiday in fixed_holidays:
-        if holiday.weekday() == 6:  # Sunday
-            public_holidays.append(holiday + timedelta(days=1))
-
-    return public_holidays
+    return sorted(holidays)
 
 
-def public_holiday(year: Year | int = CURRENT_YEAR) -> pl.Series:
-    """Gets the public holidays for 3 years"""
-    previous_year = year - 1
-    current_year = year
-    next_year = year + 1
+def public_holiday(year: int = CURRENT_YEAR) -> pl.Series:
+    """
+    Docstring for public_holiday
 
-    return pl.Series(
-        __get_public_holidays(previous_year)
-        + __get_public_holidays(current_year)
+    :param year: Description
+    :type year: int
+    :return: Description
+    :rtype: Series
+    """
+    prev_year, next_year = year - 1, year + 1
+    all_days = (
+        __get_public_holidays(prev_year)
+        + __get_public_holidays(year)
         + __get_public_holidays(next_year)
-    ).sort()
+    )
+    # extra safety: unique again across years
+    return pl.Series(sorted(set(all_days)))
 
 
 @pl.api.register_expr_namespace("days")
@@ -356,8 +358,8 @@ class Days:
 
 def duration_to_hhmm(
     df: Union[pl.DataFrame, pl.LazyFrame],
-    duration_columns: Union[str, List[str]] = None,
-) -> Union[pl.DataFrame, pl.LazyFrame]:
+    duration_columns: str | list[str] = None,
+) -> pl.LazyFrame:
     """
     Convert duration columns to HH:MM string format.
 
@@ -376,23 +378,21 @@ def duration_to_hhmm(
     # If no duration columns specified, detect them automatically
     if duration_columns is None:
         duration_columns = [
-            col_name
-            for col_name, dtype in schema.items()
-            if str(dtype).startswith("duration")
+            col_name for col_name, dtype in schema.items() if str(dtype).startswith("duration")
         ]
     elif isinstance(duration_columns, str):
         duration_columns = [duration_columns]
 
     # No duration columns to convert
     if not duration_columns:
-        return df
+        return df.lazy()
 
     # Define a function to format durations as HH:MM
     def format_as_hhmm(s: pl.Series) -> pl.Series:
         return s.map_elements(
             lambda d: (
-                f"""{int(d.total_seconds()
-            // 3600):02d}:{int((d.total_seconds() % 3600) // 60):02d}"""
+                f"""{int(d.total_seconds() // 3600):02d}:{
+                    int((d.total_seconds() % 3600) // 60):02d}"""
                 if d is not None
                 else None
             ),
@@ -401,8 +401,6 @@ def duration_to_hhmm(
 
     # Apply the conversion to each duration column
     for col in duration_columns:
-        df = df.with_columns(
-            format_as_hhmm(pl.col(col)).str.to_time(format="%H:%M").alias(col)
-        )
+        df = df.with_columns(format_as_hhmm(pl.Series(col)).str.to_time(format="%H:%M").alias(col))
 
     return df
