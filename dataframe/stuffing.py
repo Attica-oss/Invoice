@@ -5,7 +5,7 @@ import polars as pl
 from data_source.make_dataset import load_gsheet_data
 from data_source.sheet_ids import STUFFING_SHEET_ID, liner_pallet_sheet, plugin_sheet
 
-from data.price import FREE, get_price
+from price_utils.price import FREE, get_price
 from type_casting import (
     PalletType,
     enum_customer,
@@ -18,34 +18,22 @@ from type_casting import (
 
 # Price
 LINER_PRICE = (
-    get_price(["Plastic Liner Installation"])
-    .select(pl.col("Price"))
-    .to_series()[0]
+    get_price(["Plastic Liner Installation"]).select(pl.col("Price")).to_series()[0]
 )
 MAGNUM_ELECTRICITY = (
-    get_price(["Electricity Price Magnum"])
-    .select(pl.col("Price"))
-    .to_series()[0]
+    get_price(["Electricity Price Magnum"]).select(pl.col("Price")).to_series()[0]
 )
-MONITORING_PRICE = (
-    get_price(["Monitoring"]).select(pl.col("Price")).to_series()[0]
-)
+MONITORING_PRICE = get_price(["Monitoring"]).select(pl.col("Price")).to_series()[0]
 PALLET_IOT_PRICE = (
-    get_price(["Pallets(+ Wedges) Usage"])
-    .select(pl.col("Price"))
-    .to_series()[0]
+    get_price(["Pallets(+ Wedges) Usage"]).select(pl.col("Price")).to_series()[0]
 )
 PALLET_PRICE = get_price(["Pallets"]).select(pl.col("Price")).to_series()[0]
 PLUGIN_PRICE = get_price(["Plugin"]).select(pl.col("Price")).to_series()[0]
 S_FREEZER_ELECTRICITY = (
-    get_price(["Electricity Price S Freezer"])
-    .select(pl.col("Price"))
-    .to_series()[0]
+    get_price(["Electricity Price S Freezer"]).select(pl.col("Price")).to_series()[0]
 )
 STANDARD_ELECTRICITY = (
-    get_price(["Electricity Price Standard"])
-    .select(pl.col("Price"))
-    .to_series()[0]
+    get_price(["Electricity Price Standard"]).select(pl.col("Price")).to_series()[0]
 )
 
 

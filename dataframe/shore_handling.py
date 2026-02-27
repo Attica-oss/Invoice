@@ -3,10 +3,9 @@
 import polars as pl
 
 # from data_source import expressions as exp
-from data.price import get_price
+from price_utils.price import get_price
 from data_source.make_dataset import load_gsheet_data
 from data_source.sheet_ids import SHORE_HANDLING_ID, bin_tipping_sheet, salt_sheet
-from type_casting import MovementType
 from type_casting.customers import purseiner, ship_owner
 from type_casting.dates import (
     DAY_NAMES,
@@ -18,9 +17,9 @@ from type_casting.dates import (
     duration_to_hhmm,
     public_holiday,
 )
-from type_casting.validations import MovementType, OvertimePerc
+from type_casting import MovementType, OvertimePerc
 
-BIN_TIPPING_PRICE = get_price(["CCCS Movement in/out"]).select(pl.col("Price")).to_series()[0]
+# BIN_TIPPING_PRICE = get_price(["CCCS Movement in/out"]).select(pl.col("Price")).to_series()[0]
 
 SALT_PRICE = (
     get_price(["Loading (Quay to Ship)", "Loading @ Zone 14"])
@@ -84,13 +83,13 @@ hours_after_cut_off_normal_day = pl.col("date").dt.combine(pl.col("end_time")) -
     "date"
 ).dt.combine(UPPER_BOUND)
 
-hours_after_cut_off_special_day = pl.col("date").dt.combine(pl.col("end_time")) - pl.col(
-    "date"
-).dt.combine(UPPER_BOUND_SPECIAL_DAY)
+hours_after_cut_off_special_day = pl.col("date").dt.combine(
+    pl.col("end_time")
+) - pl.col("date").dt.combine(UPPER_BOUND_SPECIAL_DAY)
 
-normal_duration_special_day = pl.col("date").dt.combine(UPPER_BOUND_SPECIAL_DAY) - pl.col(
-    "date"
-).dt.combine(pl.col("start_time"))
+normal_duration_special_day = pl.col("date").dt.combine(
+    UPPER_BOUND_SPECIAL_DAY
+) - pl.col("date").dt.combine(pl.col("start_time"))
 
 normal_duration = pl.col("date").dt.combine(UPPER_BOUND) - pl.col("date").dt.combine(
     pl.col("start_time")
@@ -101,9 +100,9 @@ normal_duration = pl.col("date").dt.combine(UPPER_BOUND) - pl.col("date").dt.com
 
 midnight_time = pl.lit(0)  # Midnight in seconds
 
-duration_after_midnight = (pl.col("date").dt.combine(pl.col("end_time")) + pl.duration(days=1)) - (
-    pl.col("date") + pl.duration(days=1)
-).dt.combine(midnight_time)
+duration_after_midnight = (
+    pl.col("date").dt.combine(pl.col("end_time")) + pl.duration(days=1)
+) - (pl.col("date") + pl.duration(days=1)).dt.combine(midnight_time)
 
 
 duration_after_midnight = (pl.col("date") + pl.duration(days=1)).dt.combine(
@@ -115,7 +114,10 @@ duration_after_midnight = (pl.col("date") + pl.duration(days=1)).dt.combine(
 # Before upper bound portion (normal rate)
 before_upper_bound_portion = (
     pl.when(after_midnight & is_not_special_day & (pl.col("start_time") < UPPER_BOUND))
-    .then(pl.col("date").dt.combine(UPPER_BOUND) - pl.col("date").dt.combine(pl.col("start_time")))
+    .then(
+        pl.col("date").dt.combine(UPPER_BOUND)
+        - pl.col("date").dt.combine(pl.col("start_time"))
+    )
     .otherwise(pl.duration())
 )
 
@@ -182,18 +184,26 @@ salt: pl.LazyFrame = (
         .then(hours_after_cut_off_normal_day)
         .otherwise(pl.duration()),
         # Special days at 150%
-        sun_150=pl.when(is_special_day & stop_after_cut_off_special_day & ~after_midnight)
+        sun_150=pl.when(
+            is_special_day & stop_after_cut_off_special_day & ~after_midnight
+        )
         .then(normal_duration_special_day)
         .when(is_special_day & stop_before_cut_off_special_day & ~after_midnight)
         .then(durations)
-        .when(is_special_day & after_midnight & (pl.col("start_time") < UPPER_BOUND_SPECIAL_DAY))
+        .when(
+            is_special_day
+            & after_midnight
+            & (pl.col("start_time") < UPPER_BOUND_SPECIAL_DAY)
+        )
         .then(
             pl.col("date").dt.combine(UPPER_BOUND_SPECIAL_DAY)
             - pl.col("date").dt.combine(pl.col("start_time"))
         )
         .otherwise(pl.duration()),
         # 200% overtime - including after midnight for normal days
-        overtime_200=pl.when(is_special_day & start_after_cut_off_special_day & ~after_midnight)
+        overtime_200=pl.when(
+            is_special_day & start_after_cut_off_special_day & ~after_midnight
+        )
         .then(durations)
         .when(is_special_day & stop_after_cut_off_special_day & ~after_midnight)
         .then(hours_after_cut_off_special_day)
@@ -206,32 +216,46 @@ salt: pl.LazyFrame = (
                 - pl.col("date").dt.combine(UPPER_BOUND_SPECIAL_DAY)
             )
         )
-        .when(is_not_special_day & after_midnight)  # Add this crucial condition for normal days
-        .then(portion_after_midnight)  # After midnight portion goes to 200% for normal days
+        .when(
+            is_not_special_day & after_midnight
+        )  # Add this crucial condition for normal days
+        .then(
+            portion_after_midnight
+        )  # After midnight portion goes to 200% for normal days
         .otherwise(pl.duration()),
         # Add durations column for after midnight case
-        total_duration=pl.when(after_midnight).then(duration_after_midnight).otherwise(durations),
+        total_duration=pl.when(after_midnight)
+        .then(duration_after_midnight)
+        .otherwise(durations),
     )
     .with_columns(
         # Calculate weighted values by tonnage, using total_duration for after midnight cases
         normal=(
             pl.col("normal")
-            / pl.when(after_midnight).then(pl.col("total_duration")).otherwise(durations)
+            / pl.when(after_midnight)
+            .then(pl.col("total_duration"))
+            .otherwise(durations)
         )
         * pl.col("tonnage"),
         overtime_150=(
             pl.col("normal_150")
-            / pl.when(after_midnight).then(pl.col("total_duration")).otherwise(durations)
+            / pl.when(after_midnight)
+            .then(pl.col("total_duration"))
+            .otherwise(durations)
         )
         * pl.col("tonnage")
         + (
             pl.col("sun_150")
-            / pl.when(after_midnight).then(pl.col("total_duration")).otherwise(durations)
+            / pl.when(after_midnight)
+            .then(pl.col("total_duration"))
+            .otherwise(durations)
         )
         * pl.col("tonnage"),
         overtime_200=(
             pl.col("overtime_200")
-            / pl.when(after_midnight).then(pl.col("total_duration")).otherwise(durations)
+            / pl.when(after_midnight)
+            .then(pl.col("total_duration"))
+            .otherwise(durations)
         )
         * pl.col("tonnage"),
     )
@@ -248,7 +272,9 @@ def forklift_salt() -> pl.LazyFrame:
     """Forklift for salt operation"""
     df = salt
     result = (
-        df.filter(pl.col("operation_type").ne(pl.lit("Loading @ Zone 14", dtype=pl.Utf8)))
+        df.filter(
+            pl.col("operation_type").ne(pl.lit("Loading @ Zone 14", dtype=pl.Utf8))
+        )
         .select(
             pl.col("day_name").alias("day"),
             pl.col("date"),
@@ -388,7 +414,10 @@ def forklift_salt() -> pl.LazyFrame:
             # Calculate normal hour services as total minus both overtime categories
             normal_hour_services=pl.when(after_midnight)
             .then(
-                pl.when(~pl.col("day").is_in(SPECIAL_DAYS) & (pl.col("start_time") < UPPER_BOUND))
+                pl.when(
+                    ~pl.col("day").is_in(SPECIAL_DAYS)
+                    & (pl.col("start_time") < UPPER_BOUND)
+                )
                 .then(
                     pl.col("date").dt.combine(UPPER_BOUND)
                     - pl.col("date").dt.combine(pl.col("start_time"))
@@ -431,39 +460,39 @@ add_day_name_col: pl.Expr = (
 )
 
 
-bin_tipping: pl.LazyFrame = (
-    load_gsheet_data(sheet_id=SHORE_HANDLING_ID, sheet_name=bin_tipping_sheet)
-    .unwrap()
-    .filter(pl.col("Tonnage Tipped") > 0)
-    .with_columns(day_name=add_day_name_col, Service=pl.lit("IPHS Bin Tipping"))
-    .select(
-        pl.col("day_name").cast(dtype=pl.Enum(DAY_NAMES)),
-        pl.col("Date"),
-        pl.col("Customer"),
-        pl.col("movement_type").cast(dtype=MovementType.enum_dtype()),
-        pl.col("Service"),
-        pl.col("IOT Scows (Tipping)").alias("number_of_scows_tipped"),
-        pl.col("Tonnage Tipped").cast(pl.Float64),
-        pl.col("Overtime"),
-    )
-    .with_columns(
-        price=BIN_TIPPING_PRICE,
-        total_price=pl.when(pl.col("day_name").is_in(SPECIAL_DAYS))
-        .then(
-            (
-                pl.col("price")
-                * OvertimePerc.overtime_150
-                * (pl.col("Tonnage Tipped") - pl.col("Overtime"))
-            )
-            + (pl.col("price") * OvertimePerc.overtime_200 * pl.col("Overtime"))
-        )
-        .otherwise(
-            (
-                pl.col("price")
-                * OvertimePerc.normal_hour
-                * (pl.col("Tonnage Tipped") - pl.col("Overtime"))
-            )
-            + (pl.col("price") * OvertimePerc.overtime_150 * pl.col("Overtime"))
-        ),
-    )
-)
+# bin_tipping: pl.LazyFrame = (
+#     load_gsheet_data(sheet_id=SHORE_HANDLING_ID, sheet_name=bin_tipping_sheet)
+#     .unwrap()
+#     .filter(pl.col("Tonnage Tipped") > 0)
+#     .with_columns(day_name=add_day_name_col, Service=pl.lit("IPHS Bin Tipping"))
+#     .select(
+#         pl.col("day_name").cast(dtype=pl.Enum(DAY_NAMES)),
+#         pl.col("Date"),
+#         pl.col("Customer"),
+#         pl.col("movement_type").cast(dtype=MovementType.enum_dtype()),
+#         pl.col("Service"),
+#         pl.col("IOT Scows (Tipping)").alias("number_of_scows_tipped"),
+#         pl.col("Tonnage Tipped").cast(pl.Float64),
+#         pl.col("Overtime"),
+#     )
+#     .with_columns(
+#         price=BIN_TIPPING_PRICE,
+#         total_price=pl.when(pl.col("day_name").is_in(SPECIAL_DAYS))
+#         .then(
+#             (
+#                 pl.col("price")
+#                 * OvertimePerc.overtime_150
+#                 * (pl.col("Tonnage Tipped") - pl.col("Overtime"))
+#             )
+#             + (pl.col("price") * OvertimePerc.overtime_200 * pl.col("Overtime"))
+#         )
+#         .otherwise(
+#             (
+#                 pl.col("price")
+#                 * OvertimePerc.normal_hour
+#                 * (pl.col("Tonnage Tipped") - pl.col("Overtime"))
+#             )
+#             + (pl.col("price") * OvertimePerc.overtime_150 * pl.col("Overtime"))
+#         ),
+#     )
+# )

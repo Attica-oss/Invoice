@@ -55,7 +55,7 @@ operations_dataframes: dict[str, pl.LazyFrame] = {
 
 shore_handling_dataframes: dict[str, pl.LazyFrame] = {
     "salt": shore_handling.salt,
-    "bin_tipping": shore_handling.bin_tipping,
+    # "bin_tipping": shore_handling.bin_tipping,
     "forklift_salt": shore_handling.forklift_salt(),
 }
 

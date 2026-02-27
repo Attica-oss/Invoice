@@ -29,7 +29,7 @@ from type_casting.customers import cargo
 from type_casting.dates import Days
 
 from dataframe.stuffing import coa
-from data.price import FREE, get_price
+from price_utils.price import FREE, get_price
 
 ph_list: pl.Series = public_holiday()
 
@@ -61,9 +61,7 @@ oss_service_list: list[str] = [
 ]
 
 
-UNLOADING_PRICE: pl.LazyFrame = get_price(service_list).with_columns(
-    date=pl.col("end")
-)
+UNLOADING_PRICE: pl.LazyFrame = get_price(service_list).with_columns(date=pl.col("end"))
 
 OSS_STUFFING_PRICE: pl.LazyFrame = get_price(oss_service_list).with_columns(
     date=pl.col("end")
@@ -149,7 +147,8 @@ cccs_record = (
 
 cccs_adjusted_records = (
     (
-        load_gsheet_data(sheet_id=OPS_SHEET_ID,sheet_name= raw_sheet).unwrap()
+        load_gsheet_data(sheet_id=OPS_SHEET_ID, sheet_name=raw_sheet)
+        .unwrap()
         .filter(pl.col("Container (Destination)").str.contains("CCCS"))
         .select(
             pl.col("Day"),
@@ -163,9 +162,9 @@ cccs_adjusted_records = (
                 .str.replace(",", "")
                 .cast(pl.Int64)
                 * 0.001  # Convert to Tons from Kilos
-            ).round(3)
+            )
+            .round(3)
             .cast(pl.Float64)
-           
             .alias("total_tonnage"),
             pl.col("Container (Destination)").alias("destination"),
             pl.col("Species"),
@@ -211,7 +210,8 @@ cccs_adjusted_records = (
         total_tonnage=pl.col("adjusted_tonnage").sum().round(3),
     )
     .select(
-        ["Day",
+        [
+            "Day",
             "date",
             "vessel",
             "start_time",
@@ -221,7 +221,8 @@ cccs_adjusted_records = (
             "end_time",
             "total_tonnage",
         ]
-    ).sort(by="date")
+    )
+    .sort(by="date")
 )
 
 
@@ -230,7 +231,8 @@ cccs_adjusted_records = (
 netList = (
     pl.concat(
         [
-            load_gsheet_data(OPS_SHEET_ID, net_list_sheet).unwrap()
+            load_gsheet_data(OPS_SHEET_ID, net_list_sheet)
+            .unwrap()
             .filter(~pl.col("Container (Destination)").str.contains("CCCS"))
             .select(
                 pl.col("Date").days.add_day_name().cast(pl.Utf8).alias("Day"),
@@ -412,7 +414,8 @@ iot_coa = (
 
 iot_cargo = (
     (
-        load_gsheet_data(OPS_SHEET_ID, net_list_sheet).unwrap()
+        load_gsheet_data(OPS_SHEET_ID, net_list_sheet)
+        .unwrap()
         .select(
             pl.col("Date").alias("date"),
             pl.col("Vessel").str.to_uppercase().alias("vessel"),
@@ -465,7 +468,8 @@ iot_cargo = (
 
 # IOT SOC Stuffing DataFrame
 iot_stuffing = (
-    load_gsheet_data(OPS_SHEET_ID, net_list_sheet).unwrap()
+    load_gsheet_data(OPS_SHEET_ID, net_list_sheet)
+    .unwrap()
     .select(
         pl.col("Date").alias("date"),
         pl.col("Vessel").str.to_uppercase().alias("vessel"),

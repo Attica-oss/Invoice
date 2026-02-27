@@ -12,13 +12,12 @@ from data_source.all_dataframe import (
 from type_casting.dates import SPECIAL_DAYS
 from type_casting.customers import bycatch, client_shore_cost
 from type_casting.validations import (
-
     UNLOADING_SERVICE,
     CARGO_DISPATCH_SERVICE,
     MovementType,
     OvertimePerc,
 )
-from data.price import (
+from price_utils.price import (
     get_price,
     DARDANEL_DISCOUNT,
 )
@@ -90,11 +89,9 @@ static_loader: pl.LazyFrame = (
                 * OvertimePerc.overtime_150
             )
             + (
-                (
-                    pl.col("Price")
-                    * (pl.col("overtime_tonnage"))
-                    * OvertimePerc.overtime_200
-                )
+                pl.col("Price")
+                * (pl.col("overtime_tonnage"))
+                * OvertimePerc.overtime_200
             )
         )
         .otherwise(
@@ -381,7 +378,8 @@ cross_stuffing: pl.LazyFrame = (
         .otherwise(
             (pl.col("normal_hours") * OvertimePerc.normal_hour * pl.col("Price"))
             + (pl.col("overtime_tonnage") * OvertimePerc.overtime_150 * pl.col("Price"))
-        ).round(3)
+        )
+        .round(3)
     )
     .select(pl.all().exclude(["normal_hours", "Date"]))
 )
@@ -439,9 +437,9 @@ __by_catch_with_transfer = (
     )
     .filter(pl.col("total_tonnage_right").is_not_null())
     .with_columns(
-        total_tonnage=(pl.col("total_tonnage") - pl.col("total_tonnage_right")).cast(
-            pl.Float64
-        ).round(3),
+        total_tonnage=(pl.col("total_tonnage") - pl.col("total_tonnage_right"))
+        .cast(pl.Float64)
+        .round(3),
         overtime_tonnage=(
             pl.col("overtime_tonnage") - pl.col("overtime_tonnage_right")
         ).round(3),

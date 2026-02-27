@@ -2,7 +2,6 @@
 
 import os
 import sys
-import subprocess
 from time import sleep
 
 from dataclasses import dataclass
@@ -12,7 +11,6 @@ from typing import Optional
 from app.logger import logger
 from app.save import save_df_to_csv
 from app.view import forklift_logistics_dataset, view_data
-
 # from app.check import check_data
 
 
@@ -58,7 +56,7 @@ class App:
     def clear_screen(self) -> None:
         """clears the screen based on the OS"""
         logger.info("Clearing screen")
-        subprocess.run("cls" if os.name == "nt" else "clear", shell=True, check=False)
+        os.system("cls" if os.name == "nt" else "clear")
 
     def exit_application(self) -> None:
         """Gracefully exits the application"""
@@ -127,9 +125,9 @@ class App:
                     save_df_to_csv(data)
                 menu = input("Return to the main menu [Y/n]").lower()
                 if menu in ("y", "yes"):
-                    self.run()
-                else:
-                    self.exit_application()
+                    return
+
+                self.exit_application()
             elif choice in ("n", "no"):
                 return
             else:
