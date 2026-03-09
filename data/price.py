@@ -25,11 +25,11 @@ def price_table() -> pl.DataFrame:
 
     return (
         lf.with_columns(
-            pl.col("StartingDate").alias("start"),
+            pl.col("StartingDate").alias("date"),
             pl.col("EndingDate").alias("end"),
             pl.col("Price").cast(pl.Float64),
         )
-        .select(["Service", "Price", "start", "end"])
+        .select(["Service", "Price", "date", "end"])
         .collect()
     )
 

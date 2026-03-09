@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.19.11"
+__generated_with = "0.20.4"
 app = marimo.App(width="medium")
 
 with app.setup:
@@ -28,23 +28,300 @@ with app.setup:
 
 @app.cell
 def _():
-    invoice_df = load_gsheet_data(sheet_id=INVOICING,sheet_name=INVOICE_STATUS)
+    raw_stuffing = load_gsheet_data(sheet_id="1PvTkl6DYZdhtaiNshz0qwtSPxC8S1OOeu905NmhFKNs",sheet_name="RawData").and_then(lambda x:x.filter(pl.col("Date").dt.year().eq(2026))).collect()
+    return (raw_stuffing,)
+
+
+@app.cell(hide_code=True)
+def _(raw_stuffing):
+    _df = mo.sql(
+        f"""
+        WITH
+            iot_dol AS (
+                FROM
+                    raw_stuffing
+                SELECT
+                    "Container (Destination)",
+                    Vessel,
+                    Date,
+                    Time,
+                    "Side Working"
+                WHERE
+                    vessel = 'Dolomieu'
+                    AND "Container (Destination)" IN (
+                        'SUDU8064187',
+                        'SUDU8076059',
+                        'SUDU8082046',
+                        'SUDU8170548',
+                        'SUDU8183062',
+                        'SUDU8178045',
+                        'CNIU2234183',
+                        'SUDU8179720',
+                        'SUDU8081034',
+                        'SUDU8087048',
+                        'MNBU0318280'
+                    )
+            )
+        FROM
+            iot_dol
+        SELECT "Container (Destination)",Date,MIN(Time) AS start_time,MAX(Time) AS end_time
+        GROUP BY "Container (Destination)",Date
+        """
+    )
+    return
+
+
+@app.cell
+def _():
+    report_status = load_gsheet_data(sheet_id=INVOICING,sheet_name="report_status").unwrap()
+    return (report_status,)
+
+
+@app.cell(hide_code=True)
+def _(report_status):
+    _df = mo.sql(
+        f"""
+        FROM
+            report_status
+        SELECT
+            invoice_number,
+            report_type || ' -- ' || sub_type AS report_type,
+            "vessel/client",
+            start_date,
+            end_date,
+            status,
+            invoice_amount
+        ORDER BY invoice_number DESC
+        """
+    )
+    return
+
+
+@app.cell
+def _():
+    invoice_df = load_gsheet_data(sheet_id=INVOICING,sheet_name=INVOICE_STATUS).unwrap()
     return (invoice_df,)
 
 
-app._unparsable_cell(
-    r"""
-    berth = load_excel(ExcelFiles.)
-    """,
-    name="_"
-)
+@app.cell
+def _():
+    berth = load_excel(ExcelFiles.BERTH_DUES_2026)
+    return (berth,)
+
+
+@app.cell
+def _():
+    berth2 = load_excel(ExcelFiles.BERTH_DUES)
+    return (berth2,)
+
+
+@app.cell(hide_code=True)
+def _(berth2):
+    _df = mo.sql(
+        f"""
+        FROM berth2 WHERE MONTH("DATE IN") = 12
+        """
+    )
+    return
+
+
+@app.cell
+def _(berth):
+    berth.collect()
+    return
+
+
+@app.cell
+def _():
+    iphs_truck = load_gsheet_data(sheet_id="1VbfiiWsp8yxs6KSR1CXpw1S_35tYlWV8UjjWah9Afpw",sheet_name="IPHSTruck").unwrap()
+    return (iphs_truck,)
+
+
+@app.cell
+def _():
+    from datetime import date
+
+    bin_dispatch = (
+        load_gsheet_data(
+            sheet_id="1VbfiiWsp8yxs6KSR1CXpw1S_35tYlWV8UjjWah9Afpw",
+            sheet_name="CCCSReport",
+        )
+        .and_then(
+            lambda x: x.filter(
+                pl.col("operation_type")
+                .is_in(["Bin Dispatch to IOT", "Bin Dispatch from IOT"])
+                .and_(
+                    pl.col("date").is_between(date(2026, 2, 1), date(2026, 2, 28))
+                )
+            ).select(
+                pl.col("day"),
+                pl.col("date"),
+                pl.col("vessel"),
+                pl.col("operation_type"),
+                pl.col("total_tonnage").abs(),
+                pl.col("overtime_tonnage")
+                .str.replace("", "0")
+                .cast(pl.Float64)
+                .round(3),
+            )
+        )
+        .collect()
+    )
+    return (bin_dispatch,)
+
+
+@app.cell(hide_code=True)
+def _(bin_dispatch):
+    _df = mo.sql(
+        f"""
+        FROM bin_dispatch
+        SELECT *,CASE WHEN "day" IN ('SUN','PH') THEN (CAST(total_tonnage - overtime_tonnage AS DECIMAL) * 3.5*1.5) + CAST(overtime_tonnage * 3.5 *2.0 AS DECIMAL) ELSE (CAST(total_tonnage - overtime_tonnage AS DECIMAL) * 3.5) + CAST(overtime_tonnage * 3.5 *1.5 AS DECIMAL) END AS price
+        """
+    )
+    return
+
+
+@app.cell
+def _():
+    1461.50375 - (250*3.5*1.5)
+    return
+
+
+@app.cell(hide_code=True)
+def _(iphs_truck):
+    _df = mo.sql(
+        f"""
+        FROM
+            iphs_truck
+        SELECT *,CASE WHEN "day" IN ('SUN','PH') THEN (CAST(total_tonnage - overtime_tonnage AS DECIMAL) * 3.5*1.5) + CAST(overtime_tonnage * 3.5 *2.0 AS DECIMAL) ELSE (CAST(total_tonnage - overtime_tonnage AS DECIMAL) * 3.5) + CAST(overtime_tonnage * 3.5 *1.5 AS DECIMAL) END AS price
+        WHERE
+            YEAR(date) = 2026
+            AND MONTH(date) = 2
+            AND customer LIKE '%SAPMER%' AND vessel = 'DOLOMIEU'
+        """
+    )
+    return
+
+
+@app.cell
+def _():
+    9.29600 - 7.02
+    return
 
 
 @app.cell(hide_code=True)
 def _(berth):
     _df = mo.sql(
         f"""
-        FROM berth
+        FROM
+            berth
+        SELECT
+            "VESSEL NAME" AS vessel,
+            "DATE IN" AS date_in,
+            CAST("TIME IN" AS TIME) AS time_in,
+            "DATE OUT" AS date_out,
+            CAST("TIME OUT" AS TIME) AS time_out,
+            "DURATION IN PORT" AS duration_in_port,
+            "INVOICING ENTITY" AS customer,
+            "VESSEL TYPE" AS vessel_type,
+            "INVOICE VALUE" AS total_amount,
+            "COMMENTS" AS remarks
+        WHERE time_in  = '00:00'::TIME
+        """
+    )
+    return
+
+
+@app.cell
+def _():
+    from dataframe.miscellaneous import cccs_container_stuffing,truck_to_cccs
+
+    return (truck_to_cccs,)
+
+
+@app.cell(hide_code=True)
+def _(truck_to_cccs):
+    _df = mo.sql(
+        f"""
+        FROM truck_to_cccs WHERE customer = 'DARDANEL'
+        """
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(cccs_stuffing):
+    _df = mo.sql(
+        f"""
+        FROM
+            cccs_stuffing
+        SELECT
+            -- *
+            date,
+            ROUND(CAST(SUM(total_tonnage) AS DECIMAL),3) AS tons,
+            ROUND(CAST(SUM(total_tonnage) * 3.0 AS DECIMAL),2) AS price
+            -- CAST(SUM(total_tonnage) AS DECIMAL) * 3.0
+        WHERE
+            YEAR(date) = 2026
+            AND MONTH(date) = 2
+            AND customer = 'OCEAN BASKET'
+        GROUP BY date
+        ORDER BY date
+        """
+    )
+    return
+
+
+@app.cell
+def _():
+    100.254 * 5.0 *1.5
+    return
+
+
+@app.cell
+def _():
+    from dataframe.transport import forklift
+
+    return (forklift,)
+
+
+@app.cell
+def _():
+    forklift_log = load_excel(file_path=ExcelFiles.FORKLIFT_USAGE)
+
+    shifting_log = load_excel(file_path=ExcelFiles.CONTAINER_SHIFTING)
+    return forklift_log, shifting_log
+
+
+@app.cell(hide_code=True)
+def _(shifting_log):
+    _df = mo.sql(
+        f"""
+        FROM shifting_log
+        """
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(forklift_log):
+    _df = mo.sql(
+        f"""
+        SELECT
+            "Date of Service",
+            Driver,
+            "Forklift No.",
+            CAST("Time Out" AS TIME) AS "Time Out",
+            CAST("Time In" AS TIME) AS "Time In",
+            CAST("Duration" AS TIME) AS "Duration",
+            "Vessel/Client",
+            "Purpose"
+        FROM
+            forklift_log
+        WHERE
+            YEAR("Date of Service") = 2026
+            AND "Vessel/Client" = 'EGALABUR'
+        ORDER BY "Date of Service","Time Out"
         """
     )
     return
@@ -745,10 +1022,8 @@ def _():
 @app.cell
 def _():
     from dataframe.shore_handling import salt,forklift_salt
-    from dataframe.transport import forklift
-
-
-    return forklift, forklift_salt, salt
+    # from dataframe.transport import forklift
+    return forklift_salt, salt
 
 
 @app.cell(hide_code=True)
@@ -765,7 +1040,7 @@ def _(forklift):
 def _(salt):
     _df = mo.sql(
         f"""
-        FROM salt WHERE customer LIKE '%HARTSWATER%' AND date >= '2025-12-01'
+        FROM salt WHERE customer LIKE '%ATUNSA NV%' AND date >= '2025-12-01'
         """
     )
     return
@@ -792,7 +1067,7 @@ def _(forklift_salt):
 def _(f_salt):
     _df = mo.sql(
         f"""
-        FROM f_salt WHERE customer LIKE '%HARTSWATER%' AND MONTH(date) = 12 AND YEAR(date) = 2025
+        FROM f_salt
         """
     )
     return
@@ -835,6 +1110,119 @@ def _(shore_crane):
 
 @app.cell
 def _():
+    sheet_id = "1L9qkq9WlIa2j5DcvoLvxkqYogRg76S-e8OxAIyLruAE"
+    pre_trip = "ContainerPTI"
+    gate_in_s = "ContainerGateIn"
+    gate_out_s = "ContainerGateOut"
+    plug_in = "ContainerPlugIn"
+    washing = "ContainerCleaning"
+    return gate_in_s, pre_trip, sheet_id, washing
+
+
+@app.cell
+def _(gate_in_s, pre_trip, sheet_id, washing):
+    washing_log = load_gsheet_data(sheet_id=sheet_id,sheet_name=washing).unwrap()
+    gate_in_log = load_gsheet_data(sheet_id=sheet_id,sheet_name=gate_in_s).unwrap()
+    pti_log = load_gsheet_data(sheet_id=sheet_id,sheet_name=pre_trip).unwrap()
+    return gate_in_log, pti_log, washing_log
+
+
+@app.cell(hide_code=True)
+def _(gate_in_log, pti_log):
+    _df = mo.sql(
+        f"""
+        WITH
+            pti AS (
+                FROM
+                    pti_log
+                SELECT
+                    "Date Plugin",
+                    "Container Number",
+                    "Set Point",
+                    "Unit Manufacturer"
+                WHERE
+                    "Date Plugin" BETWEEN '2026-01-01' AND '2026-01-31'
+                    AND "Shipping Line" = 'CMA CGM'
+            ),
+            gate AS (
+                FROM
+                    gate_in_log
+            )
+
+        SELECT 
+            	p.*,
+            	g."Date",
+            	g."Type",
+            	g."Unit Manufacturer"
+        FROM
+            pti p
+
+            LEFT JOIN gate g ON p."Date Plugin" >= g."Date"
+            AND p."Container Number" = g."Container Number"
+        """
+    )
+    return
+
+
+@app.cell
+def _():
+    2768774
+    return
+
+
+@app.cell(hide_code=True)
+def _(washing_log):
+    _df = mo.sql(
+        f"""
+        FROM washing_log WHERE date BETWEEN '2026-01-01' AND '2026-01-31'
+        """
+    )
+    return
+
+
+@app.cell
+def _():
+    transfer_log = load_excel(file_path=ExcelFiles.CONTAINER_TRANSFER)
+    return (transfer_log,)
+
+
+@app.cell(hide_code=True)
+def _(transfer_log):
+    _df = mo.sql(
+        f"""
+        FROM transfer_log WHERE date BETWEEN '2026-01-01' AND '2026-01-31' AND "Line/Client" = 'IOT'
+        """
+    )
+    return
+
+
+@app.cell
+def _():
+    return
+
+
+@app.cell
+def _():
+    return
+
+
+@app.cell
+def _():
+    return
+
+
+@app.cell
+def _():
+    return
+
+
+@app.cell
+def _():
+    return
+
+
+@app.cell
+def _():
     from dataframe.miscellaneous import cross_stuffing
 
     return (cross_stuffing,)
@@ -844,9 +1232,15 @@ def _():
 def _(cross_stuffing):
     _df = mo.sql(
         f"""
-        FROM cross_stuffing WHERE MONTH(date) = 12
+        FROM cross_stuffing WHERE YEAR(date) = 2026 AND MONTH(date) = 2 and invoiced = 'IOT'
         """
     )
+    return
+
+
+@app.cell
+def _():
+    (7.481) * 3.5
     return
 
 
@@ -917,9 +1311,15 @@ def _():
 def _(cccs_stuffing):
     _df = mo.sql(
         f"""
-        FROM cccs_stuffing WHERE "date" BETWEEN '2025-12-01' AND '2025-12-31'
+        FROM cccs_stuffing WHERE "date" BETWEEN '2026-02-01' AND '2026-02-28'
         """
     )
+    return
+
+
+@app.cell
+def _():
+    (19.371)*(3.5+3.0)
     return
 
 
@@ -1042,6 +1442,18 @@ def _(scow_tranfer):
         FROM scow_tranfer WHERE YEAR(Date) = 2026 AND MONTH(Date) = 2
         """
     )
+    return
+
+
+@app.cell
+def _():
+    salt_log = load_excel(file_path=ExcelFiles.SALT_HANDLING)
+    return (salt_log,)
+
+
+@app.cell
+def _(salt_log):
+    salt_log.filter(pl.col("Tue 17/01").dt.year().eq(2026)).collect()
     return
 
 

@@ -9,19 +9,32 @@ from data_source.sheet_ids import (
     BY_CATCH_SHEET,
     CCCS_STUFFING_SHEET,
 )
-from type_casting.dates import CURRENT_YEAR, DAY_NAMES, public_holiday
+from type_casting.dates import CURRENT_YEAR, Days, DayName
 
 from type_casting.containers import containers_enum
+
+
+def _to_f64(column: str) -> pl.Expr:
+    """Normalize mixed/blank numeric cells to Float64 with 0 fallback."""
+    return (
+        pl.col(column)
+        .cast(pl.Utf8)
+        .str.strip_chars()
+        .replace("", None)
+        .cast(pl.Float64, strict=False)
+        .fill_null(0.0)
+    )
 
 
 # Miscellaneous Main Sheet clean up
 def miscellaneous() -> pl.LazyFrame:
     """Miscellaneous main sheet"""
     return (
-        load_gsheet_data(sheet_id=MISC_SHEET_ID, sheet_name=ALL_CCCS_DATA_SHEET).unwrap()
+        load_gsheet_data(sheet_id=MISC_SHEET_ID, sheet_name=ALL_CCCS_DATA_SHEET)
+        .unwrap()
         .filter(pl.col("date").dt.year().ge(CURRENT_YEAR - 1))
         .select(
-            pl.col("day").cast(dtype=pl.Enum(DAY_NAMES)),
+            pl.col("day").cast(dtype=DayName.enum_dtype()),
             pl.col("date"),
             pl.col("movement_type"),
             pl.col("customer"),
@@ -29,16 +42,12 @@ def miscellaneous() -> pl.LazyFrame:
             pl.col("vessel"),
             pl.col("storage_type"),
             pl.col("operation_type"),
-            pl.col("total_tonnage"),
+            _to_f64("total_tonnage").alias("total_tonnage"),
             pl.col("bins_in").str.replace("", "0").cast(pl.Int64),
             pl.col("bins_out").str.strip_chars("-").replace("", "0").cast(pl.Int64)
             * -1,
-            pl.col("static_loader")
-            .str.replace("", "0")
-            .cast(pl.Float64),  # static_loader
-            pl.col("overtime_tonnage")
-            .str.replace("", "0")
-            .cast(pl.Float64),  # overtime_tonnage
+            _to_f64("static_loader").alias("static_loader"),
+            _to_f64("overtime_tonnage").alias("overtime_tonnage"),
         )
     )
 
@@ -46,12 +55,13 @@ def miscellaneous() -> pl.LazyFrame:
 def cross_stuffing() -> pl.LazyFrame:
     """Cross stuffing sheet"""
     return (
-        load_gsheet_data(MISC_SHEET_ID, CROSS_STUFFING_SHEET).unwrap()
+        load_gsheet_data(MISC_SHEET_ID, CROSS_STUFFING_SHEET)
+        .unwrap()
         # .filter(pl.col("day").str.replace("", "x").ne("x"))
         .with_columns(storage_type=pl.lit("Dry", dtype=pl.Utf8))
         .filter(pl.col("date").dt.year().ge(CURRENT_YEAR - 1))
         .select(
-            pl.col("day").cast(dtype=pl.Enum(DAY_NAMES)),
+            pl.col("day").cast(dtype=DayName.enum_dtype()),
             pl.col("vessel_client"),
             pl.col("date"),
             pl.col("origin"),  # .cast(dtype=containers_enum)
@@ -59,10 +69,8 @@ def cross_stuffing() -> pl.LazyFrame:
             pl.col("start_time"),
             pl.col("end_time"),
             pl.col("storage_type"),
-            pl.col("total_tonnage").cast(pl.Float64).round(3),
-            pl.col("overtime_tonnage")
-            # .str.replace("", "0")
-            .cast(pl.Float64).round(3),
+            _to_f64("total_tonnage").round(3).alias("total_tonnage"),
+            _to_f64("overtime_tonnage").round(3).alias("overtime_tonnage"),
             pl.col("is_origin_empty"),
             pl.col("service").alias("Service"),
             pl.col("invoiced"),
@@ -73,14 +81,10 @@ def cross_stuffing() -> pl.LazyFrame:
 def by_catch_transfer() -> pl.LazyFrame:
     """by catch transfer sheet"""
     return (
-        load_gsheet_data(MISC_SHEET_ID, BY_CATCH_SHEET).unwrap()
+        load_gsheet_data(MISC_SHEET_ID, BY_CATCH_SHEET)
+        .unwrap()
         .filter(pl.col("date").dt.year().ge(CURRENT_YEAR - 1))
-        .with_columns(
-            day=pl.when(pl.col("date").is_in(public_holiday(CURRENT_YEAR)))
-            .then(pl.lit("PH"))
-            .otherwise(pl.col("date").dt.to_string(format="%a"))
-            .cast(dtype=pl.Enum(DAY_NAMES))
-        )
+        .with_columns(day=pl.col("date").days.add_day_name())
         .select(
             pl.col("day"),
             pl.col("date"),
@@ -89,8 +93,8 @@ def by_catch_transfer() -> pl.LazyFrame:
             pl.col("vessel"),
             pl.col("service").alias("operation_type"),
             pl.col("storage_type"),
-            pl.col("total_tonnage").cast(pl.Float64).round(3),
-            pl.col("overtime_tonnage").cast(pl.Float64).round(3),
+            _to_f64("total_tonnage").round(3).alias("total_tonnage"),
+            _to_f64("overtime_tonnage").round(3).alias("overtime_tonnage"),
         )
     )
 
@@ -98,18 +102,18 @@ def by_catch_transfer() -> pl.LazyFrame:
 def cccs_container_stuffing() -> pl.LazyFrame:
     """CCCS container stuffing dataframe clean up"""
     return (
-        load_gsheet_data(MISC_SHEET_ID, CCCS_STUFFING_SHEET).unwrap()
-        .filter(pl.col("date").dt.year().ge(CURRENT_YEAR - 1))
+        load_gsheet_data(MISC_SHEET_ID, CCCS_STUFFING_SHEET)
+        .and_then(lambda x: x.filter(pl.col("date").dt.year().eq(CURRENT_YEAR)))
         .with_columns(storage_type=pl.lit("Dry", dtype=pl.Utf8))
         .select(
-            pl.col("Day").cast(dtype=pl.Enum(DAY_NAMES)),
+            pl.col("date").days.add_day_name(),
             pl.col("date"),
             pl.col("container_number").cast(dtype=containers_enum),
             pl.col("customer"),
             pl.col("service").alias("Service"),
             pl.col("storage_type"),
-            pl.col("total_tonnage"),
-            pl.col("overtime_tonnage"),
+            _to_f64("total_tonnage").alias("total_tonnage"),
+            _to_f64("overtime_tonnage").alias("overtime_tonnage"),
             pl.col("invoiced"),
         )
     )

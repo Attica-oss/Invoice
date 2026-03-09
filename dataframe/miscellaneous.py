@@ -12,7 +12,6 @@ from data_source.all_dataframe import (
 from type_casting.dates import SPECIAL_DAYS
 from type_casting.customers import bycatch, client_shore_cost
 from type_casting.validations import (
-
     UNLOADING_SERVICE,
     CARGO_DISPATCH_SERVICE,
     MovementType,
@@ -77,10 +76,10 @@ static_loader: pl.LazyFrame = (
         STATIC_LOADER.lazy(),
         by="Service",
         left_on="date",
-        right_on="Date",
+        right_on="date",
         strategy="backward",
     )
-    .select(pl.all().exclude(["Date"]))
+    # .select(pl.all().exclude(["date"]))
     .with_columns(
         total_price=pl.when(pl.col("day").is_in(SPECIAL_DAYS))
         .then(
@@ -90,11 +89,9 @@ static_loader: pl.LazyFrame = (
                 * OvertimePerc.overtime_150
             )
             + (
-                (
-                    pl.col("Price")
-                    * (pl.col("overtime_tonnage"))
-                    * OvertimePerc.overtime_200
-                )
+                pl.col("Price")
+                * (pl.col("overtime_tonnage"))
+                * OvertimePerc.overtime_200
             )
         )
         .otherwise(
@@ -129,7 +126,7 @@ dispatch_to_cargo: pl.LazyFrame = (
         TRUCK_PRICE.lazy(),
         by="Service",
         left_on="date",
-        right_on="Date",
+        right_on="date",
         strategy="backward",
     )
     .select(pl.all().exclude(["Service"]))
@@ -143,7 +140,7 @@ dispatch_to_cargo: pl.LazyFrame = (
         CARGO_LOADING_PRICE.lazy(),
         by="Service",
         left_on="date",
-        right_on="Date",
+        right_on="date",
         strategy="backward",
     )
     .with_columns(
@@ -221,7 +218,7 @@ from_cccs_to_vessel = (
         TRUCK_PRICE.lazy(),
         by="Service",
         left_on="date",
-        right_on="Date",
+        right_on="date",
         strategy="backward",
     )
     .with_columns(
@@ -229,7 +226,7 @@ from_cccs_to_vessel = (
         operation_type=pl.lit("From CCCS to Vessel"),
     )
     .with_columns(Price=pl.col("Price") + pl.col("CCCS_incoming_fee"))
-    .drop(["Service", "Date", "CCCS_incoming_fee"])
+    .drop(["Service", "CCCS_incoming_fee"])
     .with_columns(
         total_price=pl.when(pl.col("day").is_in(SPECIAL_DAYS))
         .then(
@@ -289,7 +286,7 @@ truck_to_cccs = (
         TRUCK_PRICE.lazy(),
         by="Service",
         left_on="date",
-        right_on="Date",
+        right_on="date",
         strategy="backward",
     )
     .with_columns(
@@ -348,7 +345,7 @@ truck_to_cccs = (
             )
         )
     )
-).select(pl.all().exclude(["Service", "Date"]))
+).select(pl.all().exclude(["Service"]))
 
 # Cross stuffing and Unstuffing dataset
 cross_stuffing: pl.LazyFrame = (
@@ -357,7 +354,7 @@ cross_stuffing: pl.LazyFrame = (
         CROSS_STUFFING_PRICE.lazy(),
         by="Service",
         left_on="date",
-        right_on="Date",
+        right_on="date",
         strategy="backward",
     )
     .with_columns(
@@ -381,9 +378,10 @@ cross_stuffing: pl.LazyFrame = (
         .otherwise(
             (pl.col("normal_hours") * OvertimePerc.normal_hour * pl.col("Price"))
             + (pl.col("overtime_tonnage") * OvertimePerc.overtime_150 * pl.col("Price"))
-        ).round(3)
+        )
+        .round(3)
     )
-    .select(pl.all().exclude(["normal_hours", "Date"]))
+    .select(pl.all().exclude(["normal_hours"]))
 )
 
 # BY CATCH RECORDS
@@ -439,9 +437,9 @@ __by_catch_with_transfer = (
     )
     .filter(pl.col("total_tonnage_right").is_not_null())
     .with_columns(
-        total_tonnage=(pl.col("total_tonnage") - pl.col("total_tonnage_right")).cast(
-            pl.Float64
-        ).round(3),
+        total_tonnage=(pl.col("total_tonnage") - pl.col("total_tonnage_right"))
+        .cast(pl.Float64)
+        .round(3),
         overtime_tonnage=(
             pl.col("overtime_tonnage") - pl.col("overtime_tonnage_right")
         ).round(3),
@@ -528,7 +526,7 @@ by_catch = (
         BY_CATCH_PRICE.lazy(),
         by="Service",
         left_on="date",
-        right_on="Date",
+        right_on="date",
         strategy="backward",
     )
     .with_columns(normal_hours=pl.col("total_tonnage") - pl.col("overtime_tonnage"))
@@ -543,7 +541,7 @@ by_catch = (
             + (pl.col("overtime_tonnage") * OvertimePerc.overtime_150 * pl.col("Price"))
         )
     )
-    .select(pl.all().exclude(["movement_type", "Date", "Service", "normal_hours"]))
+    .select(pl.all().exclude(["movement_type", "Service", "normal_hours"]))
 )
 
 # CCCS Container Stuffing dataset
@@ -553,12 +551,12 @@ cccs_stuffing: pl.LazyFrame = (
         CCCS_STUFFING_PRICE.lazy(),
         by="Service",
         left_on="date",
-        right_on="Date",
+        right_on="date",
         strategy="backward",
     )
     .with_columns(normal_hours=pl.col("total_tonnage") - pl.col("overtime_tonnage"))
     .with_columns(
-        total_price=pl.when(pl.col("Day").is_in(SPECIAL_DAYS))
+        total_price=pl.when(pl.col("day_name").is_in(SPECIAL_DAYS))
         .then(
             (pl.col("normal_hours") * OvertimePerc.overtime_150 * pl.col("Price"))
             + (pl.col("overtime_tonnage") * OvertimePerc.overtime_200 * pl.col("Price"))

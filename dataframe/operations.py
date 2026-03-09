@@ -9,18 +9,20 @@ from data.price import get_price
 from data_source.excel_file_path import ExcelFiles
 from data_source.make_dataset import load_gsheet_data
 from data_source.sheet_ids import OPS_SHEET_ID, raw_sheet
-from type_casting.dates import DAY_NAMES, SPECIAL_DAYS, public_holiday
+from type_casting.dates import DayName, SPECIAL_DAYS, public_holiday, CURRENT_YEAR
 from type_casting.validations import FISH_STORAGE, OvertimePerc
 
 # To move the Price to the Price module
 
 EXTRAMEN: pl.DataFrame = get_price(["Extra Men"]).with_columns(date=pl.col("end"))
 
-WELL_TO_WELL: pl.DataFrame = get_price(["Well to Well Transfer"]).with_columns(date=pl.col("end"))
+WELL_TO_WELL: pl.DataFrame = get_price(["Well to Well Transfer"]).with_columns(
+    date=pl.col("end")
+)
 
 TARE_RATE: pl.DataFrame = (
     get_price(["Rental of Calibration", "Tare Calibration"])
-    .with_columns(date=pl.col("end"))
+    .with_columns(date=pl.col("date"))
     .select(
         pl.col("date").alias("effective_date"),
         pl.col("Service").alias("service"),
@@ -41,6 +43,7 @@ ADDITIONAL_OVERTIME: pl.DataFrame = (
 ops: pl.LazyFrame = (
     load_gsheet_data(sheet_id=OPS_SHEET_ID, sheet_name=raw_sheet)
     .unwrap()
+    .filter(pl.col("Date").dt.year().eq(CURRENT_YEAR))
     .select(
         pl.col("Day"),
         pl.col("Date"),
@@ -68,7 +71,7 @@ def add_day_name_column(date_col: pl.Expr) -> pl.Expr:
         pl.when(date_col.is_in(public_holiday()))
         .then(pl.lit("PH"))
         .otherwise(date_col.dt.to_string(format="%a"))
-    ).cast(dtype=pl.Enum(DAY_NAMES))
+    ).cast(dtype=pl.Enum(DayName.list_all()))
 
 
 # main_file: pl.LazyFrame = (
@@ -202,9 +205,7 @@ tare: pl.LazyFrame = (
     (
         (
             (
-                load_gsheet_data(OPS_SHEET_ID, raw_sheet)
-                .unwrap()
-                .select(
+                ops.select(
                     pl.col("Date").alias("date"),
                     pl.col("Vessel").str.to_uppercase().alias("vessel"),
                     pl.col("Side Working").alias("side_working"),
@@ -212,12 +213,21 @@ tare: pl.LazyFrame = (
                 .unique()
                 .sort(by="date")
                 .group_by(["date", "vessel"], maintain_order=True)
-                .agg(pl.col("side_working").unique().sort().str.join(", ").alias("side_working"))
+                .agg(
+                    pl.col("side_working")
+                    .unique()
+                    .sort()
+                    .str.join(", ")
+                    .alias("side_working")
+                )
             )
             .with_columns(
                 [
                     pl.lit(1, dtype=pl.Int64).alias("rental_of_weight"),
-                    pl.col("side_working").str.split(", ").list.len().alias("number_of_sides"),
+                    pl.col("side_working")
+                    .str.split(", ")
+                    .list.len()
+                    .alias("number_of_sides"),
                     pl.lit("Rental of Calibration").alias("service"),
                 ]
             )
@@ -232,7 +242,11 @@ tare: pl.LazyFrame = (
             .drop(["service", "effective_date"])
         )
         .with_columns(
-            [(pl.col("unit_price") * pl.col("rental_of_weight")).alias("price_per_rental")]
+            [
+                (pl.col("unit_price") * pl.col("rental_of_weight")).alias(
+                    "price_per_rental"
+                )
+            ]
         )
         .drop("unit_price")
     )
@@ -247,11 +261,19 @@ tare: pl.LazyFrame = (
     )
     .drop(["service", "effective_date"])
     .with_columns(
-        [(pl.col("unit_price") * pl.col("number_of_sides")).alias("price_per_calibrations")]
+        [
+            (pl.col("unit_price") * pl.col("number_of_sides")).alias(
+                "price_per_calibrations"
+            )
+        ]
     )
     .drop("unit_price")
     .with_columns(
-        [(pl.col("price_per_rental") + pl.col("price_per_calibrations")).alias("total_price")]
+        [
+            (pl.col("price_per_rental") + pl.col("price_per_calibrations")).alias(
+                "total_price"
+            )
+        ]
     )
 )
 

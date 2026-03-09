@@ -16,7 +16,7 @@ from type_casting.dates import (
     UPPER_BOUND_SPECIAL_DAY,
     public_holiday,
     CURRENT_YEAR,
-    DAY_NAMES,
+    DayName,
 )
 from type_casting.validations import (
     BIN_DISPATCH_SERVICE,
@@ -24,6 +24,7 @@ from type_casting.validations import (
     MovementType,
     Overtime,
 )
+
 
 # Prepare the list of Public Holiday dates in the Current Year
 ph_list: pl.Series = public_holiday()
@@ -34,14 +35,15 @@ SCOW_TRANSFER = ALL_PRICE.filter(pl.col("Service").eq(pl.lit("CCCS Movement in/o
 
 
 # Full Scows
-bin_dispatch: pl.LazyFrame = (
-    load_gsheet_data(MISC_SHEET_ID, ALL_CCCS_DATA_SHEET).unwrap()
+bin_dispatch_base: pl.LazyFrame = (
+    load_gsheet_data(MISC_SHEET_ID, ALL_CCCS_DATA_SHEET)
+    .unwrap()
     .filter(
         pl.col("operation_type").is_in(BIN_DISPATCH_SERVICE),
-        pl.col("date").dt.year() >= CURRENT_YEAR - 1,
+        pl.col("date").dt.year().eq(CURRENT_YEAR),
     )
     .select(
-        pl.col("day").cast(pl.Enum(DAY_NAMES)).alias("day_name"),
+        pl.col("date").days.add_day_name(),
         pl.col("date"),
         pl.col("movement_type").cast(MovementType.enum_dtype()),
         pl.col("customer"),
@@ -49,10 +51,35 @@ bin_dispatch: pl.LazyFrame = (
         pl.col("total_tonnage").abs().cast(pl.Float64).round(3),
         pl.col("overtime_tonnage").str.replace("", "0").cast(pl.Float64).round(3),
     )
+)
+
+bin_dispatch: pl.LazyFrame = (
+    bin_dispatch_base.group_by(["date", "customer", "movement_type"])
+    .agg(pl.col("total_tonnage").sum(), pl.col("overtime_tonnage").sum())
     .with_columns(
-        normal_tonnage=(pl.col("total_tonnage") - pl.col("overtime_tonnage")).round(3).cast(
-            pl.Float64
-        )
+        normal_tonnage=(pl.col("total_tonnage") - pl.col("overtime_tonnage"))
+        .round(3)
+        .cast(pl.Float64)
+    )
+)
+
+bin_dispatch_fallback: pl.LazyFrame = (
+    bin_dispatch_base.group_by(["date", "movement_type"])
+    .agg(pl.col("total_tonnage").sum(), pl.col("overtime_tonnage").sum())
+    .with_columns(
+        normal_tonnage=(pl.col("total_tonnage") - pl.col("overtime_tonnage"))
+        .round(3)
+        .cast(pl.Float64)
+    )
+)
+
+bin_dispatch_customer_fallback: pl.LazyFrame = (
+    bin_dispatch_base.group_by(["date", "customer"])
+    .agg(pl.col("total_tonnage").sum(), pl.col("overtime_tonnage").sum())
+    .with_columns(
+        normal_tonnage=(pl.col("total_tonnage") - pl.col("overtime_tonnage"))
+        .round(3)
+        .cast(pl.Float64)
     )
 )
 
@@ -93,6 +120,18 @@ full_scows: pl.LazyFrame = (
         pl.col("num_of_scows").sum(),
     )
     .join(other=bin_dispatch, on=["date", "customer", "movement_type"], how="left")
+    .join(
+        other=bin_dispatch_fallback,
+        on=["date", "movement_type"],
+        how="left",
+        suffix="_fb",
+    )
+    .join(
+        other=bin_dispatch_customer_fallback,
+        on=["date", "customer"],
+        how="left",
+        suffix="_cfb",
+    )
     .with_columns(
         tonnage=pl.when(
             (pl.col("overtime") == Overtime.normal_hour_text)
@@ -101,18 +140,38 @@ full_scows: pl.LazyFrame = (
                 & (pl.col("overtime") == Overtime.overtime_150_text)
             )
         )
-        .then(pl.col("normal_tonnage"))
-        .otherwise(pl.col("overtime_tonnage"))
+        .then(
+            pl.coalesce(
+                [
+                    pl.col("normal_tonnage"),
+                    pl.col("normal_tonnage_fb"),
+                    pl.col("normal_tonnage_cfb"),
+                ]
+            )
+        )
+        .otherwise(
+            pl.coalesce(
+                [
+                    pl.col("overtime_tonnage"),
+                    pl.col("overtime_tonnage_fb"),
+                    pl.col("overtime_tonnage_cfb"),
+                ]
+            )
+        )
         .cast(pl.Float64)
     )
     .select(
         pl.all().exclude(
             [
-                # "day_name",
-                "operation_type",
                 "total_tonnage",
                 "overtime_tonnage",
                 "normal_tonnage",
+                "total_tonnage_fb",
+                "overtime_tonnage_fb",
+                "normal_tonnage_fb",
+                "total_tonnage_cfb",
+                "overtime_tonnage_cfb",
+                "normal_tonnage_cfb",
             ]
         )
     )
@@ -121,7 +180,7 @@ full_scows: pl.LazyFrame = (
         SCOW_TRANSFER.lazy(),
         by=None,
         left_on="date",
-        right_on="Date",
+        right_on="date",
         strategy="backward",
     )
     .with_columns(
@@ -133,7 +192,9 @@ full_scows: pl.LazyFrame = (
         .then(pl.col("tonnage") * NORMAL_HOUR * pl.col("Price"))
         .when(pl.col("overtime") == Overtime.overtime_150_text)
         .then(pl.col("tonnage") * OVERTIME_150 * pl.col("Price"))
-        .otherwise(pl.col("tonnage") * OVERTIME_200 * pl.col("Price")).round(3).cast(pl.Float64),
+        .otherwise(pl.col("tonnage") * OVERTIME_200 * pl.col("Price"))
+        .round(3)
+        .cast(pl.Float64),
         movement_type=pl.when(pl.col("movement_type") == MovementType.out)
         .then(pl.lit("IPHS Delivery of Full Scows to IOT"))
         .when(pl.col("movement_type") == MovementType.in_)
@@ -197,7 +258,7 @@ empty_scows: pl.LazyFrame = (
         SCOW_TRANSFER.lazy(),
         by=None,
         left_on="date",
-        right_on="Date",
+        right_on="date",
         strategy="backward",
     )
     .with_columns(
@@ -212,5 +273,5 @@ empty_scows: pl.LazyFrame = (
         .then(pl.lit("IPHS Collection of Empty Scows from IOT"))
         .otherwise(pl.lit("Err")),
     )
-    .select(pl.all().exclude(["Service", "Date"]))
+    .select(pl.all().exclude(["Service"]))
 )

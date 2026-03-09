@@ -6,8 +6,10 @@ from dataclasses import dataclass
 import polars as pl
 
 from .polars_enum import PolarsEnum
+from enum import auto
 
 # Paller types
+
 
 class PalletType(PolarsEnum):
     """Pallet Type"""
@@ -17,14 +19,36 @@ class PalletType(PolarsEnum):
     LINER: str = "Liner"
 
 
+class ShippingLine(PolarsEnum):
+    """Shipping Line"""
+
+    MAERSK = "MAERSK"
+    CMA_CGM = "CMA CGM"
+    IOT = "IOT"
+
+
+class TransferLocation(PolarsEnum):
+    """transfer location"""
+
+    FISHING_PORT = "FISHING PORT"
+    IPHS = "IPHS"
+    IOT = "IOT"
+    HD_YARD = "HD YARD"
+    JHL = "JHL"
+    LML = "LML"
+    CCCS = "CCCS"
 
 
 # Miscellaneous / CCCS Metrics
 
 # Services
 BIN_DISPATCH_SERVICE: list[str] = ["Bin Dispatch to IOT", "Bin Dispatch from IOT"]
-UNLOADING_SERVICE:list[str] = ['Sorting from Unloading','Unsorted from Unloading']
-CARGO_DISPATCH_SERVICE:list[str] = ["Dispatch to Cargo Vessel", "Dispatch from Cargo Vessel"]
+UNLOADING_SERVICE: list[str] = ["Sorting from Unloading", "Unsorted from Unloading"]
+CARGO_DISPATCH_SERVICE: list[str] = [
+    "Dispatch to Cargo Vessel",
+    "Dispatch from Cargo Vessel",
+]
+
 
 class MovementType(PolarsEnum):
     """Classification of Movement"""
@@ -50,38 +74,42 @@ class Status:
     full: str = "Full"
     empty: str = "Empty"
 
-STATUS_TYPE: list[str] = [Status.full,Status.empty]
+
+STATUS_TYPE: list[str] = [Status.full, Status.empty]
+
 
 @dataclass
 class FishStorage:
     """Brine or Dry"""
 
-    brine:str = "Brine"
-    dry:str="Dry"
+    brine: str = "Brine"
+    dry: str = "Dry"
 
-FISH_STORAGE:list[str] =[
-    FishStorage.brine,
-    FishStorage.dry
-]
+
+FISH_STORAGE: list[str] = [FishStorage.brine, FishStorage.dry]
+
 
 # Overtime Labels
 @dataclass
 class Overtime:
     """Overtime Labels"""
 
-    overtime_150_text:str = "overtime 150%"
-    overtime_200_text:str = "overtime 200%"
-    normal_hour_text:str = "normal hours"
+    overtime_150_text: str = "overtime 150%"
+    overtime_200_text: str = "overtime 200%"
+    normal_hour_text: str = "normal hours"
+
 
 @dataclass
 class OvertimePerc:
     """Overtime Percentage rates"""
+
     overtime_150: float = 1.5
     overtime_200: float = 2.0
     normal_hour: float = 1.0
 
 
 # Stuffing Validations
+
 
 @dataclass
 class PluggedStatus:
@@ -102,18 +130,15 @@ PLUGGED_STATUS: list[str] = [
 @dataclass
 class SetPoint:
     """Classifies the main 3 set point"""
-    standard:str="-25"
-    magnum:str="-35"
-    s_freezer:str="-60"
+
+    standard: str = "-25"
+    magnum: str = "-35"
+    s_freezer: str = "-60"
 
     @classmethod
-    def list_all(cls)->list[str]:
+    def list_all(cls) -> list[str]:
         """list all set point"""
-        return [cls.standard,cls.magnum,cls.s_freezer]
+        return [cls.standard, cls.magnum, cls.s_freezer]
 
 
-SETPOINTS:list[str] = [
-    SetPoint.standard,
-    SetPoint.magnum,
-    SetPoint.s_freezer
-]
+SETPOINTS: list[str] = [SetPoint.standard, SetPoint.magnum, SetPoint.s_freezer]

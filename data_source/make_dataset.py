@@ -31,7 +31,7 @@ def load_gsheet_data(sheet_id: str, sheet_name: str) -> Result[pl.LazyFrame, Exc
         Exception: If there is an error loading the Google Sheet.
     """
 
-    return  read_google_sheet(sheet_id=sheet_id, sheet_name=sheet_name)
+    return read_google_sheet(sheet_id=sheet_id, sheet_name=sheet_name)
 
 
 def load_excel(file_path: ExcelFiles) -> pl.LazyFrame:

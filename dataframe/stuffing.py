@@ -120,6 +120,10 @@ coa: pl.LazyFrame = (
         pl.col("location"),
     )
     .with_columns(
+        pl.col("date_plugged").cast(pl.Date, strict=False),
+        pl.col("date_out").cast(pl.Date, strict=False),
+    )
+    .with_columns(
         days_on_plug=pl.when(transfer_direct | on_plug | plugged_only)
         .then(timedelta(days=0))
         .when(partially_stuffed)

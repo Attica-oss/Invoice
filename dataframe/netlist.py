@@ -62,11 +62,11 @@ oss_service_list: list[str] = [
 
 
 UNLOADING_PRICE: pl.LazyFrame = get_price(service_list).with_columns(
-    date=pl.col("end")
+    date=pl.col("date")
 )
 
 OSS_STUFFING_PRICE: pl.LazyFrame = get_price(oss_service_list).with_columns(
-    date=pl.col("end")
+    date=pl.col("date")
 )
 
 
@@ -149,7 +149,8 @@ cccs_record = (
 
 cccs_adjusted_records = (
     (
-        load_gsheet_data(sheet_id=OPS_SHEET_ID,sheet_name= raw_sheet).unwrap()
+        load_gsheet_data(sheet_id=OPS_SHEET_ID, sheet_name=raw_sheet)
+        .unwrap()
         .filter(pl.col("Container (Destination)").str.contains("CCCS"))
         .select(
             pl.col("Day"),
@@ -163,9 +164,9 @@ cccs_adjusted_records = (
                 .str.replace(",", "")
                 .cast(pl.Int64)
                 * 0.001  # Convert to Tons from Kilos
-            ).round(3)
+            )
+            .round(3)
             .cast(pl.Float64)
-           
             .alias("total_tonnage"),
             pl.col("Container (Destination)").alias("destination"),
             pl.col("Species"),
@@ -211,7 +212,8 @@ cccs_adjusted_records = (
         total_tonnage=pl.col("adjusted_tonnage").sum().round(3),
     )
     .select(
-        ["Day",
+        [
+            "Day",
             "date",
             "vessel",
             "start_time",
@@ -221,7 +223,8 @@ cccs_adjusted_records = (
             "end_time",
             "total_tonnage",
         ]
-    ).sort(by="date")
+    )
+    .sort(by="date")
 )
 
 
@@ -230,7 +233,8 @@ cccs_adjusted_records = (
 netList = (
     pl.concat(
         [
-            load_gsheet_data(OPS_SHEET_ID, net_list_sheet).unwrap()
+            load_gsheet_data(OPS_SHEET_ID, net_list_sheet)
+            .unwrap()
             .filter(~pl.col("Container (Destination)").str.contains("CCCS"))
             .select(
                 pl.col("Date").days.add_day_name().cast(pl.Utf8).alias("Day"),
@@ -317,7 +321,7 @@ netList = (
     .with_columns(Service=pl.col("service") + " - " + pl.col("storage_type"))
     .sort(by="date")
     .join_asof(UNLOADING_PRICE.lazy(), by="Service", on="date", strategy="backward")
-    .select(pl.all().exclude(["Service", "date"]))
+    .select(pl.all().exclude(["Service", "end"]))
     .with_columns(
         Price=pl.when(pl.col("overtime") == Overtime.overtime_200_text)
         .then(pl.col("Price") * OvertimePerc.overtime_200)
@@ -412,7 +416,8 @@ iot_coa = (
 
 iot_cargo = (
     (
-        load_gsheet_data(OPS_SHEET_ID, net_list_sheet).unwrap()
+        load_gsheet_data(OPS_SHEET_ID, net_list_sheet)
+        .unwrap()
         .select(
             pl.col("Date").alias("date"),
             pl.col("Vessel").str.to_uppercase().alias("vessel"),
@@ -465,7 +470,8 @@ iot_cargo = (
 
 # IOT SOC Stuffing DataFrame
 iot_stuffing = (
-    load_gsheet_data(OPS_SHEET_ID, net_list_sheet).unwrap()
+    load_gsheet_data(OPS_SHEET_ID, net_list_sheet)
+    .unwrap()
     .select(
         pl.col("Date").alias("date"),
         pl.col("Vessel").str.to_uppercase().alias("vessel"),

@@ -10,12 +10,14 @@ This module provides utilities for working with dates, including:
 - Month name to number conversions
 """
 
-from datetime import date, datetime, time, timedelta, timezone
+from datetime import date, datetime, time, timedelta
 from enum import Enum
 from typing import Literal, Union
 
 import polars as pl
 from dateutil.relativedelta import relativedelta
+
+from .polars_enum import PolarsEnum
 
 MonthName = Literal[
     "JANUARY",
@@ -124,7 +126,7 @@ class Month(Enum):
         return cls[name.upper()].value
 
 
-class DayName(Enum):
+class DayName(PolarsEnum):
     """
     Enum representing day names including PH (Public Holiday).
 
@@ -142,13 +144,9 @@ class DayName(Enum):
     SAT = "Sat"
 
     @classmethod
-    def lists(cls) -> list[str]:
-        """Return a list of all day names in order."""
-        return [member.value for member in cls]
+    def special_days(cls) -> list[DayName]:
+        return [cls.SUN, cls.PH]
 
-
-# List of day names
-DAY_NAMES: list[str] = DayName.lists()
 
 # List of special days
 SPECIAL_DAYS: list[str] = [DayName.PH.value, DayName.SUN.value]
@@ -198,7 +196,9 @@ def create_weekly_table(year: Year) -> pl.DataFrame:
     )
 
 
-def month_range(month_name: str, year: Year = Year(datetime.now().year)) -> tuple[date, date]:
+def month_range(
+    month_name: str, year: Year = Year(datetime.now().year)
+) -> tuple[date, date]:
     """
     Calculates the start and end date of a given month within a specified year.
 
@@ -346,7 +346,7 @@ class Days:
                 .then(pl.lit("PH"))
                 .otherwise(self._expr.dt.to_string(format="%a"))
             )
-            .cast(dtype=pl.Enum(DAY_NAMES))
+            .cast(dtype=DayName.enum_dtype())
             .alias("day_name")
         )
 
@@ -378,7 +378,9 @@ def duration_to_hhmm(
     # If no duration columns specified, detect them automatically
     if duration_columns is None:
         duration_columns = [
-            col_name for col_name, dtype in schema.items() if str(dtype).startswith("duration")
+            col_name
+            for col_name, dtype in schema.items()
+            if str(dtype).startswith("duration")
         ]
     elif isinstance(duration_columns, str):
         duration_columns = [duration_columns]
@@ -401,6 +403,8 @@ def duration_to_hhmm(
 
     # Apply the conversion to each duration column
     for col in duration_columns:
-        df = df.with_columns(format_as_hhmm(pl.Series(col)).str.to_time(format="%H:%M").alias(col))
+        df = df.with_columns(
+            format_as_hhmm(pl.Series(col)).str.to_time(format="%H:%M").alias(col)
+        )
 
     return df
