@@ -133,6 +133,13 @@ def _(berth):
 
 @app.cell
 def _():
+    31*70
+
+    return
+
+
+@app.cell
+def _():
     iphs_truck = load_gsheet_data(sheet_id="1VbfiiWsp8yxs6KSR1CXpw1S_35tYlWV8UjjWah9Afpw",sheet_name="IPHSTruck").unwrap()
     return (iphs_truck,)
 

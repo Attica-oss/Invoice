@@ -10,9 +10,11 @@ This module provides utilities for working with dates, including:
 - Month name to number conversions
 """
 
+from __future__ import annotations
+
 from datetime import date, datetime, time, timedelta
 from enum import Enum
-from typing import Literal, Union
+from typing import Literal
 
 import polars as pl
 from dateutil.relativedelta import relativedelta
@@ -357,54 +359,53 @@ class Days:
 
 
 def duration_to_hhmm(
-    df: Union[pl.DataFrame, pl.LazyFrame],
+    df: pl.DataFrame | pl.LazyFrame,
     duration_columns: str | list[str] = None,
-) -> pl.LazyFrame:
+) -> pl.DataFrame | pl.LazyFrame:
     """
     Convert duration columns to HH:MM string format.
 
     Args:
-        df: The DataFrame or LazyFrame to process
-        duration_columns: Column names containing duration data. If None, automatically detects
-                          all duration columns in the DataFrame.
+        df: The DataFrame or LazyFrame to process.
+        duration_columns: Duration column name or names. If None, auto-detects
+            duration columns from the schema.
 
     Returns:
-        DataFrame or LazyFrame with duration columns converted to HH:MM format
+        The same type as input, with the selected duration columns converted
+        to HH:MM strings.
     """
     # Determine if we're working with a DataFrame or LazyFrame
     is_lazy = isinstance(df, pl.LazyFrame)
-    schema = df.schema if not is_lazy else df.collect_schema()
+    schema = df.collect_schema() if is_lazy else df.schema
 
     # If no duration columns specified, detect them automatically
     if duration_columns is None:
         duration_columns = [
             col_name
             for col_name, dtype in schema.items()
-            if str(dtype).startswith("duration")
+            if str(dtype).startswith("Duration") or str(dtype).startswith("duration")
         ]
     elif isinstance(duration_columns, str):
         duration_columns = [duration_columns]
 
     # No duration columns to convert
     if not duration_columns:
-        return df.lazy()
+        return df
 
     # Define a function to format durations as HH:MM
-    def format_as_hhmm(s: pl.Series) -> pl.Series:
-        return s.map_elements(
-            lambda d: (
-                f"""{int(d.total_seconds() // 3600):02d}:{
-                    int((d.total_seconds() % 3600) // 60):02d}"""
-                if d is not None
-                else None
-            ),
-            return_dtype=pl.Utf8,
+    def hhmm_expr(col: str) -> pl.Expr:
+        total_minutes = pl.col(col).dt.total_seconds().floordiv(60)
+
+        hours = total_minutes.floordiv(60).cast(pl.Int64).cast(pl.Utf8).str.zfill(2)
+        minutes = total_minutes.mod(60).cast(pl.Int64).cast(pl.Utf8).str.zfill(2)
+
+        return (
+            pl.when(pl.col(col).is_null())
+            .then(pl.lit(None, dtype=pl.Utf8))
+            .otherwise(hours + pl.lit(":") + minutes)
+            .alias(col)
         )
 
-    # Apply the conversion to each duration column
-    for col in duration_columns:
-        df = df.with_columns(
-            format_as_hhmm(pl.Series(col)).str.to_time(format="%H:%M").alias(col)
-        )
-
-    return df
+    return df.with_columns(
+        [hhmm_expr(col).str.to_time(format="%H:%M") for col in duration_columns]
+    )

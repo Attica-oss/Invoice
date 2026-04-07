@@ -26,7 +26,7 @@ from type_casting.validations import (
 from type_casting.containers import iot_soc
 from type_casting.customers import cargo
 
-from type_casting.dates import Days
+from type_casting.dates import Days, CURRENT_YEAR
 
 from dataframe.stuffing import coa
 from data.price import FREE, get_price
@@ -234,7 +234,7 @@ netList = (
     pl.concat(
         [
             load_gsheet_data(OPS_SHEET_ID, net_list_sheet)
-            .unwrap()
+            .and_then(lambda x: x.filter(pl.col("Date").dt.year().eq(CURRENT_YEAR)))
             .filter(~pl.col("Container (Destination)").str.contains("CCCS"))
             .select(
                 pl.col("Date").days.add_day_name().cast(pl.Utf8).alias("Day"),
@@ -440,10 +440,10 @@ iot_cargo = (
         IOT_CARGO_PRICE.lazy(),
         by="Service",
         left_on="date",
-        right_on="Date",
+        right_on="date",
         strategy="backward",
     )
-    .drop("Service", "Date")
+    .drop("Service")
     .with_columns(
         total_price=pl.when(pl.col("overtime") == "normal hours")
         .then(pl.col("total_tonnage") * pl.col("Price") * OvertimePerc.normal_hour)
@@ -471,7 +471,7 @@ iot_cargo = (
 # IOT SOC Stuffing DataFrame
 iot_stuffing = (
     load_gsheet_data(OPS_SHEET_ID, net_list_sheet)
-    .unwrap()
+    .and_then(lambda x: x.filter(pl.col("Date").dt.year().eq(CURRENT_YEAR)))
     .select(
         pl.col("Date").alias("date"),
         pl.col("Vessel").str.to_uppercase().alias("vessel"),
@@ -493,7 +493,7 @@ iot_stuffing = (
         STUFFING_PRICE.lazy(),
         by=None,
         left_on="date",
-        right_on="Date",
+        right_on="date",
         strategy="backward",
     )
     .select(pl.all().exclude(["Service"]))

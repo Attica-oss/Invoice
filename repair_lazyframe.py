@@ -13,34 +13,13 @@ with app.setup:
 
 @app.cell
 def _():
-    report_status = load_gsheet_data(
-        sheet_id="1xNh4SiP_xw8Ck1baLhFazBsmMLIbOHjF4tg_M89efvI",
-        sheet_name="report_status",
-    ).and_then(
-        lambda x: x.filter(pl.col("report_type").ne(pl.lit("OSS"))).select(
-            pl.col("vessel/client").alias("customer"),
-            pl.col("start_date"),
-            pl.col("end_date").str.to_date(format="%d/%m/%Y", strict=False)
+    from dataframe.emr import washing
 
-        ).with_row_index("row_nr").unique(["start_date","customer"])
-    )
-    return (report_status,)
+    return
 
 
 @app.cell
 def _(report_status):
-    report_status.collect()
-    return
-
-
-@app.cell
-def _():
-    forklift.collect()
-    return
-
-
-@app.cell
-def _():
     _df = mo.sql(
         f"""
         WITH
@@ -99,7 +78,7 @@ def _():
 
 
 @app.cell(hide_code=True)
-def _():
+def _(transfer):
     _df = mo.sql(
         f"""
         FROM transfer

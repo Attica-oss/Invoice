@@ -454,6 +454,8 @@ def forklift_salt() -> pl.LazyFrame:
         "normal_hour_services",
     ]
 
+    # return result
+
     return duration_to_hhmm(result, duration_columns)
 
 
@@ -465,38 +467,37 @@ add_day_name_col: pl.Expr = (
 
 
 bin_tipping: pl.LazyFrame = (
-    load_gsheet_data(sheet_id=SHORE_HANDLING_ID, sheet_name=bin_tipping_sheet)
-    .unwrap()
-    .filter(pl.col("Tonnage Tipped") > 0)
-    .with_columns(day_name=add_day_name_col, Service=pl.lit("IPHS Bin Tipping"))
-    .select(
-        pl.col("day_name").cast(dtype=pl.Enum(DayName.list_all())),
-        pl.col("Date"),
-        pl.col("Customer"),
-        pl.col("movement_type").cast(dtype=MovementType.enum_dtype()),
-        pl.col("Service"),
-        pl.col("IOT Scows (Tipping)").alias("number_of_scows_tipped"),
-        pl.col("Tonnage Tipped").cast(pl.Float64),
-        pl.col("Overtime"),
-    )
-    .with_columns(
-        price=BIN_TIPPING_PRICE,
-        total_price=pl.when(pl.col("day_name").is_in(SPECIAL_DAYS))
-        .then(
-            (
-                pl.col("price")
-                * OvertimePerc.overtime_150
-                * (pl.col("Tonnage Tipped") - pl.col("Overtime"))
-            )
-            + (pl.col("price") * OvertimePerc.overtime_200 * pl.col("Overtime"))
-        )
-        .otherwise(
-            (
-                pl.col("price")
-                * OvertimePerc.normal_hour
-                * (pl.col("Tonnage Tipped") - pl.col("Overtime"))
-            )
-            + (pl.col("price") * OvertimePerc.overtime_150 * pl.col("Overtime"))
-        ),
-    )
+    load_gsheet_data(sheet_id=SHORE_HANDLING_ID, sheet_name=bin_tipping_sheet).unwrap()
+    # .filter(pl.col("Tonnage Tipped") > 0)
+    # .with_columns(day_name=add_day_name_col, Service=pl.lit("IPHS Bin Tipping"))
+    # .select(
+    #     pl.col("day_name").cast(dtype=pl.Enum(DayName.list_all())),
+    #     pl.col("Date"),
+    #     pl.col("Customer"),
+    #     pl.col("movement_type").cast(dtype=MovementType.enum_dtype()),
+    #     pl.col("Service"),
+    #     pl.col("IOT Scows (Tipping)").alias("number_of_scows_tipped"),
+    #     pl.col("Tonnage Tipped").cast(pl.Float64),
+    #     pl.col("Overtime"),
+    # )
+    # .with_columns(
+    #     price=BIN_TIPPING_PRICE,
+    #     total_price=pl.when(pl.col("day_name").is_in(SPECIAL_DAYS))
+    #     .then(
+    #         (
+    #             pl.col("price")
+    #             * OvertimePerc.overtime_150
+    #             * (pl.col("Tonnage Tipped") - pl.col("Overtime"))
+    #         )
+    #         + (pl.col("price") * OvertimePerc.overtime_200 * pl.col("Overtime"))
+    #     )
+    #     .otherwise(
+    #         (
+    #             pl.col("price")
+    #             * OvertimePerc.normal_hour
+    #             * (pl.col("Tonnage Tipped") - pl.col("Overtime"))
+    #         )
+    #         + (pl.col("price") * OvertimePerc.overtime_150 * pl.col("Overtime"))
+    #     ),
+    # )
 )

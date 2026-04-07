@@ -33,7 +33,7 @@ def customers(customer_type: str) -> list[str]:
 def ship_owner() -> list[str]:
     """Calls the master validation sheet and get a list of ship owners/operators"""
     return (
-        CUSTOMERS.filter(pl.col("Type") == "THONIER")
+        CUSTOMERS.filter(pl.col("Type") == "PURSEINER")
         .select(pl.col("Customer"))
         .unique()
         .collect()
@@ -42,9 +42,9 @@ def ship_owner() -> list[str]:
     )
 
 
-purseiner = customers("THONIER")
+purseiner = customers("PURSEINER")
 longliner = customers("LONGLINER")
-cargo = customers("CARGO")
+cargo = customers("CARGO VESSEL")
 supply_vessel = customers("SUPPLY VESSEL")
 military_vessel = customers("MILITARY VESSEL")
 tug_boat = customers("TUG BOAT")
@@ -82,7 +82,7 @@ shipper = (
         "IOT IMPORT",
         "CCCS",
         "IPHS",
-        "JMARR"
+        "JMARR",
         # "ALBACORA SA",
         # "INPESCA SA",
     ]
