@@ -2,11 +2,7 @@
 
 from dataclasses import dataclass
 
-
-import polars as pl
-
 from .polars_enum import PolarsEnum
-from enum import auto
 
 # Paller types
 

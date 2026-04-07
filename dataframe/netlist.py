@@ -1,19 +1,27 @@
 """NetList Lazyframes"""
 
 from datetime import date
+
 import polars as pl
+
+from data.price import FREE, get_price
 from data_source.all_dataframe import miscellaneous
 from data_source.make_dataset import load_gsheet_data
 from data_source.sheet_ids import (
     # MISC_SHEET_ID,
     OPS_SHEET_ID,
-    raw_sheet,
     net_list_sheet,
     # by_catch_sheet,
     # all_cccs_data_sheet,
+    raw_sheet,
 )
+from dataframe.stuffing import coa
+from type_casting.containers import iot_soc
+from type_casting.customers import cargo
 from type_casting.dates import (
+    CURRENT_YEAR,
     SPECIAL_DAYS,
+    Days,
     public_holiday,
 )
 from type_casting.validations import (
@@ -23,13 +31,6 @@ from type_casting.validations import (
     Overtime,
     OvertimePerc,
 )
-from type_casting.containers import iot_soc
-from type_casting.customers import cargo
-
-from type_casting.dates import Days, CURRENT_YEAR
-
-from dataframe.stuffing import coa
-from data.price import FREE, get_price
 
 ph_list: pl.Series = public_holiday()
 
@@ -61,13 +62,9 @@ oss_service_list: list[str] = [
 ]
 
 
-UNLOADING_PRICE: pl.LazyFrame = get_price(service_list).with_columns(
-    date=pl.col("date")
-)
+UNLOADING_PRICE: pl.DataFrame = get_price(service_list).with_columns(date=pl.col("date"))
 
-OSS_STUFFING_PRICE: pl.LazyFrame = get_price(oss_service_list).with_columns(
-    date=pl.col("date")
-)
+OSS_STUFFING_PRICE: pl.DataFrame = get_price(oss_service_list).with_columns(date=pl.col("date"))
 
 
 by_catch_companies = [
@@ -92,9 +89,7 @@ stuffing_type = (
             ]
         )
     )
-    .with_columns(
-        pl.col("container_number").cast(pl.Utf8), pl.col("vessel_client").cast(pl.Utf8)
-    )
+    .with_columns(pl.col("container_number").cast(pl.Utf8), pl.col("vessel_client").cast(pl.Utf8))
     .filter(
         (~pl.col("operation_type").str.contains("CCCS"))
         & (pl.col("operation_type").str.contains_any(["Full", "Basic", "Stuffing"]))
@@ -150,7 +145,6 @@ cccs_record = (
 cccs_adjusted_records = (
     (
         load_gsheet_data(sheet_id=OPS_SHEET_ID, sheet_name=raw_sheet)
-        .unwrap()
         .filter(pl.col("Container (Destination)").str.contains("CCCS"))
         .select(
             pl.col("Day"),
@@ -160,9 +154,7 @@ cccs_adjusted_records = (
             pl.col("Storage").alias("storage_type"),
             pl.col("Vessel").str.to_uppercase().alias("vessel"),
             (
-                pl.col("Scale Reading(-Fish Net) (Cal)")
-                .str.replace(",", "")
-                .cast(pl.Int64)
+                pl.col("Scale Reading(-Fish Net) (Cal)").str.replace(",", "").cast(pl.Int64)
                 * 0.001  # Convert to Tons from Kilos
             )
             .round(3)
@@ -196,9 +188,7 @@ cccs_adjusted_records = (
         )
     )
     .join(cccs_record, on=["date", "destination", "vessel", "storage_type"], how="left")
-    .with_columns(
-        normal_tonnage=pl.col("total_tonnage_right") - pl.col("overtime_tonnage")
-    )
+    .with_columns(normal_tonnage=pl.col("total_tonnage_right") - pl.col("overtime_tonnage"))
     .with_columns(
         perc_diff=pl.when(pl.col("tonnage_select") == "normal")
         .then(pl.col("normal_tonnage") / pl.col("tons"))
@@ -234,7 +224,7 @@ netList = (
     pl.concat(
         [
             load_gsheet_data(OPS_SHEET_ID, net_list_sheet)
-            .and_then(lambda x: x.filter(pl.col("Date").dt.year().eq(CURRENT_YEAR)))
+            .filter(pl.col("Date").dt.year().eq(CURRENT_YEAR))
             .filter(~pl.col("Container (Destination)").str.contains("CCCS"))
             .select(
                 pl.col("Date").days.add_day_name().cast(pl.Utf8).alias("Day"),
@@ -293,11 +283,7 @@ netList = (
                 )  # Asian Marine Reefer is for IOT
             )
             | (pl.col("destination").str.contains("Unload to Quay"))
-            | (
-                pl.col("destination")
-                .is_in(iot_soc)
-                .and_(pl.col("customer").eq(pl.lit("IOT")))
-            )
+            | (pl.col("destination").is_in(iot_soc).and_(pl.col("customer").eq(pl.lit("IOT"))))
         )
         .then(pl.lit("Unload to Quay"))
         .when(pl.col("destination").str.to_uppercase().is_in(cargo))
@@ -417,7 +403,6 @@ iot_coa = (
 iot_cargo = (
     (
         load_gsheet_data(OPS_SHEET_ID, net_list_sheet)
-        .unwrap()
         .select(
             pl.col("Date").alias("date"),
             pl.col("Vessel").str.to_uppercase().alias("vessel"),
@@ -471,7 +456,7 @@ iot_cargo = (
 # IOT SOC Stuffing DataFrame
 iot_stuffing = (
     load_gsheet_data(OPS_SHEET_ID, net_list_sheet)
-    .and_then(lambda x: x.filter(pl.col("Date").dt.year().eq(CURRENT_YEAR)))
+    .filter(pl.col("Date").dt.year().eq(CURRENT_YEAR))
     .select(
         pl.col("Date").alias("date"),
         pl.col("Vessel").str.to_uppercase().alias("vessel"),

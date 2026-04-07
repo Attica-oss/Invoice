@@ -1,9 +1,9 @@
-
-""""Polars Enum helper class for type-safe string enums with Polars integration."""
+""" "Polars Enum helper class for type-safe string enums with Polars integration."""
 
 from __future__ import annotations
 
 from enum import StrEnum
+
 import polars as pl
 
 
@@ -34,7 +34,9 @@ class PolarsEnum(StrEnum):
         try:
             return cls(value)
         except Exception as e:
-            raise ValueError(f"Invalid {cls.__name__}: {value!r}. Allowed: {cls.list_all()}") from e
+            raise ValueError(
+                f"Invalid {cls.__name__}: {value!r}. Allowed: {cls.list_all()}"
+            ) from e
 
     @classmethod
     def normalize(cls, value: str) -> str:

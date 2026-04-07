@@ -1,12 +1,14 @@
-""""View Logistics Datasets to add in Google Sheets"""
+""" "View Logistics Datasets to add in Google Sheets"""
+
 from __future__ import annotations
+
 import polars as pl
-from data_source.make_dataset import load_excel 
+
 from data_source.excel_file_path import ExcelFiles
+from data_source.make_dataset import load_excel
 
 
-
-def forklift_logistics_dataset() -> pl.DataFrame:
+def forklift_logistics_dataset() -> pl.LazyFrame:
     """
     Loads and returns a forklift logistics dataset from an Excel file.
 
@@ -16,7 +18,7 @@ def forklift_logistics_dataset() -> pl.DataFrame:
     Returns:
         pl.DataFrame: A DataFrame containing the forklift logistics data.
     """
-    forklift_data = load_excel(ExcelFiles.FORKLIFT_USAGE).select(
+    return load_excel(ExcelFiles.FORKLIFT_USAGE).select(
         pl.col("Date of Service").alias("date"),
         pl.col("Driver").str.to_titlecase().alias("driver"),
         pl.col("Forklift No.").alias("forklift_number"),
@@ -25,7 +27,6 @@ def forklift_logistics_dataset() -> pl.DataFrame:
         pl.col("Vessel/Client").alias("customer"),
         pl.col("Purpose").alias("remarks"),
     )
-    return forklift_data
 
 
 def view_data(dataset: pl.LazyFrame) -> pl.DataFrame:
@@ -38,5 +39,5 @@ def view_data(dataset: pl.LazyFrame) -> pl.DataFrame:
     Returns:
         pl.DataFrame: A DataFrame containing the data.
     """
-    data = dataset.collect()
-    return data
+    assert isinstance(dataset, pl.DataFrame)
+    return dataset

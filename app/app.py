@@ -1,13 +1,11 @@
 """Main application"""
 
 import os
-import sys
 import subprocess
-from time import sleep
-
+import sys
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional
+from time import sleep
 
 from app.logger import logger
 from app.save import save_df_to_csv
@@ -73,7 +71,7 @@ class App:
             {self.config.title} v.{self.config.version}
             ---------------------------
             {self.config.author} (c) {self.config.year}
-            
+
             Select an option:
             ----- 1. Save dataframe to CSV file
             ----- 2. View dataframe
@@ -81,11 +79,10 @@ class App:
             ----- 4. Exit Application
             """
 
-    def get_dataframe_selection(self) -> Optional[str]:
+    def get_dataframe_selection(self) -> str | None:
         """Prompts user for dataframe selection with validation"""
         options_text = "\n".join(
-            f"            {df.value} : {self._get_df_description(df)}"
-            for df in DataFrameType
+            f"            {df.value} : {self._get_df_description(df)}" for df in DataFrameType
         )
 
         print(options_text)
@@ -161,7 +158,7 @@ class App:
                         logger.info("Selected: View dataframe")
                         self.clear_screen()
 
-                        view_data(forklift_logistics_dataset())
+                        view_data(forklift_logistics_dataset().lazy())
 
                         # Implement view functionality
                     case MenuOption.CHECK:
@@ -173,7 +170,7 @@ class App:
             except KeyboardInterrupt:
                 logger.info("Received interrupt signal")
                 self.exit_application()
-            except (ValueError, IOError) as e:
+            except (ValueError, OSError) as e:
                 logger.error("Error processing input or file operation: %s", str(e))
-                print(f"An error occurred: {str(e)}")
+                print(f"An error occurred: {e}")
                 sleep(2)

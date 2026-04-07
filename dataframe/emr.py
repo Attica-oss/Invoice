@@ -24,7 +24,6 @@ WASHING = get_price(["Container Cleaning"]).select(pl.col("Price")).to_series()[
 # Shifting Data Set
 shifting: pl.LazyFrame = (
     load_gsheet_data(sheet_id=EMR_SHEET_ID, sheet_name=shifting_sheet)
-    .unwrap()
     # Add the day name column to invoice overtime calculation
     .with_columns(
         pl.col("date").days.add_day_name()
@@ -50,7 +49,6 @@ shifting: pl.LazyFrame = (
 # PTI staging Data Set
 _pti: pl.LazyFrame = (
     load_gsheet_data(EMR_SHEET_ID, pti_sheet)
-    .unwrap()
     .select(
         pl.col("datetime_start"),
         pl.col("container_number").cast(dtype=containers_enum),
@@ -128,8 +126,7 @@ pti: pl.LazyFrame = (
 # Washing Data Set
 washing = (
     load_gsheet_data(EMR_SHEET_ID, washing_sheet)
-    .unwrap()
-    .filter(pl.col("date").dt.year().ge(CURRENT_YEAR - 1))
+    .filter(pl.col("date").dt.year().eq(CURRENT_YEAR))
     .select(
         pl.col("date"),
         pl.col("container_number").cast(dtype=containers_enum),

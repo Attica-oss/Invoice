@@ -1,0 +1,366 @@
+error[unresolved-attribute]: Object of type `LazyFrame` has no attribute `and_then`
+  --> berthing.py:31:20
+   |
+29 | @app.cell
+30 | def _():
+31 |     raw_stuffing = load_gsheet_data(sheet_id="1PvTkl6DYZdhtaiNshz0qwtSPxC8S1OOeu905NmhFKNs",sheet_name="RawData").and_then(lambda x:x.…
+   |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+32 |     return (raw_stuffing,)
+   |
+info: rule `unresolved-attribute` is enabled by default
+
+error[unresolved-attribute]: Object of type `LazyFrame` has no attribute `unwrap`
+  --> berthing.py:76:21
+   |
+74 | @app.cell
+75 | def _():
+76 |     report_status = load_gsheet_data(sheet_id=INVOICING,sheet_name="report_status").unwrap()
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+77 |     return (report_status,)
+   |
+info: rule `unresolved-attribute` is enabled by default
+
+error[unresolved-attribute]: Object of type `LazyFrame` has no attribute `unwrap`
+   --> berthing.py:102:18
+    |
+100 | @app.cell
+101 | def _():
+102 |     invoice_df = load_gsheet_data(sheet_id=INVOICING,sheet_name=INVOICE_STATUS).unwrap()
+    |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+103 |     return (invoice_df,)
+    |
+info: rule `unresolved-attribute` is enabled by default
+
+error[unresolved-attribute]: Object of type `LazyFrame` has no attribute `unwrap`
+   --> berthing.py:143:18
+    |
+141 | @app.cell
+142 | def _():
+143 |     iphs_truck = load_gsheet_data(sheet_id="1VbfiiWsp8yxs6KSR1CXpw1S_35tYlWV8UjjWah9Afpw",sheet_name="IPHSTruck").unwrap()
+    |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+144 |     return (iphs_truck,)
+    |
+info: rule `unresolved-attribute` is enabled by default
+
+error[unresolved-attribute]: Object of type `LazyFrame` has no attribute `and_then`
+   --> berthing.py:152:9
+    |
+151 |       bin_dispatch = (
+152 | /         load_gsheet_data(
+153 | |             sheet_id="1VbfiiWsp8yxs6KSR1CXpw1S_35tYlWV8UjjWah9Afpw",
+154 | |             sheet_name="CCCSReport",
+155 | |         )
+156 | |         .and_then(
+    | |_________________^
+157 |               lambda x: x.filter(
+158 |                   pl.col("operation_type")
+    |
+info: rule `unresolved-attribute` is enabled by default
+
+error[unresolved-attribute]: Object of type `LazyFrame` has no attribute `unwrap`
+    --> berthing.py:1131:19
+     |
+1129 | @app.cell
+1130 | def _(gate_in_s, pre_trip, sheet_id, washing):
+1131 |     washing_log = load_gsheet_data(sheet_id=sheet_id,sheet_name=washing).unwrap()
+     |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1132 |     gate_in_log = load_gsheet_data(sheet_id=sheet_id,sheet_name=gate_in_s).unwrap()
+1133 |     pti_log = load_gsheet_data(sheet_id=sheet_id,sheet_name=pre_trip).unwrap()
+     |
+info: rule `unresolved-attribute` is enabled by default
+
+error[unresolved-attribute]: Object of type `LazyFrame` has no attribute `unwrap`
+    --> berthing.py:1132:19
+     |
+1130 | def _(gate_in_s, pre_trip, sheet_id, washing):
+1131 |     washing_log = load_gsheet_data(sheet_id=sheet_id,sheet_name=washing).unwrap()
+1132 |     gate_in_log = load_gsheet_data(sheet_id=sheet_id,sheet_name=gate_in_s).unwrap()
+     |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1133 |     pti_log = load_gsheet_data(sheet_id=sheet_id,sheet_name=pre_trip).unwrap()
+1134 |     return gate_in_log, pti_log, washing_log
+     |
+info: rule `unresolved-attribute` is enabled by default
+
+error[unresolved-attribute]: Object of type `LazyFrame` has no attribute `unwrap`
+    --> berthing.py:1133:15
+     |
+1131 |     washing_log = load_gsheet_data(sheet_id=sheet_id,sheet_name=washing).unwrap()
+1132 |     gate_in_log = load_gsheet_data(sheet_id=sheet_id,sheet_name=gate_in_s).unwrap()
+1133 |     pti_log = load_gsheet_data(sheet_id=sheet_id,sheet_name=pre_trip).unwrap()
+     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1134 |     return gate_in_log, pti_log, washing_log
+     |
+info: rule `unresolved-attribute` is enabled by default
+
+error[unresolved-attribute]: Object of type `Expr` has no attribute `days`
+  --> data_source/all_dataframe.py:82:27
+   |
+80 |         load_gsheet_data(MISC_SHEET_ID, BY_CATCH_SHEET)
+81 |         .filter(pl.col("date").dt.year().eq(CURRENT_YEAR))
+82 |         .with_columns(day=pl.col("date").days.add_day_name())
+   |                           ^^^^^^^^^^^^^^^^^^^
+83 |         .select(
+84 |             pl.col("day"),
+   |
+info: rule `unresolved-attribute` is enabled by default
+
+error[unresolved-attribute]: Object of type `Expr` has no attribute `days`
+   --> data_source/all_dataframe.py:104:13
+    |
+102 |         .with_columns(storage_type=pl.lit("Dry", dtype=pl.Utf8))
+103 |         .select(
+104 |             pl.col("date").days.add_day_name(),
+    |             ^^^^^^^^^^^^^^^^^^^
+105 |             pl.col("date"),
+106 |             pl.col("container_number").cast(dtype=containers_enum),
+    |
+info: rule `unresolved-attribute` is enabled by default
+
+error[unresolved-attribute]: Object of type `Expr` has no attribute `days`
+  --> dataframe/bin_dispatch.py:43:9
+   |
+41 |     )
+42 |     .select(
+43 |         pl.col("date").days.add_day_name(),
+   |         ^^^^^^^^^^^^^^^^^^^
+44 |         pl.col("date"),
+45 |         pl.col("movement_type").cast(MovementType.enum_dtype()),
+   |
+info: rule `unresolved-attribute` is enabled by default
+
+error[unresolved-attribute]: Object of type `Expr` has no attribute `days`
+  --> dataframe/emr.py:29:9
+   |
+27 |     # Add the day name column to invoice overtime calculation
+28 |     .with_columns(
+29 |         pl.col("date").days.add_day_name()
+   |         ^^^^^^^^^^^^^^^^^^^
+30 |         # Filter invalid invoices
+31 |     )
+   |
+info: rule `unresolved-attribute` is enabled by default
+
+error[unresolved-attribute]: Object of type `Expr` has no attribute `days`
+   --> dataframe/netlist.py:230:17
+    |
+228 |             .filter(~pl.col("Container (Destination)").str.contains("CCCS"))
+229 |             .select(
+230 |                 pl.col("Date").days.add_day_name().cast(pl.Utf8).alias("Day"),
+    |                 ^^^^^^^^^^^^^^^^^^^
+231 |                 pl.col("Date").alias("date"),
+232 |                 pl.col("Vessel").str.to_uppercase().alias("vessel"),
+    |
+info: rule `unresolved-attribute` is enabled by default
+
+error[unresolved-attribute]: Object of type `Expr` has no attribute `days`
+   --> dataframe/shore_handling.py:158:9
+    |
+156 |     load_gsheet_data(sheet_id=SHORE_HANDLING_ID, sheet_name=salt_sheet)
+157 |     .select(
+158 |         pl.col("date").days.add_day_name(),
+    |         ^^^^^^^^^^^^^^^^^^^
+159 |         pl.col("date"),
+160 |         pl.col("vessel").cast(dtype=pl.Enum(purseiner)),
+    |
+info: rule `unresolved-attribute` is enabled by default
+
+error[unresolved-attribute]: Object of type `Expr` has no attribute `days`
+   --> dataframe/transport.py:155:18
+    |
+153 |     .select(pl.all().exclude("invoice_to"))
+154 |     .with_columns(
+155 |         day_name=pl.col("date").days.add_day_name(),
+    |                  ^^^^^^^^^^^^^^^^^^^
+156 |         Service=pl.when(pl.col("size") == "40'")
+157 |         .then(pl.lit("Haulage FEU"))
+    |
+info: rule `unresolved-attribute` is enabled by default
+
+error[invalid-return-type]: Return type does not match returned value
+   --> fix_dataframes.py:111:16
+    |
+109 |             members[name] = c  # value is the original customer string
+110 |
+111 |         return StrEnum(enum_name, members)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `type[StrEnum]`, found `StrEnum`
+112 |
+113 |     return (customers_str_enum,)
+    |
+   ::: fix_dataframes.py:93:78
+    |
+ 91 |         return name
+ 92 |
+ 93 |     def customers_str_enum(customers_df, enum_name: str = "CustomerEnum") -> type[StrEnum]:
+    |                                                                              ------------- Expected `type[StrEnum]` because of return type
+ 94 |         customers = (
+ 95 |             customers_df.select(pl.col("Customer").str.strip_chars()).collect().to_series().to_list()
+    |
+info: rule `invalid-return-type` is enabled by default
+
+error[unresolved-attribute]: Object of type `Expr` has no attribute `days`
+   --> fix_dataframes.py:338:44
+    |
+336 |             filter_by_year(lf, 2026)
+337 |             .pipe(function=lambda y: y.filter(pl.col("status").eq("Full")))
+338 |             .pipe(lambda y: y.with_columns(pl.col("date").days.add_day_name()))
+    |                                            ^^^^^^^^^^^^^^^^^^^
+339 |             .pipe(
+340 |                 lambda y: y.with_columns(
+    |
+info: rule `unresolved-attribute` is enabled by default
+
+warning[possibly-missing-attribute]: Attribute `height` may be missing on object of type `InProcessQuery | DataFrame`
+  --> type_casting/containers.py:15:12
+   |
+13 | def lazy_is_empty(lf: pl.LazyFrame) -> bool:
+14 |     """Cheap emptiness check for LazyFrame."""
+15 |     return lf.limit(1).collect().height == 0
+   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+info: rule `possibly-missing-attribute` is enabled by default
+
+error[unresolved-attribute]: Object of type `LazyFrame` has no attribute `unwrap`
+ --> type_casting/customers.py:8:27
+  |
+6 | from data_source.sheet_ids import MASTER_ID, client_sheet
+7 |
+8 | CUSTOMERS: pl.LazyFrame = load_gsheet_data(MASTER_ID, client_sheet).unwrap()
+  |                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+info: rule `unresolved-attribute` is enabled by default
+
+warning[possibly-missing-attribute]: Attribute `to_series` may be missing on object of type `InProcessQuery | DataFrame`
+  --> type_casting/customers.py:14:9
+   |
+12 |       """Calls the master validation sheet and convert customer to an enum"""
+13 |       return pl.Enum(
+14 | /         CUSTOMERS.select(pl.col("Vessel/Client").str.to_uppercase())
+15 | |         .collect()
+16 | |         .to_series()
+   | |__________________^
+17 |           .unique()
+18 |           .to_list()
+   |
+info: rule `possibly-missing-attribute` is enabled by default
+
+warning[possibly-missing-attribute]: Attribute `to_series` may be missing on object of type `InProcessQuery | DataFrame`
+  --> type_casting/customers.py:25:9
+   |
+23 |       """Calls the master validation sheet and convert the type of customer to a list"""
+24 |       return (
+25 | /         CUSTOMERS.filter(pl.col("Type") == customer_type)
+26 | |         .select(pl.col("Vessel/Client"))
+27 | |         .collect()
+28 | |         .to_series()
+   | |__________________^
+29 |           .to_list()
+30 |       )
+   |
+info: rule `possibly-missing-attribute` is enabled by default
+
+warning[possibly-missing-attribute]: Attribute `to_series` may be missing on object of type `InProcessQuery | DataFrame`
+  --> type_casting/customers.py:36:9
+   |
+34 |       """Calls the master validation sheet and get a list of ship owners/operators"""
+35 |       return (
+36 | /         CUSTOMERS.filter(pl.col("Type") == "PURSEINER")
+37 | |         .select(pl.col("Customer"))
+38 | |         .unique()
+39 | |         .collect()
+40 | |         .to_series()
+   | |__________________^
+41 |           .to_list()
+42 |       )
+   |
+info: rule `possibly-missing-attribute` is enabled by default
+
+error[invalid-argument-type]: Argument to bound method `to_number` is incorrect
+   --> type_casting/dates.py:215:41
+    |
+213 |         tuple[date, date]: A tuple containing the start and end date of the month.
+214 |     """
+215 |     month_number: int = Month.to_number(month_name)
+    |                                         ^^^^^^^^^^ Expected `Literal["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", ... omitted 7 literals]`, found `str`
+216 |
+217 |     start_of_month = date(year, month_number, 1)
+    |
+info: Method defined here
+   --> type_casting/dates.py:126:9
+    |
+125 |     @classmethod
+126 |     def to_number(cls, name: MonthName) -> int:
+    |         ^^^^^^^^^      --------------- Parameter declared here
+127 |         """Convert a month name to its corresponding number."""
+128 |         return cls[name.upper()].value
+    |
+info: rule `invalid-argument-type` is enabled by default
+
+error[invalid-argument-type]: Argument to bound method `to_number` is incorrect
+   --> type_casting/dates.py:225:28
+    |
+223 | def get_monthly_range(month: str) -> int:
+224 |     """Turns a month name to it's corresponding month number"""
+225 |     return Month.to_number(month)
+    |                            ^^^^^ Expected `Literal["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", ... omitted 7 literals]`, found `str`
+    |
+info: Method defined here
+   --> type_casting/dates.py:126:9
+    |
+125 |     @classmethod
+126 |     def to_number(cls, name: MonthName) -> int:
+    |         ^^^^^^^^^      --------------- Parameter declared here
+127 |         """Convert a month name to its corresponding number."""
+128 |         return cls[name.upper()].value
+    |
+info: rule `invalid-argument-type` is enabled by default
+
+error[invalid-parameter-default]: Default value of type `None` is not assignable to annotated parameter type `str | list[str]`
+   --> type_casting/dates.py:361:5
+    |
+359 | def duration_to_hhmm(
+360 |     df: pl.LazyFrame,
+361 |     duration_columns: str | list[str] = None,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+362 | ) -> pl.LazyFrame:
+363 |     """
+    |
+info: rule `invalid-parameter-default` is enabled by default
+
+error[invalid-parameter-default]: Default value of type `None` is not assignable to annotated parameter type `list[str]`
+  --> type_casting/iso_check.py:12:26
+   |
+10 |         pass
+11 |
+12 |     def read_input(self, data: list[str] = None):
+   |                          ^^^^^^^^^^^^^^^^^^^^^^
+13 |         """Reads the container numbers"""
+14 |         if data:
+   |
+info: rule `invalid-parameter-default` is enabled by default
+
+error[no-matching-overload]: No overload of bound method `match` matches arguments
+  --> type_casting/iso_check.py:32:20
+   |
+30 |                     f"Container number '{container_number} is not 11 characters long."
+31 |                 )
+32 |             if not pattern.match(container_number):
+   |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+33 |                 raise ValueError(
+34 |                     f"Container number '{container_number}' does not match the required format."
+   |
+info: First overload defined here
+   --> stdlib/re.pyi:313:9
+    |
+311 |     def search(self, string: AnyStr, pos: int = 0, endpos: int = sys.maxsize) -> Match[AnyStr] | None: ...
+312 |     @overload
+313 |     def match(self: Pattern[str], string: str, pos: int = 0, endpos: int = sys.maxsize) -> Match[str] | None:
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+314 |         """Matches zero or more characters at the beginning of the string."""
+    |
+info: Possible overloads for bound method `match`:
+info:   (self: Pattern[str], string: str, pos: int = 0, endpos: int = ...) -> Match[str] | None
+info:   (self: Pattern[bytes], string: Buffer, pos: int = 0, endpos: int = ...) -> Match[bytes] | None
+info:   (self, string: AnyStr@Pattern, pos: int = 0, endpos: int = ...) -> Match[AnyStr@Pattern] | None
+info: rule `no-matching-overload` is enabled by default
+
+Found 27 diagnostics

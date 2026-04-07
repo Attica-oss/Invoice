@@ -1,12 +1,11 @@
 """Pricing Module"""
 
 from __future__ import annotations
+
 from functools import lru_cache
 
-
 import polars as pl
-
-from read_google_sheet import read_google_sheet
+from scan_google_sheet import scan_google_sheet
 
 from data_source.sheet_ids import MASTER_ID, price_sheet
 
@@ -16,30 +15,26 @@ PRICE_SHEET_NAME = price_sheet
 DATE_FMT = "%d/%m/%Y"
 
 
-@lru_cache(maxsize=1)
-def price_table() -> pl.DataFrame:
+@lru_cache(maxsize=1, typed=True)
+def price_table() -> pl.LazyFrame:
     """
     Load + clean the price sheet once (small table → keep in memory).
     """
-    lf = read_google_sheet(sheet_id=MASTER_ID, sheet_name=PRICE_SHEET_NAME).unwrap()
+    lf = scan_google_sheet(sheet_id=MASTER_ID, sheet_name=PRICE_SHEET_NAME)
 
-    return (
-        lf.with_columns(
-            pl.col("StartingDate").alias("date"),
-            pl.col("EndingDate").alias("end"),
-            pl.col("Price").cast(pl.Float64),
-        )
-        .select(["Service", "Price", "date", "end"])
-        .collect()
-    )
+    return lf.with_columns(
+        pl.col("StartingDate").alias("date"),
+        pl.col("EndingDate").alias("end"),
+        pl.col("Price").cast(pl.Float64),
+    ).select(["Service", "Price", "date", "end"])
 
 
 def get_price(services: list[str] | None = None) -> pl.DataFrame:
     """Get the price table, optionally filtered by a list of services."""
     df = price_table()
     if services is None:
-        return df
-    return df.filter(pl.col("Service").is_in(services))
+        return df.collect()
+    return df.filter(pl.col("Service").is_in(services)).collect()
 
 
 # from type_casting.dates import SPECIAL_DAYS

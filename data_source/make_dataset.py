@@ -1,23 +1,12 @@
 """Make the dataset (LazyFrame) from a google sheet id and sheet names"""
 
-import logging
-
-
 import polars as pl
-from polars_result import Result
-from read_google_sheet import read_google_sheet
+from scan_google_sheet import scan_google_sheet
 
 from data_source.excel_file_path import ExcelFiles
 
 
-# Configure logging
-logging.basicConfig(level=logging.ERROR)
-
-# Excel file path type
-# type ExcelFiles = tuple[Path,str]
-
-
-def load_gsheet_data(sheet_id: str, sheet_name: str) -> Result[pl.LazyFrame, Exception]:
+def load_gsheet_data(sheet_id: str, sheet_name: str) -> pl.LazyFrame:
     """
     Loads a Google Sheet as a Polars LazyFrame.
 
@@ -31,7 +20,7 @@ def load_gsheet_data(sheet_id: str, sheet_name: str) -> Result[pl.LazyFrame, Exc
         Exception: If there is an error loading the Google Sheet.
     """
 
-    return read_google_sheet(sheet_id=sheet_id, sheet_name=sheet_name)
+    return scan_google_sheet(sheet_id=sheet_id, sheet_name=sheet_name)
 
 
 def load_excel(file_path: ExcelFiles) -> pl.LazyFrame:

@@ -1,34 +1,32 @@
 """Miscellaneous Dataframe"""
 
 from datetime import date
+
 import polars as pl
 
+from data.price import (
+    DARDANEL_DISCOUNT,
+    get_price,
+)
 from data_source.all_dataframe import (
     by_catch_transfer,
-    miscellaneous,
-    cross_stuffing,
     cccs_container_stuffing,
+    cross_stuffing,
+    miscellaneous,
 )
-from type_casting.dates import SPECIAL_DAYS
 from type_casting.customers import bycatch, client_shore_cost
+from type_casting.dates import SPECIAL_DAYS
 from type_casting.validations import (
-    UNLOADING_SERVICE,
     CARGO_DISPATCH_SERVICE,
+    UNLOADING_SERVICE,
     MovementType,
     OvertimePerc,
 )
-from data.price import (
-    get_price,
-    DARDANEL_DISCOUNT,
-)
-
 
 # Price
 TRUCK_PRICE = get_price(["Tipping Truck"])
 CARGO_LOADING_PRICE = get_price(["Loading to Cargo"])
-CCCS_MOVEMENT_FEE = (
-    get_price(["CCCS Movement in/out"]).select(pl.col("Price")).to_series()[0]
-)
+CCCS_MOVEMENT_FEE = get_price(["CCCS Movement in/out"]).select(pl.col("Price")).to_series()[0]
 CROSS_STUFFING_PRICE = get_price(
     [
         "Cross Stuffing",
@@ -88,11 +86,7 @@ static_loader: pl.LazyFrame = (
                 * (pl.col("static_loader") - pl.col("overtime_tonnage"))
                 * OvertimePerc.overtime_150
             )
-            + (
-                pl.col("Price")
-                * (pl.col("overtime_tonnage"))
-                * OvertimePerc.overtime_200
-            )
+            + (pl.col("Price") * (pl.col("overtime_tonnage")) * OvertimePerc.overtime_200)
         )
         .otherwise(
             (
@@ -144,13 +138,9 @@ dispatch_to_cargo: pl.LazyFrame = (
         strategy="backward",
     )
     .with_columns(
-        price=pl.when(
-            pl.col("customer").eq("DARDANEL").and_(pl.col("date").lt(date(2025, 9, 1)))
-        )
+        price=pl.when(pl.col("customer").eq("DARDANEL").and_(pl.col("date").lt(date(2025, 9, 1))))
         .then(pl.col("Price") - DARDANEL_DISCOUNT + pl.col("Price_right"))
-        .otherwise(
-            pl.col("Price") + pl.col("Price_right") + pl.col("cccs_movement_fee")
-        )
+        .otherwise(pl.col("Price") + pl.col("Price_right") + pl.col("cccs_movement_fee"))
     )
     .with_columns(
         total_price=pl.when(pl.col("day").is_in(SPECIAL_DAYS))
@@ -165,9 +155,7 @@ dispatch_to_cargo: pl.LazyFrame = (
     )
     .select(pl.all().exclude(["Service", "normal_tonnage", "price"]))
     .with_columns(
-        Price=pl.when(
-            pl.col("customer").eq("DARDANEL").and_(pl.col("date").lt(date(2025, 9, 1)))
-        )
+        Price=pl.when(pl.col("customer").eq("DARDANEL").and_(pl.col("date").lt(date(2025, 9, 1))))
         .then(pl.col("Price") - 1.0)  # Need a better way to represent this 1.0.
         .otherwise(pl.col("Price")),
         cccs_movement_fee=pl.when(
@@ -231,30 +219,15 @@ from_cccs_to_vessel = (
         total_price=pl.when(pl.col("day").is_in(SPECIAL_DAYS))
         .then(
             (
-                (
-                    (pl.col("total_tonnage") - pl.col("overtime_tonnage"))
-                    * pl.col("Price")
-                    * OvertimePerc.overtime_150
-                )
-                + (
-                    pl.col("overtime_tonnage")
-                    * pl.col("Price")
-                    * OvertimePerc.overtime_200
-                )
+                (pl.col("total_tonnage") - pl.col("overtime_tonnage"))
+                * pl.col("Price")
+                * OvertimePerc.overtime_150
             )
+            + (pl.col("overtime_tonnage") * pl.col("Price") * OvertimePerc.overtime_200)
         )
         .otherwise(
-            (
-                (
-                    (pl.col("total_tonnage") - pl.col("overtime_tonnage"))
-                    * pl.col("Price")
-                )
-                + (
-                    pl.col("overtime_tonnage")
-                    * pl.col("Price")
-                    * OvertimePerc.overtime_150
-                )
-            )
+            ((pl.col("total_tonnage") - pl.col("overtime_tonnage")) * pl.col("Price"))
+            + (pl.col("overtime_tonnage") * pl.col("Price") * OvertimePerc.overtime_150)
         )
     )
 )
@@ -289,9 +262,7 @@ truck_to_cccs = (
         right_on="date",
         strategy="backward",
     )
-    .with_columns(
-        CCCS_incoming_fee=CCCS_MOVEMENT_FEE, operation_type=pl.lit("IPHS Truck to CCCS")
-    )
+    .with_columns(CCCS_incoming_fee=CCCS_MOVEMENT_FEE, operation_type=pl.lit("IPHS Truck to CCCS"))
     .with_columns(
         total_price=pl.when(pl.col("day").is_in(SPECIAL_DAYS))
         .then(
@@ -301,11 +272,7 @@ truck_to_cccs = (
                     * pl.col("Price")
                     * OvertimePerc.overtime_150
                 )
-                + (
-                    pl.col("overtime_tonnage")
-                    * pl.col("Price")
-                    * OvertimePerc.overtime_200
-                )
+                + (pl.col("overtime_tonnage") * pl.col("Price") * OvertimePerc.overtime_200)
             )
             + (
                 (
@@ -322,15 +289,8 @@ truck_to_cccs = (
         )
         .otherwise(
             (
-                (
-                    (pl.col("total_tonnage") - pl.col("overtime_tonnage"))
-                    * pl.col("Price")
-                )
-                + (
-                    pl.col("overtime_tonnage")
-                    * pl.col("Price")
-                    * OvertimePerc.overtime_150
-                )
+                ((pl.col("total_tonnage") - pl.col("overtime_tonnage")) * pl.col("Price"))
+                + (pl.col("overtime_tonnage") * pl.col("Price") * OvertimePerc.overtime_150)
             )
             + (
                 (
@@ -440,9 +400,7 @@ __by_catch_with_transfer = (
         total_tonnage=(pl.col("total_tonnage") - pl.col("total_tonnage_right"))
         .cast(pl.Float64)
         .round(3),
-        overtime_tonnage=(
-            pl.col("overtime_tonnage") - pl.col("overtime_tonnage_right")
-        ).round(3),
+        overtime_tonnage=(pl.col("overtime_tonnage") - pl.col("overtime_tonnage_right")).round(3),
     )
     .filter(pl.col("total_tonnage").ne(0))
     .select(

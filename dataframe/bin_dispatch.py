@@ -1,30 +1,28 @@
 "Bin dispatch (Scow Transfer) to and from IOT"
 
 import polars as pl
-from data.price import ALL_PRICE, OVERTIME_150, OVERTIME_200, NORMAL_HOUR
 
-# from dataframe import shore_handling
-from dataframe.transport import scow_transfer
+from data.price import ALL_PRICE, NORMAL_HOUR, OVERTIME_150, OVERTIME_200
 from data_source.make_dataset import load_gsheet_data
 from data_source.sheet_ids import (
-    MISC_SHEET_ID,
     ALL_CCCS_DATA_SHEET,
+    MISC_SHEET_ID,
 )
+from dataframe.transport import scow_transfer
 from type_casting.dates import (
+    CURRENT_YEAR,
     SPECIAL_DAYS,
     UPPER_BOUND,
     UPPER_BOUND_SPECIAL_DAY,
-    public_holiday,
-    CURRENT_YEAR,
     DayName,
+    public_holiday,
 )
 from type_casting.validations import (
     BIN_DISPATCH_SERVICE,
-    Status,
     MovementType,
     Overtime,
+    Status,
 )
-
 
 # Prepare the list of Public Holiday dates in the Current Year
 ph_list: pl.Series = public_holiday()
@@ -37,7 +35,6 @@ SCOW_TRANSFER = ALL_PRICE.filter(pl.col("Service").eq(pl.lit("CCCS Movement in/o
 # Full Scows
 bin_dispatch_base: pl.LazyFrame = (
     load_gsheet_data(MISC_SHEET_ID, ALL_CCCS_DATA_SHEET)
-    .unwrap()
     .filter(
         pl.col("operation_type").is_in(BIN_DISPATCH_SERVICE),
         pl.col("date").dt.year().eq(CURRENT_YEAR),
@@ -103,17 +100,12 @@ full_scows: pl.LazyFrame = (
         .then(pl.lit(Overtime.overtime_200_text))
         .when(
             (pl.col("day_name").is_in(SPECIAL_DAYS))
-            | (
-                (~pl.col("day_name").is_in(SPECIAL_DAYS))
-                & (pl.col("time_out") > UPPER_BOUND)
-            )
+            | ((~pl.col("day_name").is_in(SPECIAL_DAYS)) & (pl.col("time_out") > UPPER_BOUND))
         )
         .then(pl.lit(Overtime.overtime_150_text))
         .otherwise(pl.lit(Overtime.normal_hour_text))
     )
-    .group_by(
-        ["day_name", "date", "customer", "movement_type", "overtime", "storage_type"]
-    )
+    .group_by(["day_name", "date", "customer", "movement_type", "overtime", "storage_type"])
     .agg(
         pl.col("time_out").min().alias("start_time"),
         pl.col("time_in").max().alias("end_time"),
@@ -184,9 +176,7 @@ full_scows: pl.LazyFrame = (
         strategy="backward",
     )
     .with_columns(
-        total_price=pl.when(
-            pl.col("customer").is_in(["ISLAND CATCH", "OCEAN BASKET", "AMIRANTE"])
-        )
+        total_price=pl.when(pl.col("customer").is_in(["ISLAND CATCH", "OCEAN BASKET", "AMIRANTE"]))
         .then(pl.lit(0.0))
         .when(pl.col("overtime") == Overtime.normal_hour_text)
         .then(pl.col("tonnage") * NORMAL_HOUR * pl.col("Price"))
@@ -239,10 +229,7 @@ empty_scows: pl.LazyFrame = (
         .then(pl.lit(Overtime.overtime_200_text))
         .when(
             (pl.col("day_name").is_in(SPECIAL_DAYS))
-            | (
-                (~pl.col("day_name").is_in(SPECIAL_DAYS))
-                & (pl.col("time_out") > UPPER_BOUND)
-            )
+            | ((~pl.col("day_name").is_in(SPECIAL_DAYS)) & (pl.col("time_out") > UPPER_BOUND))
         )
         .then(pl.lit(Overtime.overtime_150_text))
         .otherwise(pl.lit(Overtime.normal_hour_text))

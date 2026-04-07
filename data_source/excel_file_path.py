@@ -1,7 +1,7 @@
 """Enumeration of Excel file paths and their corresponding sheet names."""
 
-from pathlib import Path
 from enum import Enum
+from pathlib import Path
 
 BASE_PATH = Path.home() / "Dropbox"
 
@@ -16,9 +16,7 @@ class ExcelFiles(Enum):
         "Plug in Plug out",
     )
     SALT_HANDLING = (
-        Path(
-            rf"{BASE_PATH}/Container and Transport/Salt Handling/IPHS Salt Operations.xlsx"
-        ),
+        Path(rf"{BASE_PATH}/Container and Transport/Salt Handling/IPHS Salt Operations.xlsx"),
         "Salt Operations",
     )
     CONTAINER_TRANSFER = (

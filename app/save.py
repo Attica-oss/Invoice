@@ -5,22 +5,19 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-
 import polars as pl
-from app.logger import logger
-
 
 from all_dataframes.all_dataframes import (
-    emr_dataframes,
-    netlist_dataframes,
     bin_dispatch_dataframes,
-    shore_handling_dataframes,
+    emr_dataframes,
     miscellaneous_dataframes,
+    netlist_dataframes,
     operations_dataframes,
+    shore_handling_dataframes,
     stuffing_dataframes,
     transport_dataframes,
 )
-
+from app.logger import logger
 
 df_dict = {
     "emr": emr_dataframes,
@@ -46,9 +43,7 @@ class SaveResult:
     error: Exception | None = None
 
 
-def save_to_csv(
-    name: str, lf: pl.LazyFrame, output_dir: Path = OUTPUT_DIR
-) -> SaveResult:
+def save_to_csv(name: str, lf: pl.LazyFrame, output_dir: Path = OUTPUT_DIR) -> SaveResult:
     """Save a LazyFrame to CSV and return a result object."""
     output_dir.mkdir(parents=True, exist_ok=True)
     path = output_dir / f"{name}.csv"

@@ -1,8 +1,8 @@
 """Polars expression used in the dataframe creation"""
+
 import polars as pl
 
 from type_casting.dates import UPPER_BOUND, UPPER_BOUND_SPECIAL_DAY
-
 
 # Day Exprs
 is_special_day = pl.col("Day").is_in(["Sun", "PH"])
@@ -40,19 +40,19 @@ stop_before_cut_off_special_day = (pl.col("Time Stop") <= UPPER_BOUND_SPECIAL_DA
 
 
 # Duration bits Expr
-hours_after_cut_off_normal_day: pl.Expr = pl.col("Date").dt.combine(
-    pl.col("Time Stop")
-) - pl.col("Date").dt.combine(UPPER_BOUND)
+hours_after_cut_off_normal_day: pl.Expr = pl.col("Date").dt.combine(pl.col("Time Stop")) - pl.col(
+    "Date"
+).dt.combine(UPPER_BOUND)
 
-hours_after_cut_off_special_day: pl.Expr = pl.col("Date").dt.combine(
-    pl.col("Time Stop")
-) - pl.col("Date").dt.combine(UPPER_BOUND_SPECIAL_DAY)
+hours_after_cut_off_special_day: pl.Expr = pl.col("Date").dt.combine(pl.col("Time Stop")) - pl.col(
+    "Date"
+).dt.combine(UPPER_BOUND_SPECIAL_DAY)
 
-normal_duration_special_day: pl.Expr = pl.col("Date").dt.combine(
-    UPPER_BOUND_SPECIAL_DAY
-) - pl.col("Date").dt.combine(pl.col("Time Start"))
+normal_duration_special_day: pl.Expr = pl.col("Date").dt.combine(UPPER_BOUND_SPECIAL_DAY) - pl.col(
+    "Date"
+).dt.combine(pl.col("Time Start"))
 
-normal_duration : pl.Expr= pl.col("Date").dt.combine(UPPER_BOUND) - pl.col("Date").dt.combine(
+normal_duration: pl.Expr = pl.col("Date").dt.combine(UPPER_BOUND) - pl.col("Date").dt.combine(
     pl.col("Time Start")
 )
 

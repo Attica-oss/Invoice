@@ -198,9 +198,7 @@ def create_weekly_table(year: Year) -> pl.DataFrame:
     )
 
 
-def month_range(
-    month_name: str, year: Year = Year(datetime.now().year)
-) -> tuple[date, date]:
+def month_range(month_name: str, year: Year = Year(datetime.now().year)) -> tuple[date, date]:
     """
     Calculates the start and end date of a given month within a specified year.
 
@@ -359,9 +357,9 @@ class Days:
 
 
 def duration_to_hhmm(
-    df: pl.DataFrame | pl.LazyFrame,
+    df: pl.LazyFrame,
     duration_columns: str | list[str] = None,
-) -> pl.DataFrame | pl.LazyFrame:
+) -> pl.LazyFrame:
     """
     Convert duration columns to HH:MM string format.
 
@@ -376,7 +374,7 @@ def duration_to_hhmm(
     """
     # Determine if we're working with a DataFrame or LazyFrame
     is_lazy = isinstance(df, pl.LazyFrame)
-    schema = df.collect_schema() if is_lazy else df.schema
+    schema = df.collect_schema() if is_lazy else df.lazy().collect_schema()
 
     # If no duration columns specified, detect them automatically
     if duration_columns is None:

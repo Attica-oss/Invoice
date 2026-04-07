@@ -9,16 +9,14 @@ from data.price import get_price
 from data_source.excel_file_path import ExcelFiles
 from data_source.make_dataset import load_gsheet_data
 from data_source.sheet_ids import OPS_SHEET_ID, raw_sheet
-from type_casting.dates import DayName, SPECIAL_DAYS, public_holiday, CURRENT_YEAR
+from type_casting.dates import CURRENT_YEAR, SPECIAL_DAYS, DayName, public_holiday
 from type_casting.validations import FISH_STORAGE, OvertimePerc
 
 # To move the Price to the Price module
 
 EXTRAMEN: pl.DataFrame = get_price(["Extra Men"]).with_columns(date=pl.col("end"))
 
-WELL_TO_WELL: pl.DataFrame = get_price(["Well to Well Transfer"]).with_columns(
-    date=pl.col("end")
-)
+WELL_TO_WELL: pl.DataFrame = get_price(["Well to Well Transfer"]).with_columns(date=pl.col("end"))
 
 TARE_RATE: pl.DataFrame = (
     get_price(["Rental of Calibration", "Tare Calibration"])
@@ -42,7 +40,6 @@ ADDITIONAL_OVERTIME: pl.DataFrame = (
 # Operations Activity Unloading Lazyframe
 ops: pl.LazyFrame = (
     load_gsheet_data(sheet_id=OPS_SHEET_ID, sheet_name=raw_sheet)
-    .unwrap()
     .filter(pl.col("Date").dt.year().eq(CURRENT_YEAR))
     .select(
         pl.col("Day"),
@@ -213,21 +210,12 @@ tare: pl.LazyFrame = (
                 .unique()
                 .sort(by="date")
                 .group_by(["date", "vessel"], maintain_order=True)
-                .agg(
-                    pl.col("side_working")
-                    .unique()
-                    .sort()
-                    .str.join(", ")
-                    .alias("side_working")
-                )
+                .agg(pl.col("side_working").unique().sort().str.join(", ").alias("side_working"))
             )
             .with_columns(
                 [
                     pl.lit(1, dtype=pl.Int64).alias("rental_of_weight"),
-                    pl.col("side_working")
-                    .str.split(", ")
-                    .list.len()
-                    .alias("number_of_sides"),
+                    pl.col("side_working").str.split(", ").list.len().alias("number_of_sides"),
                     pl.lit("Rental of Calibration").alias("service"),
                 ]
             )
@@ -242,11 +230,7 @@ tare: pl.LazyFrame = (
             .drop(["service", "effective_date"])
         )
         .with_columns(
-            [
-                (pl.col("unit_price") * pl.col("rental_of_weight")).alias(
-                    "price_per_rental"
-                )
-            ]
+            [(pl.col("unit_price") * pl.col("rental_of_weight")).alias("price_per_rental")]
         )
         .drop("unit_price")
     )
@@ -261,19 +245,11 @@ tare: pl.LazyFrame = (
     )
     .drop(["service", "effective_date"])
     .with_columns(
-        [
-            (pl.col("unit_price") * pl.col("number_of_sides")).alias(
-                "price_per_calibrations"
-            )
-        ]
+        [(pl.col("unit_price") * pl.col("number_of_sides")).alias("price_per_calibrations")]
     )
     .drop("unit_price")
     .with_columns(
-        [
-            (pl.col("price_per_rental") + pl.col("price_per_calibrations")).alias(
-                "total_price"
-            )
-        ]
+        [(pl.col("price_per_rental") + pl.col("price_per_calibrations")).alias("total_price")]
     )
 )
 

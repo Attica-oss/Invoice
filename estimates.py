@@ -14,22 +14,6 @@ with app.setup:
     from dataframe.stuffing import coa
 
 
-@app.cell(hide_code=True)
-def _():
-    _df = mo.sql(
-        f"""
-        FROM coa SELECT SUM(tonnage) WHERE container_number IN ('TTNU8203070','TTNU8374957','TCLU1222417','TTNU8336350') AND YEAR(date_plugged) = 2026 AND vessel_client = 'FRANCHE TERRE'
-        """
-    )
-    return
-
-
-@app.cell
-def _():
-    23.71 + 3.68
-    return
-
-
 @app.cell
 def _():
     invoicing_df = scan_google_sheet(sheet_id=INVOICING,sheet_name=REPORT_STATUS)
@@ -38,16 +22,30 @@ def _():
 
 @app.cell
 def _(invoicing_df):
-    invoicing_df.collect()
-    return
-
-
-@app.cell
-def _():
-    path = r"C:\Users\gmounac\Dropbox\! OPERATION SUPPORTING DOCUMENTATION\2026\2026 IPHS operation activity.xlsx"
-
-
-    additional_stevedores = pl.read_excel(path,sheet_name="Additional Stevedores",schema_overrides={"End Time":pl.Time})
+    _df = mo.sql(
+        f"""
+        FROM invoicing_df
+            SELECT
+            "month" AS invoice_month,
+            report_type,
+            sub_type AS number,
+            "vessel/client" AS vessel,
+            customer,
+            start_date,
+            start_time,
+            CASE
+                WHEN end_date = '' THEN NULL
+                ELSE STRPTIME(end_date, '%d/%m/%Y')::DATE
+   
+            END AS end_date,
+                CASE
+                WHEN end_time = '' THEN NULL
+                ELSE STRPTIME(end_time, '%H:%M:%S')::TIME
+   
+            END AS end_time
+        WHERE status <> 'Send for Approval'
+        """
+    )
     return
 
 
