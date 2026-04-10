@@ -62,9 +62,13 @@ oss_service_list: list[str] = [
 ]
 
 
-UNLOADING_PRICE: pl.DataFrame = get_price(service_list).with_columns(date=pl.col("date"))
+UNLOADING_PRICE: pl.DataFrame = get_price(service_list).with_columns(
+    date=pl.col("date")
+)
 
-OSS_STUFFING_PRICE: pl.DataFrame = get_price(oss_service_list).with_columns(date=pl.col("date"))
+OSS_STUFFING_PRICE: pl.DataFrame = get_price(oss_service_list).with_columns(
+    date=pl.col("date")
+)
 
 
 by_catch_companies = [
@@ -89,7 +93,9 @@ stuffing_type = (
             ]
         )
     )
-    .with_columns(pl.col("container_number").cast(pl.Utf8), pl.col("vessel_client").cast(pl.Utf8))
+    .with_columns(
+        pl.col("container_number").cast(pl.Utf8), pl.col("vessel_client").cast(pl.Utf8)
+    )
     .filter(
         (~pl.col("operation_type").str.contains("CCCS"))
         & (pl.col("operation_type").str.contains_any(["Full", "Basic", "Stuffing"]))
@@ -154,7 +160,9 @@ cccs_adjusted_records = (
             pl.col("Storage").alias("storage_type"),
             pl.col("Vessel").str.to_uppercase().alias("vessel"),
             (
-                pl.col("Scale Reading(-Fish Net) (Cal)").str.replace(",", "").cast(pl.Int64)
+                pl.col("Scale Reading(-Fish Net) (Cal)")
+                .str.replace(",", "")
+                .cast(pl.Int64)
                 * 0.001  # Convert to Tons from Kilos
             )
             .round(3)
@@ -188,7 +196,9 @@ cccs_adjusted_records = (
         )
     )
     .join(cccs_record, on=["date", "destination", "vessel", "storage_type"], how="left")
-    .with_columns(normal_tonnage=pl.col("total_tonnage_right") - pl.col("overtime_tonnage"))
+    .with_columns(
+        normal_tonnage=pl.col("total_tonnage_right") - pl.col("overtime_tonnage")
+    )
     .with_columns(
         perc_diff=pl.when(pl.col("tonnage_select") == "normal")
         .then(pl.col("normal_tonnage") / pl.col("tons"))
@@ -283,7 +293,11 @@ netList = (
                 )  # Asian Marine Reefer is for IOT
             )
             | (pl.col("destination").str.contains("Unload to Quay"))
-            | (pl.col("destination").is_in(iot_soc).and_(pl.col("customer").eq(pl.lit("IOT"))))
+            | (
+                pl.col("destination")
+                .is_in(iot_soc)
+                .and_(pl.col("customer").eq(pl.lit("IOT")))
+            )
         )
         .then(pl.lit("Unload to Quay"))
         .when(pl.col("destination").str.to_uppercase().is_in(cargo))
@@ -354,7 +368,7 @@ oss = (
         .otherwise(pl.lit("Stuffing"))
     )
     .join_asof(OSS_STUFFING_PRICE.lazy(), by="Service", on="date", strategy="backward")
-    .select(pl.all().exclude(["Service", "date"]))
+    .select(pl.all().exclude(["Service", "end"]))
     .with_columns(
         Price=pl.when(pl.col("overtime") == Overtime.overtime_200_text)
         .then(pl.col("Price") * OvertimePerc.overtime_200)
