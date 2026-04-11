@@ -5,7 +5,6 @@ import polars as pl
 
 from data.price import get_price
 
-from dataframe import invoice
 from data_source.excel_file_path import ExcelFiles
 from data_source.make_dataset import load_gsheet_data
 from data_source.sheet_ids import OPS_SHEET_ID, raw_sheet
