@@ -13,11 +13,17 @@ from type_casting.validations import SETPOINTS, SetPoint
 
 # Price
 
-MAGNUM_PTI_ELECTRICITY = get_price(["PTI Magnum"]).select(pl.col("Price")).to_series()[0]
+MAGNUM_PTI_ELECTRICITY = (
+    get_price(["PTI Magnum"]).select(pl.col("Price")).to_series()[0]
+)
 PLUGIN = get_price(["Plugin"]).select(pl.col("Price")).to_series()[0]
-S_FREEZER_PTI_ELECTRICITY = get_price(["PTI S Freezer"]).select(pl.col("Price")).to_series()[0]
+S_FREEZER_PTI_ELECTRICITY = (
+    get_price(["PTI S Freezer"]).select(pl.col("Price")).to_series()[0]
+)
 SHIFTING = get_price(["Shifting"]).select(pl.col("Price")).to_series()[0]
-STANDARD_PTI_ELECTRICITY = get_price(["PTI Standard"]).select(pl.col("Price")).to_series()[0]
+STANDARD_PTI_ELECTRICITY = (
+    get_price(["PTI Standard"]).select(pl.col("Price")).to_series()[0]
+)
 WASHING = get_price(["Container Cleaning"]).select(pl.col("Price")).to_series()[0]
 
 
@@ -56,18 +62,27 @@ _pti: pl.LazyFrame = (
         pl.col("unit_manufacturer"),
         pl.col("datetime_end"),
         pl.col("status").cast(dtype=pl.Enum(["PASSED", "FAILED"])),
-        pl.col("invoice_to").cast(dtype=pl.Enum(["MAERSKLINE", "IOT", "INVALID", "CMA CGM"])),
+        pl.col("invoice_to").cast(
+            dtype=pl.Enum(["MAERSKLINE", "IOT", "INVALID", "CMA CGM"])
+        ),
         pl.col("plugged_on").alias("generator"),
     )
     .with_columns(
-        hours=(pl.col("datetime_end") - pl.col("datetime_start")).dt.total_minutes() / 60,
+        hours=(pl.col("datetime_end") - pl.col("datetime_start")).dt.total_minutes()
+        / 60,
         plugin_price=PLUGIN,
     )
-    .with_columns(above_8_hours=pl.when(pl.col("hours").gt(pl.lit(8))).then(2).otherwise(1))
+    .with_columns(
+        above_8_hours=pl.when(pl.col("hours").gt(pl.lit(8))).then(2).otherwise(1)
+    )
     .with_columns(
         electricity_price=(
             pl.when(pl.col("invoice_to").eq(pl.lit("IOT")))
-            .then((pl.col("datetime_end") - pl.col("datetime_start")).dt.total_hours() / 24 + 1)
+            .then(
+                (pl.col("datetime_end") - pl.col("datetime_start")).dt.total_hours()
+                / 24
+                + 1
+            )
             .when(pl.col("set_point").eq(SetPoint.s_freezer))
             .then(S_FREEZER_PTI_ELECTRICITY)
             .when(pl.col("set_point") == SetPoint.magnum)
@@ -79,7 +94,10 @@ _pti: pl.LazyFrame = (
         * pl.col("above_8_hours")
     )
     .with_columns(
-        pl.col("container_number").cum_count().over(pl.col("container_number")).alias("cum_count")
+        pl.col("container_number")
+        .cum_count()
+        .over(pl.col("container_number"))
+        .alias("cum_count")
     )
 )
 
@@ -94,7 +112,10 @@ pti: pl.LazyFrame = (
     )
     .with_columns(
         no_shifting=(
-            ((pl.col("datetime_start") - pl.col("datetime_end_right")) > pl.duration(hours=24))
+            (
+                (pl.col("datetime_start") - pl.col("datetime_end_right"))
+                > pl.duration(hours=24)
+            )
             & (pl.col("generator_right") == pl.col("generator"))
         ).fill_null(True)
     )
@@ -115,11 +136,15 @@ pti: pl.LazyFrame = (
             ]
         )
     )
-    .with_columns(shifting_price=pl.when(pl.col("no_shifting")).then(SHIFTING).otherwise(FREE))
     .with_columns(
-        (pl.col("plugin_price") + pl.col("electricity_price") + pl.col("shifting_price")).alias(
-            "total_price"
-        )
+        shifting_price=pl.when(pl.col("no_shifting")).then(SHIFTING).otherwise(FREE)
+    )
+    .with_columns(
+        (
+            pl.col("plugin_price")
+            + pl.col("electricity_price")
+            + pl.col("shifting_price")
+        ).alias("total_price")
     )
 )
 
