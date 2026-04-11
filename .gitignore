@@ -7,3 +7,5 @@ __marimo__/session/
 *.duckdb
 *.sqlite
 *.sqlite3
+__pycache__/
+*.pyc
