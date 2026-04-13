@@ -12,7 +12,7 @@ This module provides utilities for working with dates, including:
 
 from __future__ import annotations
 
-from datetime import date, datetime, time, timedelta
+from datetime import date, datetime, time, timedelta, timezone
 from enum import Enum
 from typing import Literal
 
@@ -85,7 +85,7 @@ class Year(int):
 
 
 # Constants
-CURRENT_DATE: date = datetime.now().date()
+CURRENT_DATE: date = datetime.now(tz=timezone.utc).date()
 CURRENT_YEAR: Year = Year(CURRENT_DATE.year)
 START_OF_YEAR: date = Year.date_range_for_a_year(CURRENT_YEAR)[0]
 END_OF_YEAR: date = Year.date_range_for_a_year(CURRENT_YEAR)[1]
@@ -113,19 +113,19 @@ class Month(Enum):
     DECEMBER = 12
 
     @classmethod
-    def from_name(cls, name: MonthName) -> "Month":
+    def from_name(cls, name: MonthName) -> Month:
         """Convert a month name to a Month enum member."""
         return cls[name.upper()]
 
     @classmethod
-    def from_number(cls, number: int) -> "Month":
+    def from_number(cls, number: int) -> Month:
         """Convert a month number to a Month enum member."""
         return cls(number)
 
     @classmethod
     def to_number(cls, name: MonthName) -> int:
         """Convert a month name to its corresponding number."""
-        return cls[name.upper()].value
+        return cls[name].value
 
 
 class DayName(PolarsEnum):
@@ -151,7 +151,7 @@ class DayName(PolarsEnum):
 
 
 # List of special days
-SPECIAL_DAYS: list[str] = [DayName.PH.value, DayName.SUN.value]
+SPECIAL_DAYS: list[DayName] = DayName.special_days()
 
 
 def create_weekly_table(year: Year) -> pl.DataFrame:
@@ -198,7 +198,7 @@ def create_weekly_table(year: Year) -> pl.DataFrame:
     )
 
 
-def month_range(month_name: str, year: Year = Year(datetime.now().year)) -> tuple[date, date]:
+def month_range(month_name: str, year: Year = CURRENT_YEAR) -> tuple[date, date]:
     """
     Calculates the start and end date of a given month within a specified year.
 
@@ -358,7 +358,7 @@ class Days:
 
 def duration_to_hhmm(
     df: pl.LazyFrame,
-    duration_columns: str | list[str] = None,
+    duration_columns: str | list[str],
 ) -> pl.LazyFrame:
     """
     Convert duration columns to HH:MM string format.
