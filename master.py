@@ -780,24 +780,49 @@ def _(oss):
 
 @app.cell(hide_code=True)
 def _(netlist):
-    net_df = mo.sql(
+    _df = mo.sql(
         f"""
         FROM netList
+        """
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(customer_df, netlist):
+    net_df = mo.sql(
+        f"""
+        WITH data_ AS (FROM netList
             SELECT STRFTIME(date,'%a') AS day_name,
             date,
-            CASE WHEN remarks IS NULL OR remarks NOT IN ('AMIRANTE','OCEAN BASKET') THEN vessel ELSE remarks || ' // EX-' ||vessel END AS vessel,
+            vessel,
             service AS operation_type,
             overtime,
             CAST(SUM(total_tonnage) AS DECIMAL) AS total_tonnage,
             storage_type,
             Price AS unit_price,
             CAST(SUM(invoice_value) AS DECIMAL) AS total_price,
-            'UNLOADING VESSEL' AS service,
+           UPPER(Service) AS service,
             'STO' AS sub_type,
             'STO' AS report_type
         WHERE YEAR(date) = 2026
         GROUP BY ALL
-        ORDER BY date
+        ORDER BY date)
+        ,client AS (
+            FROM
+                    customer_df
+                SELECT
+                    "Vessel/Client" AS vessel,
+                    "Customer" AS customer
+                WHERE
+                    "Type" = 'PURSEINER'
+        )
+            SELECT d.*,
+            c.customer
+
+        FROM
+            data_ d
+            LEFT JOIN client c ON c.vessel = d.vessel
         """
     )
     return (net_df,)
@@ -1212,7 +1237,7 @@ def _(exchange_rate_df, pallet):
             date
         """
     )
-    return
+    return (pallet_df,)
 
 
 @app.cell(hide_code=True)
@@ -1253,7 +1278,7 @@ def _(pallet):
         ORDER BY date
         """
     )
-    return
+    return (liner_df,)
 
 
 @app.cell
@@ -1344,7 +1369,7 @@ def _(staged_electricity, transfer):
         ORDER BY date
         """
     )
-    return
+    return (haulage_df,)
 
 
 @app.cell(hide_code=True)
@@ -1386,7 +1411,7 @@ def _(shore_crane):
             date
         """
     )
-    return
+    return (shore_crane_df,)
 
 
 @app.cell(hide_code=True)
@@ -1400,6 +1425,7 @@ def _(forklift):
                 date,
                 customer AS vessel,
                 invoiced_in AS customer,
+            	CEIL(SUM(EXTRACT(EPOCH FROM duration)) / 3600) AS duration,
                 CEIL(SUM(normal_hours) / 60.0) * 30 AS normal_hours,
                 CEIL(SUM(overtime_150) / 60.0) * 45 AS overtime_150,
                 CEIL(SUM(overtime_200) / 60.0) * 60 AS overtime_200,
@@ -1413,12 +1439,12 @@ def _(forklift):
             GROUP BY ALL
         )
         SELECT
-            *,
+            * EXCLUDE(normal_hours,overtime_150,overtime_200),
             (normal_hours + overtime_150 + overtime_200) AS total_price
         ORDER BY date
         """
     )
-    return
+    return (forklift_df,)
 
 
 @app.cell
@@ -1429,19 +1455,25 @@ def _():
 
     berth_url = "https://docs.google.com/spreadsheets/d/1xNh4SiP_xw8Ck1baLhFazBsmMLIbOHjF4tg_M89efvI/edit?gid=303791708#gid=303791708"
 
+    miscr_url = "https://docs.google.com/spreadsheets/d/1VbfiiWsp8yxs6KSR1CXpw1S_35tYlWV8UjjWah9Afpw/edit?pli=1&gid=61862422#gid=61862422"
+
     well_tab = "WelltoWell"
     additional_tab = "AdditionalStevedores"
     extra_men_tab = "ExtraMen"
     tare_tab = "RawData"
 
     customer_tab = "Client"
+
+    truck_tab = "IPHSTruck"
     return (
         additional_tab,
         customer_tab,
         extra_men_tab,
         master_url,
+        miscr_url,
         operations_url,
         tare_tab,
+        truck_tab,
         well_tab,
     )
 
@@ -1450,6 +1482,45 @@ def _():
 def _(customer_tab, master_url, scan_google_sheet):
     customer_df = scan_google_sheet(url=master_url,sheet_name=customer_tab)
     return (customer_df,)
+
+
+@app.cell
+def _(miscr_url, scan_google_sheet, truck_tab):
+    truck_via_skiff_df = scan_google_sheet(url=miscr_url,sheet_name=truck_tab)
+    return (truck_via_skiff_df,)
+
+
+@app.cell(hide_code=True)
+def _(truck_via_skiff_df):
+    truck_skiff_df = mo.sql(
+        f"""
+        FROM
+            truck_via_skiff_df
+        SELECT
+            "day" AS day_name,
+            date,
+            vessel,
+            customer,
+            operation_type,
+            total_tonnage,
+            overtime_tonnage,
+            CASE
+                WHEN day_name IN ('Sun', 'PH') THEN CAST(
+                    ((total_tonnage - overtime_tonnage) * 11 * 1.5) + (overtime_tonnage * 11 * 2.0) AS DECIMAL
+                )
+                ELSE CAST(
+                    ((total_tonnage - overtime_tonnage) * 11 * 1.0) + (overtime_tonnage * 11 * 1.5) AS DECIMAL
+                )
+            END AS total_price,
+            'TRUCK TO CCCS VIA SKIFF' AS service,
+            'SI' AS sub_type,
+            'SI' AS report_type
+        WHERE
+            YEAR(date) = 2026
+            AND operation_type = 'Truck to CCCS via Skiff'
+        """
+    )
+    return (truck_skiff_df,)
 
 
 @app.cell
@@ -1494,7 +1565,7 @@ def _(customer_df, well_df):
             LEFT JOIN client c ON c.vessel = d.vessel
         """
     )
-    return
+    return (well_transfer_df,)
 
 
 @app.cell
@@ -1507,44 +1578,50 @@ def _(additional_tab, operations_url, scan_google_sheet):
 def _(additional_df, customer_df):
     additional_ot_df = mo.sql(
         f"""
-        WITH
-            data_ AS (
-                FROM
-                    additional_df
-                SELECT
-                    day_name,
-                    date,
-                    vessel,
-                    tonnage,
-                    "hours",
-                    number_of_stevedores,
-                    "hours" * CASE
-                        WHEN number_of_stevedores = 'To check' THEN 0
-                        ELSE COALESCE(CAST(number_of_stevedores AS INT), 0)
-                    END * 8 AS total_price
-                WHERE
-                    total_price > 0
-            ),
-            client AS (
-                FROM
-                    customer_df
-                SELECT
-                    "Vessel/Client" AS vessel,
-                    "Customer" AS customer
-                WHERE
-                    "Type" = 'PURSEINER'
-            )
-            SELECT d.*,
+        WITH data_ AS (
+            SELECT
+                day_name,
+                date,
+                vessel,
+                tonnage,
+                "hours",
+                CASE
+                    WHEN TRIM(number_of_stevedores) = 'To check' THEN 0
+                    ELSE COALESCE(CAST(NULLIF(TRIM(number_of_stevedores), '') AS INT), 0)
+                END AS num_stevedores
+            FROM additional_df
+        ),
+        data_priced AS (
+            SELECT
+                day_name,
+                date,
+                vessel,
+                tonnage,
+                "hours",
+                num_stevedores,
+                "hours" * num_stevedores * 8 AS total_price
+            FROM data_
+            WHERE "hours" * num_stevedores * 8 > 0
+        ),
+        client AS (
+            SELECT
+                "Vessel/Client" AS vessel,
+                "Customer" AS customer
+            FROM customer_df
+            WHERE "Type" = 'PURSEINER'
+        )
+        SELECT
+            d.*,
             c.customer,
             'ADDITIONAL OVERTIME' AS service,
             'STO' AS sub_type,
-            sub_type AS report_type
-        FROM
-            data_ d
-            LEFT JOIN client c ON c.vessel = d.vessel
+            'STO' AS report_type
+        FROM data_priced d
+        LEFT JOIN client c
+            ON c.vessel = d.vessel;
         """
     )
-    return
+    return (additional_ot_df,)
 
 
 @app.cell
@@ -1566,9 +1643,9 @@ def _(customer_df, extra_men_df):
                     "Date" AS date,
                     "Vessel" AS vessel,
                     "Tonnage" AS tonnage,
-                    "ExtraMen" AS extra_men
-                WHERE
-                    extra_men > 0
+            CAST(NULLIF(TRIM("ExtraMen"), '') AS BIGINT) AS extra_men
+     
+                WHERE NULLIF(TRIM("ExtraMen"), '') IS NOT NULL AND CAST(NULLIF(TRIM("ExtraMen"), '') AS BIGINT) >0
             ),
             client AS (
                 FROM
@@ -1594,7 +1671,7 @@ def _(customer_df, extra_men_df):
             LEFT JOIN client c ON c.vessel = d.vessel
         """
     )
-    return
+    return (xtra_men_df,)
 
 
 @app.cell
@@ -1605,7 +1682,7 @@ def _(operations_url, scan_google_sheet, tare_tab):
 
 @app.cell(hide_code=True)
 def _(customer_df, tare_df):
-    _df = mo.sql(
+    tare_rental_df = mo.sql(
         f"""
         WITH data_ AS (FROM
             tare_df
@@ -1641,7 +1718,7 @@ def _(customer_df, tare_df):
             LEFT JOIN client c ON c.vessel = d.vessel
         """
     )
-    return
+    return (tare_rental_df,)
 
 
 @app.cell
@@ -1677,7 +1754,7 @@ def _(customer_df, miscellaneous_op_df):
             LEFT JOIN client c ON c.vessel = d.vessel
         """
     )
-    return
+    return (misc_ops_df,)
 
 
 @app.cell
@@ -1687,57 +1764,261 @@ def _():
 
 @app.cell
 def _():
-    return
-
-
-@app.cell(hide_code=True)
-def _(net_df):
-    _df = mo.sql(
-        f"""
-        FROM net_df
-        """
-    )
     return
 
 
 @app.cell(hide_code=True)
 def _(
+    additional_ot_df,
     by_catch_handling_df,
     cold_store_stuffing_df,
     cross_stuffing_df,
     dispatch_to_cargo_vessel_df,
+    electricity_df,
     empty_scow_transfer_df,
+    forklift_df,
     forklift_salt_df,
     forklift_scow_handling,
     from_cold_store_to_vessel_df,
     full_scow_transfer_df,
+    haulage_df,
     internal_shifting_df,
     iot_s_df,
+    liner_df,
+    misc_ops_df,
     net_df,
     oss_s_df,
+    pallet_df,
     pti_df,
     salt_df,
     shifting_at_washing_df,
+    shore_crane_df,
+    tare_rental_df,
+    truck_skiff_df,
     washing_df,
+    well_transfer_df,
+    xtra_men_df,
 ):
-    _df = mo.sql(
+    master_df = mo.sql(
         f"""
         WITH
+            truck_skiff_ AS (
+                FROM
+                    truck_skiff_df
+                SELECT
+                    MONTH(date) AS month_number,
+                    MONTHNAME(date) AS month_name,
+                    customer,
+                    vessel,
+                    CAST(SUM(total_tonnage) AS DECIMAL) AS total_metrics,
+                    'TONNAGE' AS unit,
+                    CAST(SUM(total_price) AS DECIMAL) AS total_price,
+                    service,
+                    sub_type,
+                    report_type
+                GROUP BY ALL
+                ORDER BY
+                    month_number
+            ),
+            tare_ AS (
+                FROM
+                    tare_rental_df
+                SELECT
+                    MONTH(date) AS month_number,
+                    MONTHNAME(date) AS month_name,
+                    customer,
+                    vessel,
+                    CAST(SUM(number_of_side_working) AS DECIMAL) AS total_metrics,
+                    'CALIBRATION' AS unit,
+                    CAST(SUM(total_price) AS DECIMAL) AS total_price,
+                    service,
+                    sub_type,
+                    report_type
+                GROUP BY ALL
+                ORDER BY
+                    month_number
+            ),
+            misc_o_ AS (
+                FROM
+                    misc_ops_df
+                SELECT
+                    MONTH(date) AS month_number,
+                    MONTHNAME(date) AS month_name,
+                    customer,
+                    vessel,
+                    CAST(SUM(total_tonnage) AS DECIMAL) AS total_metrics,
+                    'TONNAGE' AS unit,
+                    CAST(SUM(total_price) AS DECIMAL) AS total_price,
+                    service,
+                    sub_type,
+                    report_type
+                GROUP BY ALL
+                ORDER BY
+                    month_number
+            ),
+            x_ AS (
+                FROM
+                    xtra_men_df
+                SELECT
+                    MONTH(date) AS month_number,
+                    MONTHNAME(date) AS month_name,
+                    customer,
+                    vessel,
+                    CAST(SUM(extra_men * tonnage) AS DECIMAL) AS total_metrics,
+                    'EXTRA MEN * TONNAGE' AS unit,
+                    CAST(SUM(total_price) AS DECIMAL) AS total_price,
+                    service,
+                    sub_type,
+                    report_type
+                GROUP BY ALL
+                ORDER BY
+                    month_number
+            ),
+            add_ AS (
+                FROM
+                    additional_ot_df
+                SELECT
+                    MONTH(date) AS month_number,
+                    MONTHNAME(date) AS month_name,
+                    customer,
+                    vessel,
+                    SUM(num_stevedores * hours) AS total_metrics,
+                    'STEVEDORES * HOUR' AS unit,
+                    CAST(SUM(total_price) AS DECIMAL) AS total_price,
+                    service,
+                    sub_type,
+                    report_type
+                GROUP BY ALL
+                ORDER BY
+                    month_number
+            ),
+            well_ AS (
+                FROM
+                    well_transfer_df
+                SELECT
+                    MONTH(date) AS month_number,
+                    MONTHNAME(date) AS month_name,
+                    customer,
+                    vessel,
+                    SUM(tonnage) AS total_metrics,
+                    'TONNAGE' AS unit,
+                    CAST(SUM(total_price) AS DECIMAL) AS total_price,
+                    service,
+                    sub_type,
+                    report_type
+                GROUP BY ALL
+                ORDER BY
+                    month_number
+            ),
+            crane_ AS (
+                FROM
+                    shore_crane_df
+                SELECT
+                    MONTH(date) AS month_number,
+                    MONTHNAME(date) AS month_name,
+                    customer,
+                    vessel,
+                    SUM(billable_hours) AS total_metrics,
+                    'HOURS' AS unit,
+                    CAST(SUM(total_price) AS DECIMAL) AS total_price,
+                    service,
+                    sub_type,
+                    report_type
+                GROUP BY ALL
+                ORDER BY
+                    month_number
+            ),
+            hau_ AS (
+                FROM
+                    haulage_df
+                SELECT
+                    MONTH(date) AS month_number,
+                    MONTHNAME(date) AS month_name,
+                    customer,
+                    vessel,
+                    SUM(number_of_service) AS total_metrics,
+                    'MOVES' AS unit,
+                    CAST(SUM(shifting_price) AS DECIMAL) + CAST(SUM(haulage_price) AS DECIMAL) AS total_price,
+                    service,
+                    sub_type,
+                    report_type
+                GROUP BY ALL
+                HAVING
+                    customer <> 'NA'
+                ORDER BY
+                    month_number
+            ),
+            lin_ AS (
+                FROM
+                    liner_df
+                SELECT
+                    MONTH(date) AS month_number,
+                    MONTHNAME(date) AS month_name,
+                    customer,
+                    vessel,
+                    SUM(number_of_service) AS total_metrics,
+                    'PALLET' AS unit,
+                    CAST(SUM(total_price) AS DECIMAL) AS total_price,
+                    service,
+                    sub_type,
+                    report_type
+                GROUP BY ALL
+                ORDER BY
+                    month_number
+            ),
+            pal_ AS (
+                FROM
+                    pallet_df
+                SELECT
+                    MONTH(date) AS month_number,
+                    MONTHNAME(date) AS month_name,
+                    customer,
+                    vessel,
+                    SUM(number_of_service) AS total_metrics,
+                    'PALLET' AS unit,
+                    CAST(SUM(total_price) AS DECIMAL) AS total_price,
+                    service,
+                    sub_type,
+                    report_type
+                GROUP BY ALL
+                ORDER BY
+                    month_number
+            ),
+            elec_ AS (
+                FROM
+                    electricity_df
+                SELECT
+                    MONTH(invoice_month) AS month_number,
+                    MONTHNAME(invoice_month) AS month_name,
+                    customer,
+                    vessel,
+                    SUM(number_of_days) AS total_metrics,
+                    'DAYS' AS unit,
+                    CAST(SUM(total_price) AS DECIMAL) AS total_price,
+                    service,
+                    sub_type,
+                    report_type
+                GROUP BY ALL
+                ORDER BY
+                    month_number
+            ),
             f_salt_ AS (
-            FROM forklift_salt_df
-        SELECT
-            MONTH(date) AS month_number,
-            MONTHNAME(date) AS month_name,
-            customer,
-            SUM(billed_hours) AS total_metrics,
-            'HOURS' AS unit,
-            CAST(SUM(total_price) AS DECIMAL) AS total_price,
-            service,
-            sub_type,
-            report_type
-        GROUP BY ALL
-        ORDER BY
-            month_number
+                FROM
+                    forklift_salt_df
+                SELECT
+                    MONTH(date) AS month_number,
+                    MONTHNAME(date) AS month_name,
+                    customer,
+                    vessel,
+                    SUM(billed_hours) AS total_metrics,
+                    'HOURS' AS unit,
+                    CAST(SUM(total_price) AS DECIMAL) AS total_price,
+                    service,
+                    sub_type,
+                    report_type
+                GROUP BY ALL
+                ORDER BY
+                    month_number
             ),
             salt_ AS (
                 FROM
@@ -1746,6 +2027,7 @@ def _(
                     MONTH(date) AS month_number,
                     MONTHNAME(date) AS month_name,
                     customer,
+                    vessel,
                     SUM(total_tonnage) AS total_metrics,
                     'TONNAGE' AS unit,
                     CAST(SUM(total_price) AS DECIMAL) AS total_price,
@@ -1762,7 +2044,8 @@ def _(
                 SELECT
                     MONTH(date) AS month_number,
                     MONTHNAME(date) AS month_name,
-                    vessel AS customer,
+                    customer,
+                    vessel,
                     SUM(total_tonnage) AS total_metrics,
                     'TONNAGE' AS unit,
                     CAST(SUM(total_price) AS DECIMAL) AS total_price,
@@ -1779,7 +2062,8 @@ def _(
                 SELECT
                     MONTH(date) AS month_number,
                     MONTHNAME(date) AS month_name,
-                    vessel AS customer,
+                    customer,
+                    vessel,
                     SUM(total_tonnage) AS total_metrics,
                     'TONNAGE' AS unit,
                     CAST(SUM(total_price) AS DECIMAL) AS total_price,
@@ -1797,6 +2081,7 @@ def _(
                     MONTH(date) AS month_number,
                     MONTHNAME(date) AS month_name,
                     customer,
+                    NULL AS vessel,
                     SUM(tonnage) AS total_metrics,
                     'TONNAGE' AS unit,
                     CAST(
@@ -1816,6 +2101,7 @@ def _(
                     MONTH(date) AS month_number,
                     MONTHNAME(date) AS month_name,
                     customer,
+                    NULL AS vessel,
                     SUM(number_of_scows) AS total_metrics,
                     'SCOWS' AS unit,
                     CAST(SUM(scow_transfer_price) AS DECIMAL) AS total_price,
@@ -1833,6 +2119,7 @@ def _(
                     MONTH(date) AS month_number,
                     MONTHNAME(date) AS month_name,
                     customer,
+                    NULL AS vessel,
                     SUM(number_of_scows) AS total_metrics,
                     'SCOWS' AS unit,
                     CAST(SUM(forklift_price) AS DECIMAL) AS total_price,
@@ -1850,6 +2137,7 @@ def _(
                     MONTH(date) AS month_number,
                     MONTHNAME(date) AS month_name,
                     customer,
+                    NULL AS vessel,
                     SUM(number_of_service) AS total_metrics,
                     'CONTAINERS' AS unit,
                     CAST(SUM(washing_price) AS DECIMAL) AS total_price,
@@ -1867,6 +2155,7 @@ def _(
                     MONTH(date) AS month_number,
                     MONTHNAME(date) AS month_name,
                     customer,
+                    NULL AS vessel,
                     SUM(number_of_service) AS total_metrics,
                     'CONTAINERS' AS unit,
                     CAST(SUM(total_pti_price) AS DECIMAL) AS total_price,
@@ -1884,6 +2173,7 @@ def _(
                     MONTH(date) AS month_number,
                     MONTHNAME(date) AS month_name,
                     customer,
+                    NULL AS vessel,
                     SUM(number_of_service) AS total_metrics,
                     'CONTAINERS' AS unit,
                     CAST(SUM(shifting_price) AS DECIMAL) AS total_price,
@@ -1901,6 +2191,7 @@ def _(
                     MONTH(date) AS month_number,
                     MONTHNAME(date) AS month_name,
                     customer,
+                    NULL AS vessel,
                     SUM(number_of_service) AS total_metrics,
                     'CONTAINERS' AS unit,
                     CAST(SUM(shifting_price) AS DECIMAL) AS total_price,
@@ -1918,6 +2209,7 @@ def _(
                     MONTH(date) AS month_number,
                     MONTHNAME(date) AS month_name,
                     customer,
+                    vessel,
                     SUM(total_tonnage) AS total_metrics,
                     'TONNAGE' AS unit,
                     CAST(SUM(total_dispatch_price) AS DECIMAL) AS total_price,
@@ -1935,6 +2227,7 @@ def _(
                     MONTH(date) AS month_number,
                     MONTHNAME(date) AS month_name,
                     customer,
+                    vessel,
                     SUM(total_tonnage) AS total_metrics,
                     'TONNAGE' AS unit,
                     CAST(SUM(total_price) AS DECIMAL) AS total_price,
@@ -1952,6 +2245,7 @@ def _(
                     MONTH(date) AS month_number,
                     MONTHNAME(date) AS month_name,
                     customer,
+                    vessel,
                     ROUND(SUM(total_tonnage), 3) AS total_metrics,
                     'TONNAGE' AS unit,
                     CAST(SUM(total_price) AS DECIMAL) AS total_price,
@@ -1969,6 +2263,7 @@ def _(
                     MONTH(date) AS month_number,
                     MONTHNAME(date) AS month_name,
                     customer,
+                    NULL AS vessel,
                     SUM(total_tonnage) AS total_metrics,
                     'TONNAGE' AS unit,
                     CAST(SUM(total_price) AS DECIMAL) AS total_price,
@@ -1986,6 +2281,7 @@ def _(
                     MONTH(date) AS month_number,
                     MONTHNAME(date) AS month_name,
                     customer,
+                    NULL AS vessel,
                     SUM(total_tonnage) AS total_metrics,
                     'TONNAGE' AS unit,
                     CAST(SUM(total_price) AS DECIMAL) AS total_price,
@@ -2002,6 +2298,7 @@ def _(
                 SELECT
                     MONTH(date) AS month_number,
                     MONTHNAME(date) AS month_name,
+                    vessel,
                     customer,
                     SUM(total_tonnage) AS total_metrics,
                     'TONNAGE' AS unit,
@@ -2012,11 +2309,67 @@ def _(
                 GROUP BY ALL
                 ORDER BY
                     month_number
+            ),
+            forkl_ AS (
+                FROM
+                    forklift_df
+                SELECT
+                    MONTH(date) AS month_number,
+                    MONTHNAME(date) AS month_name,
+                    customer,
+                    vessel,
+                    SUM(duration) AS total_metrics,
+                    'HOURS' AS unit,
+                    CAST(SUM(total_price) AS DECIMAL) AS total_price,
+                    service,
+                    sub_type,
+                    report_type
+                GROUP BY ALL
+                ORDER BY
+                    month_number
             )
-        FROM f_salt_ 
-            UNION ALL
-        FROM salt_ 
-            UNION ALL
+        FROM
+            truck_skiff_
+        UNION ALL
+        FROM
+            tare_
+        UNION ALL
+        FROM
+            misc_o_
+        UNION ALL
+        FROM
+            x_
+        UNION ALL
+        FROM
+            add_
+        UNION ALL
+        FROM
+            well_
+        UNION ALL
+        FROM
+            forkl_
+        UNION ALL
+        FROM
+            crane_
+        UNION ALL
+        FROM
+            hau_
+        UNION ALL
+        FROM
+            lin_
+        UNION ALL
+        FROM
+            pal_
+        UNION ALL
+        FROM
+            elec_
+        UNION ALL
+        FROM
+            f_salt_
+        UNION ALL
+        FROM
+            salt_
+        UNION ALL
         FROM
             net_
         UNION ALL
@@ -2066,20 +2419,26 @@ def _(
             customer
         """
     )
+    return (master_df,)
+
+
+@app.cell
+def _():
     return
 
 
 @app.cell(hide_code=True)
-def _(electricity_df):
+def _(truck_skiff_df):
     _df = mo.sql(
         f"""
-        FROM electricity_df
+        FROM truck_skiff_df
         SELECT
             MONTH(date) AS month_number,
             MONTHNAME(date) AS month_name,
             customer,
-            SUM(billed_hours) AS total_metrics,
-            'HOURS' AS unit,
+         vessel,
+            CAST(SUM(total_tonnage) AS DECIMAL) AS total_metrics,
+            'TONNAGE' AS unit,
             CAST(SUM(total_price) AS DECIMAL) AS total_price,
             service,
             sub_type,
@@ -2087,6 +2446,58 @@ def _(electricity_df):
         GROUP BY ALL
         ORDER BY
             month_number
+        """
+    )
+    return
+
+
+@app.cell
+def _():
+    return
+
+
+@app.cell(column=1, hide_code=True)
+def _(master_df):
+    by_customer = mo.sql(
+        f"""
+        FROM master_df
+        SELECT month_number,month_name,customer,SUM(total_price) AS total_invoice,sub_type,report_type
+        GROUP  BY  ALL
+        ORDER BY month_number
+        """
+    )
+    return (by_customer,)
+
+
+@app.cell
+def _(by_customer):
+    float(by_customer.select(pl.col("total_invoice")).sum().to_series().to_list()[0])
+    return
+
+
+@app.cell
+def _(master_df):
+    month_names = master_df.sort(by="month_number").select(pl.col("month_name").unique()).to_series().to_list()
+
+    month_selection = mo.ui.dropdown(options=month_names,value='January')
+    month_selection
+
+    return (month_selection,)
+
+
+@app.cell(hide_code=True)
+def _(master_df, month_selection):
+    _df = mo.sql(
+        f"""
+        WITH data_ AS (FROM master_df
+        SELECT month_number,month_name,SUM(total_price) AS total_invoice,report_type
+        GROUP  BY  ALL
+        ORDER BY month_number)
+
+        FROM data_ 
+        SELECT report_type,total_invoice
+        WHERE month_name = '{month_selection.value}' AND report_type <> 'NOT TO INVOICE'
+        ORDER BY total_invoice
         """
     )
     return
