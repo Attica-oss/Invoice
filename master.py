@@ -1644,7 +1644,7 @@ def _(customer_df, extra_men_df):
                     "Vessel" AS vessel,
                     "Tonnage" AS tonnage,
             CAST(NULLIF(TRIM("ExtraMen"), '') AS BIGINT) AS extra_men
-     
+
                 WHERE NULLIF(TRIM("ExtraMen"), '') IS NOT NULL AND CAST(NULLIF(TRIM("ExtraMen"), '') AS BIGINT) >0
             ),
             client AS (
@@ -2458,6 +2458,16 @@ def _():
 
 @app.cell(column=1, hide_code=True)
 def _(master_df):
+    _df = mo.sql(
+        f"""
+        FROM master_df
+        """
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(master_df):
     by_customer = mo.sql(
         f"""
         FROM master_df
@@ -2481,7 +2491,6 @@ def _(master_df):
 
     month_selection = mo.ui.dropdown(options=month_names,value='January')
     month_selection
-
     return (month_selection,)
 
 

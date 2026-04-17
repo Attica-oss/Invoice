@@ -26,7 +26,7 @@ BY_CATCH_TRANSFER_SHEET: str = "ByCatchTransfer"
 # Transport Services
 TRANSPORT_SHEET_ID: str = "1O8K26c7CqLSdLr-f2gvZliDpBn9ArxXvj9tEJy-ElUg"
 
-shore_crane_sheet = "ShoreCrane"
+SHORE_CRANE_SHEET = "ShoreCrane"
 TRANSFER = "Transfer"
 forklift_sheet = "ForkliftRecord"
 scow_sheet = "ScowTransfer"
