@@ -15,7 +15,28 @@ with app.setup:
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    # Casting Types
+    # Process Invoices
+    ---------
+
+    * Load data from various Google Sheets into Polars LazyFrame
+      * Use [DuckDB](https://duckdb.org/) to process these by adding day name, price, and customers.
+      * Clean the data; flag invalid data and produce these into a dataframe view.
+      * Currently, data is not getting persisted. However, we aim to use Parquet or DuckDB files.
+      * There are some validations occurring in the Google Sheets; however, this is limited.
+      * We are using strEnum to create enums to cast most columns.
+    * Filter the datasets by date range and customer (vessels).
+      * We have a Google Sheet that stores this information.
+      * We aim to turn it into a `ReportMeta`
+    * Save the data into an Excel Workbook using [Polars](https://docs.pola.rs/api/python/stable/reference/api/polars.DataFrame.write_excel.html) and [Xlsxwriter](https://xlsxwriter.readthedocs.io/working_with_polars.html)
+    * Forma
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _():
+    mo.md(r"""
+    ## Casting Types
     """)
     return
 
@@ -62,6 +83,7 @@ def _():
 
     import anywidget
     import traitlets
+
 
     class ContainerValidationWidget(anywidget.AnyWidget):
         _esm = """
@@ -198,7 +220,9 @@ def _():
                 return
 
             owner, equipment, serial, check = match.groups()
-            calculated_check = self._calculate_check_digit(owner + equipment + serial)
+            calculated_check = self._calculate_check_digit(
+                owner + equipment + serial
+            )
 
             self.owner_code = owner
             self.equipment_category = self._get_equipment_name(equipment)
@@ -214,10 +238,32 @@ def _():
 
         def _calculate_check_digit(self, code: str) -> int:
             letter_values = {
-                "A": 10, "B": 12, "C": 13, "D": 14, "E": 15, "F": 16, "G": 17,
-                "H": 18, "I": 19, "J": 20, "K": 21, "L": 23, "M": 24, "N": 25,
-                "O": 26, "P": 27, "Q": 28, "R": 29, "S": 30, "T": 31, "U": 32,
-                "V": 34, "W": 35, "X": 36, "Y": 37, "Z": 38,
+                "A": 10,
+                "B": 12,
+                "C": 13,
+                "D": 14,
+                "E": 15,
+                "F": 16,
+                "G": 17,
+                "H": 18,
+                "I": 19,
+                "J": 20,
+                "K": 21,
+                "L": 23,
+                "M": 24,
+                "N": 25,
+                "O": 26,
+                "P": 27,
+                "Q": 28,
+                "R": 29,
+                "S": 30,
+                "T": 31,
+                "U": 32,
+                "V": 34,
+                "W": 35,
+                "X": 36,
+                "Y": 37,
+                "Z": 38,
             }
             total = sum(
                 (letter_values[c] if c.isalpha() else int(c)) * (2**i)
@@ -299,9 +345,9 @@ def _(all_containers):
             SELECT container_number
         WHERE line = 'IOT'
         """,
-        output=False
+        output=False,
     )
-    return
+    return (iot_soc_list,)
 
 
 @app.cell(hide_code=True)
@@ -393,7 +439,9 @@ class PolarsEnum(StrEnum):
         if key in lower_map:
             return lower_map[key]
 
-        raise ValueError(f"Invalid {cls.__name__}: {value!r}. Allowed: {cls.list_all()}")
+        raise ValueError(
+            f"Invalid {cls.__name__}: {value!r}. Allowed: {cls.list_all()}"
+        )
 
     @classmethod
     def lit(cls, value: str) -> pl.Expr:
@@ -453,6 +501,7 @@ def _():
         COLLECTION = "Collection"
         SHIFTING = "Shifting"
 
+
     class ColdStoreMovementType(PolarsEnum):
         """Cold Store Movement NOTE INTERVAL is not valid"""
 
@@ -503,7 +552,9 @@ def _():
 
 @app.cell
 def _(MASTER_VALIDATION_URL):
-    price_raw_dataf = scan_google_sheet(url=MASTER_VALIDATION_URL, sheet_name="Price")
+    price_raw_dataf = scan_google_sheet(
+        url=MASTER_VALIDATION_URL, sheet_name="Price"
+    )
     return (price_raw_dataf,)
 
 
@@ -529,7 +580,7 @@ def _(price_raw_dataf):
         WHERE
             "EndingDate" = ''
         """,
-        output=False
+        output=False,
     )
     return (price_df,)
 
@@ -595,7 +646,9 @@ def _():
 
 @app.cell
 def _(MASTER_VALIDATION_URL):
-    client_raw_dataf = scan_google_sheet(url=MASTER_VALIDATION_URL, sheet_name="Client")
+    client_raw_dataf = scan_google_sheet(
+        url=MASTER_VALIDATION_URL, sheet_name="Client"
+    )
     return (client_raw_dataf,)
 
 
@@ -616,7 +669,9 @@ def _():
 
 @app.cell
 def _():
-    iotc_vessel = pl.read_excel(source="./rav_search_2026-04-17T16_05_23.033Z.xlsx")
+    iotc_vessel = pl.read_excel(
+        source="./rav_search_2026-04-17T16_05_23.033Z.xlsx"
+    )
     return (iotc_vessel,)
 
 
@@ -646,9 +701,31 @@ def _(client_raw_dataf):
                 '{VesselType.SUPPLY_VESSEL}',
                 '{VesselType.LONGLINER}'
             )
-        """
+        """,
+        output=False,
     )
     return
+
+
+@app.cell(hide_code=True)
+def _():
+    mo.md(r"""
+    #### Cargo Vessel
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(client_raw_dataf):
+    cargo_vessel_df = mo.sql(
+        f"""
+        FROM client_raw_dataf
+            SELECT "Vessel/Client" AS vessel,
+                "Customer" AS ship_owner
+        WHERE "Type" = '{VesselType.CARGO_VESSEL}'
+        """
+    )
+    return (cargo_vessel_df,)
 
 
 @app.cell
@@ -679,6 +756,7 @@ def _():
     # from datetime import date
     from dataclasses import dataclass
 
+
     @dataclass(frozen=True, slots=True)
     class ContinuousHoliday:
         start_year: int
@@ -692,8 +770,11 @@ def _():
         def to_date(self, year: int) -> date:
             return date(year, self.month, self.day)
 
+
     NEW_CONTINUOUS_HOLIDAYS = [
-        ContinuousHoliday(start_year=2026, month=2, day=1, name="Abolition of Slavery"),
+        ContinuousHoliday(
+            start_year=2026, month=2, day=1, name="Abolition of Slavery"
+        ),
     ]
 
     ONE_TIME_HOLIDAYS_BY_YEAR: dict[int, set[date]] = {
@@ -736,6 +817,7 @@ def _(dataclass):
     #     NEW_CONTINUOUS_HOLIDAYS,
     #     ONE_TIME_HOLIDAYS_BY_YEAR,
     # )
+
 
     @dataclass(slots=True)
     class PublicHolidayCalendar:
@@ -786,11 +868,17 @@ def _(dataclass):
 
         def to_lazyframe(self, year: int) -> pl.LazyFrame:
             holidays = sorted(self.get_holidays(year))
-            return pl.LazyFrame({"date": holidays}).with_columns(pl.lit("PH").alias("day_name"))
+            return pl.LazyFrame({"date": holidays}).with_columns(
+                pl.lit("PH").alias("day_name")
+            )
 
         @staticmethod
         def _get_monday_after_sunday_holidays(holidays: set[date]) -> set[date]:
-            return {holiday + timedelta(days=1) for holiday in holidays if holiday.weekday() == 6}
+            return {
+                holiday + timedelta(days=1)
+                for holiday in holidays
+                if holiday.weekday() == 6
+            }
 
         @staticmethod
         def _calculate_easter_sunday(year: int) -> date:
@@ -990,7 +1078,7 @@ def _(price_df, public_holiday_dates, shore_crane_raw):
 
         FROM priced;
         """,
-        output=False
+        output=False,
     )
     return (shore_crane_raw_df,)
 
@@ -1074,7 +1162,7 @@ def _(shore_crane_raw_df):
             WHERE validation_status = 'OK'
         ORDER BY service_date, start_time;
         """,
-        output=False
+        output=False,
     )
     return (final_shore_crane_df,)
 
@@ -1101,6 +1189,909 @@ def _(final_shore_crane_df):
 @app.cell(column=5, hide_code=True)
 def _():
     mo.md(r"""
+    # Net List // Unloading Records
+    """)
+    return
+
+
+@app.cell
+def _():
+    operations_activity_url = "https://docs.google.com/spreadsheets/d/1PvTkl6DYZdhtaiNshz0qwtSPxC8S1OOeu905NmhFKNs/edit?gid=1960309715#gid=1960309715"
+
+    miscellaneous_activity_url = "https://docs.google.com/spreadsheets/d/1VbfiiWsp8yxs6KSR1CXpw1S_35tYlWV8UjjWah9Afpw/edit?pli=1&gid=61862422#gid=61862422"
+
+    stuffing_and_plugin_url = "https://docs.google.com/spreadsheets/d/1L0HlevB-asshOgXMmIQ14bysq56lUPp0lYCrHPB0iGg/edit?gid=76354553#gid=76354553"
+
+    unloading_summary_sheet = "UnloadingSummary"
+    iphs_truck_sheet = "IPHSTruck"
+    container_operations_sheet = "containerOperations"
+    return (
+        container_operations_sheet,
+        iphs_truck_sheet,
+        miscellaneous_activity_url,
+        operations_activity_url,
+        stuffing_and_plugin_url,
+        unloading_summary_sheet,
+    )
+
+
+@app.cell
+def _(
+    container_operations_sheet,
+    iphs_truck_sheet,
+    miscellaneous_activity_url,
+    operations_activity_url,
+    stuffing_and_plugin_url,
+    unloading_summary_sheet,
+):
+    net_list_raw = scan_google_sheet(
+        url=operations_activity_url, sheet_name=unloading_summary_sheet
+    )
+    to_cold_store_via_truck_raw = scan_google_sheet(
+        url=miscellaneous_activity_url, sheet_name=iphs_truck_sheet
+    )
+    container_stuffing_raw = scan_google_sheet(
+        url=stuffing_and_plugin_url, sheet_name=container_operations_sheet
+    )
+    return container_stuffing_raw, net_list_raw, to_cold_store_via_truck_raw
+
+
+@app.cell(hide_code=True)
+def _(net_list_raw, to_cold_store_via_truck_raw):
+    cold_store_adjusted_dataf = mo.sql(
+        f"""
+        WITH
+            base AS (
+                SELECT
+                    "day" AS day_name,
+                    date AS service_date,
+                    'CCCS (' || REPLACE(REPLACE(customer, ' S.A.', ''), ' S.A', '') || ')' AS destination,
+                    vessel,
+                    CAST(total_tonnage - overtime_tonnage AS DECIMAL) AS tonnage,
+                    overtime_tonnage,
+                    "storage" AS storage_type
+                FROM
+                    to_cold_store_via_truck_raw
+                WHERE
+                    YEAR(date) = 2026
+                    AND operation_type = 'To CCCS via Truck'
+            ),
+            normal AS (
+                SELECT
+                    * EXCLUDE (overtime_tonnage),
+                    CASE
+                        WHEN day_name IN ('Sun', 'PH') THEN 'overtime 150%'
+                        ELSE 'normal hours'
+                    END AS overtime
+                FROM
+                    base
+            ),
+            overtime AS (
+                SELECT
+                   day_name,
+            service_date,
+            destination,
+            vessel,
+            overtime_tonnage AS tonnage,
+            storage_type,
+                    CASE
+                        WHEN day_name IN ('Sun', 'PH') THEN 'overtime 200%'
+                        ELSE 'overtime 150%'
+                    END AS overtime,
+
+                FROM
+                    base
+                WHERE
+                    overtime_tonnage > 0
+            ),
+            adjusted_cold_store AS (
+                SELECT
+                    *
+                FROM
+                    normal
+                UNION ALL
+                SELECT
+                    *
+                FROM
+                    overtime
+                ORDER BY
+                    service_date,
+                    vessel
+            ),
+            raw_cold_store AS (
+                FROM
+                    net_list_raw
+                SELECT
+                    "Date" AS service_date,
+                    UPPER("Vessel") AS vessel,
+                    "startTime" AS start_time,
+                    "Container (Destination)" AS destination,
+                    overtime,
+                    "Storage" AS storage_type,
+                    "endTime" AS end_time,
+                    "Total Tonnage" AS total_tonnage
+                WHERE
+                    YEAR(date) = 2026
+                    AND destination LIKE '%CCCS%'
+            )
+
+            SELECT r.*,
+            a.tonnage
+        FROM
+            raw_cold_store r
+            LEFT JOIN adjusted_cold_store a ON a.service_date = r.service_date
+            AND r.vessel = a.vessel
+            AND r.destination = a.destination
+            AND r.storage_type = a.storage_type
+            AND r.overtime = a.overtime
+        """,
+        output=False,
+    )
+    return (cold_store_adjusted_dataf,)
+
+
+@app.cell(hide_code=True)
+def _():
+    mo.md(r"""
+    ### Check the Cold Store Tonnage Against Genesis Data
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(cold_store_adjusted_dataf):
+    cccs_tonnage_comparison = mo.sql(
+        f"""
+        FROM
+            cold_store_adjusted_dataf
+        SELECT
+            service_date,
+            vessel,
+            destination,
+            total_tonnage,
+            tonnage,
+           ROUND((tonnage - total_tonnage),3) AS var,
+            CASE WHEN ROUND((tonnage - total_tonnage),3) > 0 THEN '🔺'
+           WHEN ROUND((tonnage - total_tonnage),3) < 0 THEN '🔻'
+            ELSE '🟰' END AS var_symbol
+        ORDER BY var
+        LIMIT 5
+        """
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(
+    cargo_vessel_df,
+    cold_store_adjusted_dataf,
+    container_stuffing_raw,
+    iot_soc_list,
+    net_list_raw,
+    price_df,
+    public_holiday_dates,
+):
+    final_net_list_df = mo.sql(
+        f"""
+        WITH
+            unit_price AS (
+                SELECT
+                    service AS pricing_service,
+                    unit_price
+                FROM
+                    price_df
+                WHERE
+                    service_type = '{ServiceGroupType.NET_LIST}'
+            ),
+            ph_dates AS (
+                SELECT
+                    CAST(date AS DATE) AS ph_date,
+                    day_name
+                FROM
+                    public_holiday_dates
+            ),
+            base AS (
+                FROM
+                    net_list_raw
+                SELECT
+                    "Date" AS service_date,
+                    UPPER("Vessel") AS vessel,
+                    "startTime" AS start_time,
+                    "Container (Destination)" AS destination,
+                    overtime,
+                    "Storage" AS storage_type,
+                    "endTime" AS end_time,
+                    "Total Tonnage" AS total_tonnage
+                WHERE
+                    YEAR(date) = 2026
+                    AND destination NOT LIKE '%CCCS%'
+            ),
+            cold_store AS (
+                FROM
+                    cold_store_adjusted_dataf
+                SELECT
+                    service_date,
+                    vessel,
+                    start_time,
+                    destination,
+                    overtime,
+                    storage_type,
+                    end_time,
+                    tonnage
+            ),
+            stuffing AS (
+                FROM
+                    container_stuffing_raw
+                SELECT
+                    vessel_client AS vessel,
+                    date_plugged AS service_date,
+                    container_number AS destination,
+                    CASE
+                        WHEN operation_type LIKE '%Full%' THEN 'Full OSS'
+                        WHEN operation_type LIKE '%Basic%' THEN 'Basic OSS'
+                        ELSE 'Container Stuffing'
+                    END AS service,
+                    tonnage
+                WHERE
+                    (
+                        YEAR(date_out) = 2026
+                        OR date_out IS NULL
+                    )
+                    AND (
+                        operation_type LIKE '%Basic OSS%'
+                        OR operation_type LIKE '%Full OSS%'
+                        OR operation_type LIKE '%Stuffing and Plugin%'
+                    )
+                    AND (
+                        operation_type NOT LIKE '%CCCS Stuffing%'
+                        AND operation_type NOT LIKE '%Cross%'
+                    )
+                    AND shipping_line <> 'IOT'
+            ),
+            grouped_data AS (
+                FROM
+                    base
+                UNION ALL
+                FROM
+                    cold_store
+                ORDER BY
+                    service_date,
+                    vessel
+            ),
+            add_day_name AS (
+                SELECT
+                    CASE
+                        WHEN p.ph_date IS NOT NULL THEN p.day_name
+                        ELSE STRFTIME(g.service_date, '%a')
+                    END AS day_name,
+                    g.*
+                FROM
+                    grouped_data g
+                    LEFT JOIN ph_dates p ON g.service_date = p.ph_date
+            ),
+            add_stuffing_service AS (
+                SELECT
+                    a.*,
+                    s.service AS service,
+                    -- s.tonnage AS stuffing_tonnage,
+                    -- s.service_date AS stuffing_service_date,
+                    CASE
+                        WHEN a.vessel = s.vessel THEN NULL
+                        ELSE s.vessel
+                    END AS remarks
+                FROM
+                    add_day_name a
+                    LEFT JOIN LATERAL (
+                        SELECT
+                            s.service,
+                            s.tonnage,
+                            s.service_date,
+                            s.vessel
+                        FROM
+                            stuffing s
+                        WHERE
+                            s.destination = a.destination
+                            AND s.service_date >= a.service_date
+                            AND s.service_date <= a.service_date + INTERVAL 1 DAY
+                            AND (
+                                s.vessel = a.vessel
+                                OR (
+                                    s.service = 'Basic OSS'
+                                    AND s.vessel IN ('OCEAN BASKET', 'AMIRANTE')
+                                )
+                            )
+                        ORDER BY
+                            CASE
+                                WHEN s.service_date = a.service_date THEN 0
+                                ELSE 1
+                            END,
+                            CASE
+                                WHEN s.vessel = a.vessel THEN 0
+                                ELSE 1
+                            END
+                        LIMIT
+                            1
+                    ) s ON TRUE
+            ),
+            add_all_service AS (
+                FROM
+                    add_stuffing_service
+                SELECT
+                    day_name,
+                    service_date,
+                    vessel,
+                    start_time,
+                    destination,
+                    overtime,
+                    storage_type,
+                    end_time,
+                    total_tonnage,
+                    CASE
+                        WHEN service IS NOT NULL THEN service
+                        WHEN destination LIKE '%IOT%'
+                        OR destination = 'Unload to Quay'
+                        OR destination IN (
+                            FROM
+                                iot_soc_list
+                        ) THEN 'Unload to Quay'
+                        WHEN UPPER(destination) IN (
+                            FROM
+                                cargo_vessel_df
+                            SELECT
+                                vessel
+                        ) THEN 'Transhipment'
+                        WHEN destination LIKE '%CCCS%' THEN 'Unload to CCCS'
+                    END AS service,
+                    remarks
+                ORDER BY
+                    service,
+                    vessel
+            ),
+            add_pricing_service AS (
+                FROM
+                    add_all_service
+                SELECT
+                    day_name,
+                    service_date,
+                    vessel,
+                    start_time,
+                    destination,
+                    overtime,
+                    storage_type,
+                    end_time,
+                    total_tonnage,
+                    service,
+                    service || ' - ' || storage_type AS pricing_service,
+                    remarks
+            )
+        SELECT
+            s.* EXCLUDE (s.pricing_service, s.remarks),
+            u.unit_price,
+            CASE
+                WHEN overtime = 'overtime 200%' THEN CAST(2.0 * u.unit_price * s.total_tonnage AS DECIMAL)
+                WHEN overtime = 'overtime 150%' THEN CAST(1.5 * u.unit_price * s.total_tonnage AS DECIMAL)
+                ELSE CAST(1.0 * u.unit_price * s.total_tonnage AS DECIMAL)
+            END AS total_price,
+            s.remarks
+        FROM
+            add_pricing_service s
+            LEFT JOIN unit_price u ON u.pricing_service = s.pricing_service
+        ORDER BY s.service_date,s.vessel
+        """
+    )
+    return (final_net_list_df,)
+
+
+@app.cell(hide_code=True)
+def _(final_net_list_df):
+    _df = mo.sql(
+        f"""
+        FROM final_net_list_df
+        LIMIT 5
+        """
+    )
+    return
+
+
+@app.cell
+def _(end_date, final_net_list_df, start_date, vessel_name):
+    final_net_df = final_net_list_df.filter(
+        (pl.col("service_date") >= start_date)
+        & (pl.col("service_date") <= end_date)
+        & (pl.col("vessel") == vessel_name)
+    )
+    return (final_net_df,)
+
+
+@app.cell(hide_code=True)
+def _(final_net_df):
+    _df = mo.sql(
+        f"""
+        FROM final_net_df
+        """
+    )
+    return
+
+
+@app.cell
+def _(final_net_df):
+    final_net_df.write_excel(
+        "shore_crane_report.xlsx",
+        worksheet="Net List",
+        table_style="Table Style Medium 2",
+        dtype_formats={
+            pl.Date: "yyyy-mm-dd",
+            pl.Time: "hh:mm",
+        },
+        column_totals={"total_tonnage": "sum", "total_price": "sum"},
+    )
+    return
+
+
+@app.cell
+def _(format_generic_report, meta):
+    format_generic_report(
+        xlsx_path="shore_crane_report.xlsx",
+        sheet_name="Net List",
+        report_meta=meta,
+        footer_text="Net List",
+        currency_cols=["unit_price", "total_price"],
+        date_cols=["service_date"],
+        time_cols=["start_time", "end_time"],
+        right_headers=["unit_price", "total_price", "total_tonnage"],
+        center_headers=["day_name", "service_date", "start_time", "end_time"],
+        header_color="595959",
+        number_format_map={
+            "unit_price": "#,##0.00",
+            "total_tonnage": "#,###0.000",
+        },
+        width_overrides={
+            "day_name": 10,
+            "service_date": 14,
+            "vessel": 18,
+            "start_time": 11,
+            "destination": 20,
+            "overtime": 16,
+            "storage_type": 14,
+            "end_time": 11,
+            "total_tonnage": 14,
+            "service": 18,
+            "unit_price": 12,
+            "total_price": 14,
+            "remarks": 18,
+        },
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _():
+    mo.md(r"""
+    ## Excel Writer
+    """)
+    return
+
+
+@app.cell
+def _():
+    import xlsxwriter
+
+    return (xlsxwriter,)
+
+
+@app.cell
+def _():
+    return
+
+
+@app.cell
+def _(
+    end_date,
+    final_net_df,
+    final_shore_crane_df,
+    start_date,
+    vessel_name,
+    xlsxwriter,
+):
+    xlsx_path = "combined_report.xlsx"
+
+    workbook = xlsxwriter.Workbook(xlsx_path)
+
+    final_net_df.write_excel(
+        workbook=workbook,
+        worksheet="Net List",
+        table_style="Table Style Medium 2",
+        dtype_formats={
+            pl.Date: "yyyy-mm-dd",
+            pl.Time: "hh:mm",
+        },
+        column_totals={"total_tonnage": "sum", "total_price": "sum"},
+    )
+
+    shore_crane_filtered = (
+        final_shore_crane_df.filter(
+            (pl.col("service_date") >= start_date)
+            & (pl.col("service_date") <= end_date)
+            & (pl.col("customer") == vessel_name)
+            & (pl.col("invoiced_to") != "MAERSKLINE")
+        )
+        .rename(
+            {
+                "day_name": "Day Name",
+                "service_date": "Date",
+                "start_time": "Start Time",
+                "end_time": "End Time",
+                "total_hours": "Hours",
+                "overtime_hours": "Overtime Hours",
+                "customer": "Client",
+                "unit_price": "Price / Hour ($)",
+                "remarks": "Operation",
+                "total_price": "Total Price ($)",
+            }
+        )
+        .drop(["invoiced_to"])
+        .select(
+            [
+                "Day Name",
+                "Date",
+                "Start Time",
+                "End Time",
+                "Hours",
+                "Overtime Hours",
+                "Client",
+                "Price / Hour ($)",
+                "Operation",
+                "Total Price ($)",
+            ]
+        )
+    )
+
+    shore_crane_filtered.write_excel(
+        workbook=workbook,
+        worksheet="Shore Crane",
+        table_style="Table Style Medium 2",
+        dtype_formats={
+            pl.Date: "yyyy-mm-dd",
+            pl.Time: "hh:mm",
+        },
+        column_formats={
+            "Price / Hour ($)": "$#,##0.000",
+            "Total Price ($)": "$#,##0.000",
+            "Hours": "0",
+            "Overtime Hours": "0",
+        },
+        column_totals={"Hours": "sum", "Total Price ($)": "sum"},
+    )
+
+    workbook.close()
+    return (xlsx_path,)
+
+
+@app.cell
+def _(format_generic_report, meta, xlsx_path):
+    format_generic_report(
+        xlsx_path=xlsx_path,
+        sheet_name="Net List",
+        report_meta=meta,
+        footer_text="Net List",
+        currency_cols=["unit_price", "total_price"],
+        date_cols=["service_date"],
+        time_cols=["start_time", "end_time"],
+        right_headers=["unit_price", "total_price", "total_tonnage"],
+        center_headers=["day_name", "service_date", "start_time", "end_time"],
+        header_color="595959",
+        number_format_map={
+            "unit_price": "#,##0.00",
+            "total_tonnage": "#,###0.000",
+        },
+        width_overrides={
+            "day_name": 10,
+            "service_date": 14,
+            "vessel": 18,
+            "start_time": 11,
+            "destination": 20,
+            "overtime": 16,
+            "storage_type": 14,
+            "end_time": 11,
+            "total_tonnage": 14,
+            "service": 18,
+            "unit_price": 12,
+            "total_price": 14,
+            "remarks": 18,
+        },
+    )
+
+
+    format_generic_report(
+        xlsx_path=xlsx_path,
+        sheet_name="Shore Crane",
+        report_meta=meta,
+        footer_text="Shore Crane",
+        currency_cols=["Price / Hour ($)", "Total Price ($)"],
+        date_cols=["Date"],
+        time_cols=["Start Time", "End Time"],
+        int_cols=["Hours", "Overtime Hours"],
+        right_headers=["Price / Hour ($)", "Total Price ($)", "Hours"],
+        center_headers=["Day Name", "Date", "Start Time", "End Time"],
+        header_color="1F4E78",
+        number_format_map={
+            "Price / Hour ($)": "#,##0.00",
+            "Total Price ($)": "#,###0.000",
+            "Hours": '_-* #,##0_-;-* #,##0_-;_-* " - "??_-;_-@_-',
+            "Overtime Hours": '_-* #,##0_-;-* #,##0_-;_-* " - "??_-;_-@_-',
+        },
+        width_overrides={
+            "Day Name": 11,
+            "Date": 13,
+            "Start Time": 12,
+            "End Time": 12,
+            "Hours": 8,
+            "Overtime Hours": 15,
+            "Client": 22,
+            "Price / Hour ($)": 16,
+            "Operation": 28,
+            "Total Price ($)": 16,
+        },
+    )
+    return
+
+
+@app.cell(column=6, hide_code=True)
+def _():
+    mo.md(r"""
+    ### Summary Sheet
+    """)
+    return
+
+
+@app.cell
+def _(xlsxwriter):
+    summary_data = {
+        "start_date": "2026-01-01",
+        "end_date": "2026-01-08",
+        "vessel": "Izaro",
+        "owner": "HARTSWATER",
+        "sto_number": "STO-2500221",
+        "collection_delivery": "-",
+        "move_1": "- Move",
+        "collection_delivery_2": "-",
+        "move_2": "- Move",
+        "total_moves": "-",
+        "total_tonnage": "ERROR",
+        "total_container_stuffed": 7,
+        "forklift_services": 1,
+        "salt_operations": "-",
+        "pallets": "-",
+    }
+
+
+    def write_summary_sheet(xlsx_path, summary_data: dict) -> None:
+        workbook = xlsxwriter.Workbook(xlsx_path)
+        ws = workbook.add_worksheet("Summary")
+
+        ws.hide_gridlines(2)
+
+        # -----------------------------
+        # Column widths / row heights
+        # -----------------------------
+        ws.set_column("A:A", 3)
+        ws.set_column("B:B", 24)
+        ws.set_column("C:C", 14)
+        ws.set_column("D:D", 14)
+        ws.set_column("E:E", 8)
+        ws.set_column("F:F", 14)
+        ws.set_column("G:G", 4)
+
+        for r in range(0, 16):
+            ws.set_row(r, 22)
+
+        # -----------------------------
+        # Formats
+        # -----------------------------
+        outer_border = workbook.add_format(
+            {
+                "border": 1,
+                "bg_color": "#F2F2F2",
+            }
+        )
+
+        label_fmt = workbook.add_format(
+            {
+                "bold": True,
+                "align": "right",
+                "valign": "vcenter",
+                "bg_color": "#F2F2F2",
+            }
+        )
+
+        center_fmt = workbook.add_format(
+            {
+                "align": "center",
+                "valign": "vcenter",
+                "bg_color": "#F2F2F2",
+            }
+        )
+
+        green_title_fmt = workbook.add_format(
+            {
+                "bg_color": "#C6EFCE",
+                "bold": True,
+                "align": "center",
+                "valign": "vcenter",
+                "font_size": 15,
+            }
+        )
+
+        green_value_fmt = workbook.add_format(
+            {
+                "bg_color": "#C6EFCE",
+                "align": "center",
+                "valign": "vcenter",
+                "font_size": 12,
+            }
+        )
+
+        metric_label_fmt = workbook.add_format(
+            {
+                "bold": True,
+                "align": "right",
+                "valign": "vcenter",
+                "bg_color": "#F2F2F2",
+                "font_size": 12,
+            }
+        )
+
+        metric_value_fmt = workbook.add_format(
+            {
+                "align": "center",
+                "valign": "vcenter",
+                "bg_color": "#F2F2F2",
+                "font_size": 12,
+            }
+        )
+
+        metric_red_fmt = workbook.add_format(
+            {
+                "font_color": "#FF0000",
+                "align": "center",
+                "valign": "vcenter",
+                "bg_color": "#F2F2F2",
+                "font_size": 12,
+            }
+        )
+
+        unit_fmt = workbook.add_format(
+            {
+                "italic": True,
+                "align": "left",
+                "valign": "vcenter",
+                "bg_color": "#F2F2F2",
+                "font_size": 12,
+            }
+        )
+
+        underline_center_fmt = workbook.add_format(
+            {
+                "align": "center",
+                "valign": "vcenter",
+                "bg_color": "#F2F2F2",
+                "bottom": 1,
+            }
+        )
+
+        underline_right_fmt = workbook.add_format(
+            {
+                "align": "right",
+                "valign": "vcenter",
+                "bg_color": "#F2F2F2",
+                "bottom": 1,
+            }
+        )
+
+        # -----------------------------
+        # Paint background block
+        # -----------------------------
+        for row in range(0, 15):
+            for col in range(0, 7):
+                ws.write_blank(row, col, None, outer_border)
+
+        # -----------------------------
+        # Outer box only
+        # -----------------------------
+        ws.conditional_format(
+            "A1:G15", {"type": "no_blanks", "format": outer_border}
+        )
+        ws.conditional_format("A1:G15", {"type": "blanks", "format": outer_border})
+
+        # -----------------------------
+        # Header section
+        # -----------------------------
+        ws.write("B1", "Date:", label_fmt)
+        ws.write("C1", summary_data.get("start_date", ""), center_fmt)
+        ws.write("E1", "to", center_fmt)
+        ws.write("F1", summary_data.get("end_date", ""), center_fmt)
+
+        ws.write("B2", "Vessel:", label_fmt)
+        ws.merge_range("C2:F2", summary_data.get("vessel", ""), green_value_fmt)
+
+        ws.write("B3", "Ship Owner/Operator:", label_fmt)
+        ws.merge_range("C3:F3", summary_data.get("owner", ""), green_title_fmt)
+
+        ws.write("B4", "STO Number", label_fmt)
+        ws.merge_range(
+            "C4:F4", summary_data.get("sto_number", ""), green_value_fmt
+        )
+
+        # -----------------------------
+        # Middle haulage section
+        # -----------------------------
+        ws.write("B6", "Haulage:", metric_label_fmt)
+
+        ws.write(
+            "C6",
+            summary_data.get("collection_delivery", "-"),
+            underline_center_fmt,
+        )
+        ws.write("F6", summary_data.get("move_1", "- Move"), underline_center_fmt)
+
+        ws.write(
+            "C7",
+            summary_data.get("collection_delivery_2", "-"),
+            underline_center_fmt,
+        )
+        ws.write("F7", summary_data.get("move_2", "- Move"), underline_center_fmt)
+
+        ws.write("C8", "Total Moves", metric_label_fmt)
+        ws.write("F8", summary_data.get("total_moves", "-"), underline_center_fmt)
+
+        # -----------------------------
+        # Lower metrics
+        # -----------------------------
+        ws.write("B10", "Total Tonnage:", metric_label_fmt)
+        ws.write("C10", summary_data.get("total_tonnage", "ERROR"), metric_red_fmt)
+        ws.write("D10", "Tons", unit_fmt)
+
+        ws.write("B11", "Total Container Stuffed:", metric_label_fmt)
+        ws.write(
+            "C11", summary_data.get("total_container_stuffed", 0), metric_value_fmt
+        )
+        ws.write("D11", "Containers", unit_fmt)
+
+        ws.write("B12", "Forklift Services:", metric_label_fmt)
+        ws.write("C12", summary_data.get("forklift_services", 0), metric_value_fmt)
+        ws.write("D12", "Hour", unit_fmt)
+
+        ws.write("B13", "Salt Operations:", metric_label_fmt)
+        ws.write("C13", summary_data.get("salt_operations", "-"), metric_value_fmt)
+        ws.write("D13", "Ton", unit_fmt)
+
+        ws.write("B14", "Pallets:", metric_label_fmt)
+        ws.write("C14", summary_data.get("pallets", "-"), metric_value_fmt)
+        ws.write("D14", "Pallet", unit_fmt)
+
+        # Optional page setup
+        ws.set_landscape()
+        ws.fit_to_pages(1, 1)
+
+        workbook.close()
+
+    return summary_data, write_summary_sheet
+
+
+@app.cell
+def _(summary_data, write_summary_sheet):
+    write_summary_sheet("shore_crane_report.xlsx", summary_data)
+    return
+
+
+@app.cell
+def _():
+    return
+
+
+@app.cell(column=7, hide_code=True)
+def _():
+    mo.md(r"""
     # Openpyxl Styling for Excel
     """)
     return
@@ -1108,23 +2099,176 @@ def _():
 
 @app.cell
 def _():
+    from typing import Iterable
+
     from openpyxl import load_workbook
     from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
     from openpyxl.utils import get_column_letter
     from openpyxl.worksheet.table import TableStyleInfo
+    from openpyxl.worksheet.properties import PageSetupProperties
 
-    def format_shore_crane_report(
+    return (
+        Alignment,
+        Border,
+        Font,
+        Iterable,
+        PageSetupProperties,
+        PatternFill,
+        Side,
+        TableStyleInfo,
+        get_column_letter,
+        load_workbook,
+    )
+
+
+@app.cell
+def _(dataclass):
+    @dataclass
+    class ReportMeta:
+        report_name: str
+        vessel: str
+        start_date: date
+        end_date: date
+
+    return (ReportMeta,)
+
+
+@app.cell
+def _(
+    Alignment,
+    Border,
+    Font,
+    Iterable,
+    PageSetupProperties,
+    PatternFill,
+    ReportMeta,
+    Side,
+    TableStyleInfo,
+    get_column_letter,
+    load_workbook,
+):
+    def _norm(value) -> str:
+        if value is None:
+            return ""
+        return str(value).strip().lower().replace(" ", "_")
+
+
+    def _build_header_map(ws) -> dict[str, int]:
+        return {
+            _norm(ws.cell(row=1, column=c).value): c
+            for c in range(1, ws.max_column + 1)
+        }
+
+
+    def _resolve_existing(
+        headers_map: dict[str, int], names: Iterable[str]
+    ) -> list[str]:
+        out = []
+        for name in names:
+            n = _norm(name)
+            if n in headers_map:
+                out.append(n)
+        return out
+
+
+    def _guess_column_roles(headers_map: dict[str, int]) -> dict[str, set[str]]:
+        headers = set(headers_map.keys())
+
+        date_like = {
+            h
+            for h in headers
+            if any(token in h for token in ["date", "service_date"])
+        }
+        time_like = {
+            h for h in headers if "time" in h or h in {"start_time", "end_time"}
+        }
+        currency_like = {
+            h
+            for h in headers
+            if any(
+                token in h
+                for token in ["price", "rate", "amount", "cost", "charge"]
+            )
+        }
+        integer_like = {
+            h
+            for h in headers
+            if any(
+                token in h
+                for token in ["hours", "qty", "quantity", "count", "moves"]
+            )
+        }
+
+        center_like = {
+            h
+            for h in headers
+            if h
+            in {
+                "day_name",
+                "service_date",
+                "date",
+                "start_time",
+                "end_time",
+                "hours",
+                "overtime_hours",
+                "unit",
+                "shift",
+            }
+        }
+
+        right_like = currency_like | {
+            h
+            for h in headers
+            if any(token in h for token in ["tonnage", "qty", "quantity", "hours"])
+        }
+
+        return {
+            "date_cols": date_like,
+            "time_cols": time_like,
+            "currency_cols": currency_like,
+            "int_cols": integer_like,
+            "center_headers": center_like,
+            "right_headers": right_like,
+        }
+
+
+    def format_generic_report(
         xlsx_path: str,
         sheet_name: str,
-        vessel_name: str,
-        start_date: date,
-        end_date: date,
-        service_name: str,
+        report_title: str | None = None,
+        report_meta: ReportMeta | None = None,
+        footer_text: str | None = None,
         table_name: str | None = None,
-        header_color: str = "1F4E78",
+        header_color: str = "595959",
+        currency_format: str = "#,##0.000",
+        number_format_map: dict[str, str] | None = None,
+        width_overrides: dict[str, float] | None = None,
+        date_cols: Iterable[str] | None = None,
+        time_cols: Iterable[str] | None = None,
+        currency_cols: Iterable[str] | None = None,
+        int_cols: Iterable[str] | None = None,
+        center_headers: Iterable[str] | None = None,
+        right_headers: Iterable[str] | None = None,
+        auto_detect: bool = True,
+        # New options
+        freeze_panes: str | None = None,  # e.g. "A2" or None
+        fit_to_page: bool = True,
+        fit_to_width: int = 1,
+        fit_to_height: int = 0,  # 0 = unlimited pages tall, 1 = single page tall
+        repeat_header_row: bool = True,
+        # Header/footer logo
+        header_logo_text: str | None = None,  # text placeholder like company name
+        header_logo_position: str = "left",  # left / center / right
+        # Optional image placeholder path note:
+        # true Excel header/footer image support is limited in openpyxl
+        logo_path: str | None = None,
     ) -> None:
         wb = load_workbook(xlsx_path)
         ws = wb[sheet_name]
+
+        max_row = ws.max_row
+        max_col = ws.max_column
+        header_map = _build_header_map(ws)
 
         # ------------------------------------------------------------------
         # Page / worksheet layout
@@ -1134,63 +2278,124 @@ def _():
         ws.sheet_view.showGridLines = False
         ws.sheet_view.view = "normal"
 
-        # Fit to page width
-        ws.page_setup.fitToWidth = 1
-        ws.page_setup.fitToHeight = 0
+        if fit_to_page:
+            ws.sheet_properties.pageSetUpPr = PageSetupProperties(
+                fitToPage=True,
+                autoPageBreaks=False,
+            )
+            ws.page_setup.fitToWidth = fit_to_width
+            ws.page_setup.fitToHeight = fit_to_height
 
-        # Margins
         ws.page_margins.left = 0.25
         ws.page_margins.right = 0.25
-        ws.page_margins.top = 0.5
+        ws.page_margins.top = 0.6
         ws.page_margins.bottom = 0.5
-        ws.page_margins.header = 0.2
+        ws.page_margins.header = 0.3
         ws.page_margins.footer = 0.2
+
+        # Center horizontally when printing
+        ws.print_options.horizontalCentered = True
+        ws.print_options.verticalCentered = False
 
         # ------------------------------------------------------------------
         # Header / footer
         # ------------------------------------------------------------------
-        header_text = f"{vessel_name} | {start_date:%d-%b-%Y} to {end_date:%d-%b-%Y}"
 
-        # Centered header, centered footer
-        ws.oddHeader.center.text = header_text
-        ws.oddHeader.center.font = "Calibri,Bold"
-        ws.oddHeader.center.size = 12
+        report_meta = report_meta or {}
 
-        ws.oddFooter.center.text = service_name
-        ws.oddFooter.center.font = "Calibri"
-        ws.oddFooter.center.size = 10
+        if report_meta:
+            report_name = report_meta.report_name or report_title
+            vessel = report_meta.vessel
+            start_date = report_meta.start_date
+            end_date = report_meta.end_date
+        else:
+            report_name = report_title
+            vessel = None
+            start_date = None
+            end_date = None
 
-        # Optional page number on right footer
+        # ---- LEFT (logo / company) ----
+        if header_logo_text:
+            ws.oddHeader.left.text = header_logo_text
+            ws.oddHeader.left.font = "Calibri,Bold"
+            ws.oddHeader.left.size = 11
+
+        # ---- CENTER (report title) ----
+        if report_name:
+            ws.oddHeader.center.text = report_name
+            ws.oddHeader.center.font = "Calibri,Bold"
+            ws.oddHeader.center.size = 12
+
+        # ---- RIGHT (vessel + date range) ----
+        right_parts = []
+
+        if vessel:
+            right_parts.append(vessel)
+
+        if start_date and end_date:
+            right_parts.append(f"{start_date:%d-%b-%Y} to {end_date:%d-%b-%Y}")
+
+        right_text = " | ".join(right_parts)
+
+        if right_text:
+            ws.oddHeader.right.text = right_text
+            ws.oddHeader.right.font = "Calibri"
+            ws.oddHeader.right.size = 10
+
+        if footer_text:
+            ws.oddFooter.center.text = footer_text
+            ws.oddFooter.center.font = "Calibri"
+            ws.oddFooter.center.size = 10
+
         ws.oddFooter.right.text = "Page &[Page] of &[Pages]"
 
-        # Repeat header row when printing
-        ws.print_title_rows = "1:1"
+        if repeat_header_row:
+            ws.print_title_rows = "1:1"
+
+        # ------------------------------------------------------------------
+        # Optional logo / header branding
+        # ------------------------------------------------------------------
+        # In openpyxl, header/footer images are not reliably supported like normal worksheet images.
+        # Best practical option: use text branding in header/footer.
+        if header_logo_text:
+            pos = header_logo_position.lower()
+            if pos == "left":
+                ws.oddHeader.left.text = header_logo_text
+                ws.oddHeader.left.font = "Calibri,Bold"
+                ws.oddHeader.left.size = 11
+            elif pos == "right":
+                ws.oddHeader.right.text = header_logo_text
+                ws.oddHeader.right.font = "Calibri,Bold"
+                ws.oddHeader.right.size = 11
+            else:
+                ws.oddHeader.center.text = (
+                    f"{header_logo_text} | {report_title}"
+                    if report_title
+                    else header_logo_text
+                )
+                ws.oddHeader.center.font = "Calibri,Bold"
+                ws.oddHeader.center.size = 12
+
+        # NOTE:
+        # logo_path is kept as a parameter for future use, but openpyxl does not
+        # reliably support inserting actual images into header/footer across Excel viewers.
+        # If you need a real image logo, the safer approach is to place the image in worksheet cells above the table.
 
         # ------------------------------------------------------------------
         # Freeze panes
         # ------------------------------------------------------------------
-        ws.freeze_panes = "A2"
-
-        # ------------------------------------------------------------------
-        # Determine used range
-        # ------------------------------------------------------------------
-        max_row = ws.max_row
-        max_col = ws.max_column
+        ws.freeze_panes = freeze_panes
 
         # ------------------------------------------------------------------
         # Table styling
         # ------------------------------------------------------------------
-        # If a table already exists (e.g. from Polars), update its style.
-        # Otherwise, leave it alone or create one separately if needed.
         if ws.tables:
-            # Use the first table unless a table_name is provided
             if table_name and table_name in ws.tables:
                 tab = ws.tables[table_name]
             else:
                 first_key = next(iter(ws.tables))
                 tab = ws.tables[first_key]
 
-            # Built-in Excel table style only
             tab.tableStyleInfo = TableStyleInfo(
                 name="TableStyleMedium2",
                 showFirstColumn=False,
@@ -1204,7 +2409,9 @@ def _():
         # ------------------------------------------------------------------
         header_fill = PatternFill("solid", fgColor=header_color)
         header_font = Font(color="FFFFFF", bold=True)
-        header_alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        header_alignment = Alignment(
+            horizontal="center", vertical="center", wrap_text=True
+        )
 
         for cell in ws[1]:
             cell.fill = header_fill
@@ -1214,56 +2421,88 @@ def _():
         ws.row_dimensions[1].height = 24
 
         # ------------------------------------------------------------------
+        # Detect roles
+        # ------------------------------------------------------------------
+        guessed = (
+            _guess_column_roles(header_map)
+            if auto_detect
+            else {
+                "date_cols": set(),
+                "time_cols": set(),
+                "currency_cols": set(),
+                "int_cols": set(),
+                "center_headers": set(),
+                "right_headers": set(),
+            }
+        )
+
+        date_cols_resolved = (
+            set(_resolve_existing(header_map, date_cols or []))
+            | guessed["date_cols"]
+        )
+        time_cols_resolved = (
+            set(_resolve_existing(header_map, time_cols or []))
+            | guessed["time_cols"]
+        )
+        currency_cols_resolved = (
+            set(_resolve_existing(header_map, currency_cols or []))
+            | guessed["currency_cols"]
+        )
+        int_cols_resolved = (
+            set(_resolve_existing(header_map, int_cols or []))
+            | guessed["int_cols"]
+        )
+        center_headers_resolved = (
+            set(_resolve_existing(header_map, center_headers or []))
+            | guessed["center_headers"]
+        )
+        right_headers_resolved = (
+            set(_resolve_existing(header_map, right_headers or []))
+            | guessed["right_headers"]
+        )
+
+        # ------------------------------------------------------------------
         # Number formats
         # ------------------------------------------------------------------
-        header_map = {ws.cell(row=1, column=c).value: c for c in range(1, max_col + 1)}
-
-        currency_cols = ["Price / Hour ($)", "Total Price ($)"]
-        int_cols = ["Hours", "Overtime Hours"]
-        date_cols = ["Date"]
-        time_cols = ["Start Time", "End Time"]
-
-        for name in currency_cols:
-            col_idx = header_map.get(name)
+        for col_name in currency_cols_resolved:
+            col_idx = header_map.get(col_name)
             if col_idx:
                 for r in range(2, max_row + 1):
-                    ws.cell(r, col_idx).number_format = "$#,##0.000"
+                    ws.cell(r, col_idx).number_format = currency_format
 
-        for name in int_cols:
-            col_idx = header_map.get(name)
+        for col_name in int_cols_resolved:
+            col_idx = header_map.get(col_name)
             if col_idx:
                 for r in range(2, max_row + 1):
                     ws.cell(r, col_idx).number_format = "0"
 
-        for name in date_cols:
-            col_idx = header_map.get(name)
+        for col_name in date_cols_resolved:
+            col_idx = header_map.get(col_name)
             if col_idx:
                 for r in range(2, max_row + 1):
-                    ws.cell(r, col_idx).number_format = "dd-mmm-yyyy"
+                    ws.cell(r, col_idx).number_format = "yyyy-mm-dd"
 
-        for name in time_cols:
-            col_idx = header_map.get(name)
+        for col_name in time_cols_resolved:
+            col_idx = header_map.get(col_name)
             if col_idx:
                 for r in range(2, max_row + 1):
                     ws.cell(r, col_idx).number_format = "hh:mm"
 
+        if number_format_map:
+            for col_name, fmt in number_format_map.items():
+                n = _norm(col_name)
+                col_idx = header_map.get(n)
+                if col_idx:
+                    for r in range(2, max_row + 1):
+                        ws.cell(r, col_idx).number_format = fmt
+
         # ------------------------------------------------------------------
         # Alignment
         # ------------------------------------------------------------------
-        center_headers = {
-            "Day Name",
-            "Date",
-            "Start Time",
-            "End Time",
-            "Hours",
-            "Overtime Hours",
-        }
-        right_headers = {"Price / Hour ($)", "Total Price ($)"}
-
         for col_name, col_idx in header_map.items():
-            if col_name in center_headers:
+            if col_name in center_headers_resolved:
                 align = Alignment(horizontal="center", vertical="center")
-            elif col_name in right_headers:
+            elif col_name in right_headers_resolved:
                 align = Alignment(horizontal="right", vertical="center")
             else:
                 align = Alignment(horizontal="left", vertical="center")
@@ -1284,22 +2523,12 @@ def _():
         # ------------------------------------------------------------------
         # Auto width
         # ------------------------------------------------------------------
-        width_overrides = {
-            "Day Name": 11,
-            "Date": 13,
-            "Start Time": 12,
-            "End Time": 12,
-            "Hours": 8,
-            "Overtime Hours": 15,
-            "Client": 22,
-            "Price / Hour ($)": 16,
-            "Operation": 28,
-            "Total Price ($)": 16,
-        }
+        width_overrides = {_norm(k): v for k, v in (width_overrides or {}).items()}
 
         for c in range(1, max_col + 1):
             col_letter = get_column_letter(c)
-            header = ws.cell(1, c).value
+            header = _norm(ws.cell(1, c).value)
+
             if header in width_overrides:
                 ws.column_dimensions[col_letter].width = width_overrides[header]
             else:
@@ -1308,17 +2537,15 @@ def _():
                     value = ws.cell(r, c).value
                     if value is not None:
                         max_len = max(max_len, len(str(value)))
-                ws.column_dimensions[col_letter].width = min(max(max_len + 2, 10), 30)
+                ws.column_dimensions[col_letter].width = min(
+                    max(max_len + 2, 10), 30
+                )
 
         # ------------------------------------------------------------------
-        # Hide unused rows/columns to mimic "hide empty cells"
+        # Hide unused rows/columns
         # ------------------------------------------------------------------
-        # Excel does not have a true "hide empty cells" mode for worksheets,
-        # so we hide everything after the used range.
-        for r in range(max_row + 1, 1048577):
+        for r in range(max_row + 1, min(max_row + 201, 1048577)):
             ws.row_dimensions[r].hidden = True
-            if r > max_row + 200:
-                break  # keep file size/work reasonable
 
         for c in range(max_col + 1, min(max_col + 51, 16385)):
             ws.column_dimensions[get_column_letter(c)].hidden = True
@@ -1330,7 +2557,7 @@ def _():
 
         wb.save(xlsx_path)
 
-    return (format_shore_crane_report,)
+    return (format_generic_report,)
 
 
 @app.cell
@@ -1438,86 +2665,11 @@ def _(summary_df):
 
 
 @app.cell
-def _(
-    end_date,
-    final_shore_crane_df,
-    format_shore_crane_report,
-    start_date,
-    vessel_name,
-):
-    final_df = (
-        final_shore_crane_df.filter(
-            (pl.col("service_date") >= start_date)
-            & (pl.col("service_date") <= end_date)
-            & (pl.col("customer") == vessel_name)
-            & (pl.col("invoiced_to") != "MAERSKLINE")
-        )
-        .rename(
-            {
-                "day_name": "Day Name",
-                "service_date": "Date",
-                "start_time": "Start Time",
-                "end_time": "End Time",
-                "total_hours": "Hours",
-                "overtime_hours": "Overtime Hours",
-                "customer": "Client",
-                "unit_price": "Price / Hour ($)",
-                "remarks": "Operation",
-                "total_price": "Total Price ($)",
-            }
-        )
-        .drop(["invoiced_to"])
-        .select(
-            [
-                "Day Name",
-                "Date",
-                "Start Time",
-                "End Time",
-                "Hours",
-                "Overtime Hours",
-                "Client",
-                "Price / Hour ($)",
-                "Operation",
-                "Total Price ($)",
-            ]
-        )
-    )
-
-    final_df.write_excel(
-        "shore_crane_report.xlsx",
-        worksheet="Shore Crane",
-        table_style="Table Style Medium 2",
-        dtype_formats={
-            pl.Date: "yyyy-mm-dd",
-            pl.Time: "hh:mm",
-        },
-        column_formats={
-            "Price / Hour ($)": "$#,##0.000",
-            "Total Price ($)": "$#,##0.000",
-            "Hours": "0",
-            "Overtime Hours": "0",
-        },
-        column_totals={"Hours": "sum", "Total Price ($)": "sum"},
-    )
-
-    format_shore_crane_report(
-        xlsx_path="shore_crane_report.xlsx",
-        sheet_name="Shore Crane",
-        vessel_name=vessel_name,
-        start_date=start_date,
-        end_date=end_date,
-        service_name="Shore Crane",
-        header_color="1F4E78",
-    )
-    return
-
-
-@app.cell
 def _():
     return
 
 
-@app.cell(column=6, hide_code=True)
+@app.cell(column=8, hide_code=True)
 def _():
     mo.md(r"""
     ## Data to process to Excel
@@ -1526,11 +2678,24 @@ def _():
 
 
 @app.cell
-def _():
+def _(ReportMeta):
     start_date = date(year=2026, month=2, day=23)
     end_date = date(2026, 2, 26)
     vessel_name = "TORRE ITALIA"
-    return end_date, start_date, vessel_name
+
+
+    meta = ReportMeta(
+        report_name="STO",
+        vessel=vessel_name,
+        start_date=start_date,
+        end_date=end_date,
+    )
+    return end_date, meta, start_date, vessel_name
+
+
+@app.cell
+def _():
+    return
 
 
 if __name__ == "__main__":
