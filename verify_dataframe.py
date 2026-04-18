@@ -5,10 +5,11 @@ app = marimo.App(width="columns", app_title="Process Invoice")
 
 with app.setup:
     from datetime import date, timedelta
+    from enum import StrEnum
+
     import marimo as mo
     import polars as pl
     from scan_google_sheet import scan_google_sheet
-    from enum import StrEnum
 
 
 @app.cell(hide_code=True)
@@ -27,6 +28,15 @@ def _():
     return
 
 
+@app.cell(hide_code=True)
+def _():
+    mo.md(r"""
+    #### STDU container.
+    Only one in service currently.
+    """)
+    return
+
+
 @app.cell
 def _():
     class STDUContainer(PolarsEnum):
@@ -38,33 +48,65 @@ def _():
     return
 
 
+@app.cell(hide_code=True)
+def _():
+    mo.md(r"""
+    #### Container Validation Text Box Widget 🇬🇸
+    """)
+    return
+
+
 @app.cell
 def _():
-    import anywidget
-    import traitlets
     import re
 
+    import anywidget
+    import traitlets
 
     class ContainerValidationWidget(anywidget.AnyWidget):
         _esm = """
         function render({ model, el }) {
           const container = document.createElement("div");
-          container.style.cssText = "font-family: monospace; padding: 12px;";
+          container.style.cssText = `
+            font-family: monospace;
+            padding: 14px 16px;
+            border: 2px solid #555;
+            border-radius: 6px;
+            display: inline-block;
+            transition: border-color 0.2s;
+          `;
 
           const label = document.createElement("label");
           label.textContent = "Container Number";
-          label.style.cssText = "display: block; font-weight: bold; margin-bottom: 4px;";
+          label.style.cssText = "display: block; font-weight: bold; margin-bottom: 6px; font-size: 13px;";
 
           const input = document.createElement("input");
           input.type = "text";
           input.placeholder = "e.g. MSCU1234565";
-          input.style.cssText = "width: 200px; padding: 6px; font-size: 14px; text-transform: uppercase;";
+          input.style.cssText = `
+            width: 200px;
+            padding: 7px 10px;
+            font-size: 14px;
+            text-transform: uppercase;
+            border: none;
+            outline: none;
+            font-family: monospace;
+            letter-spacing: 1px;
+            background: transparent;
+            color: inherit;
+          `;
 
           const validationMsg = document.createElement("div");
-          validationMsg.style.cssText = "margin-top: 6px; font-size: 13px;";
+          validationMsg.style.cssText = "margin-top: 8px; font-size: 13px; font-weight: bold;";
 
           const details = document.createElement("div");
-          details.style.cssText = "margin-top: 8px; font-size: 12px; color: #555;";
+          details.style.cssText = `
+            margin-top: 8px;
+            font-size: 12px;
+            opacity: 0.7;
+            border-top: 1px solid #555;
+            padding-top: 6px;
+          `;
 
           function updateValidation() {
             const isValid = model.get("is_valid");
@@ -75,13 +117,23 @@ def _():
             const check = model.get("check_digit");
 
             validationMsg.textContent = msg;
-            validationMsg.style.color = isValid ? "green" : (msg ? "red" : "#999");
+
+            if (!msg) {
+              validationMsg.style.color = "";
+              container.style.borderColor = "#555";
+            } else if (isValid) {
+              validationMsg.style.color = "#4caf50";
+              container.style.borderColor = "#4caf50";
+            } else {
+              validationMsg.style.color = "#f44336";
+              container.style.borderColor = "#f44336";
+            }
 
             if (owner) {
               details.innerHTML = `
-                <b>Owner:</b> ${owner} &nbsp;
-                <b>Category:</b> ${equip} &nbsp;
-                <b>Serial:</b> ${serial} &nbsp;
+                <b>Owner:</b> ${owner} &nbsp;|&nbsp;
+                <b>Category:</b> ${equip} &nbsp;|&nbsp;
+                <b>Serial:</b> ${serial} &nbsp;|&nbsp;
                 <b>Check Digit:</b> ${check}
               `;
             } else {
@@ -110,7 +162,6 @@ def _():
         export default { render };
         """
 
-        # Traitlets (synced with JS)
         container_number = traitlets.Unicode("").tag(sync=True)
         is_valid = traitlets.Bool(False).tag(sync=True)
         validation_message = traitlets.Unicode("").tag(sync=True)
@@ -129,6 +180,10 @@ def _():
             if not container:
                 self.is_valid = False
                 self.validation_message = ""
+                self.owner_code = ""
+                self.equipment_category = ""
+                self.serial_number = ""
+                self.check_digit = ""
                 return
 
             pattern = r"^([A-Z]{3})([UJZ])(\d{6})(\d)$"
@@ -143,9 +198,7 @@ def _():
                 return
 
             owner, equipment, serial, check = match.groups()
-            calculated_check = self._calculate_check_digit(
-                owner + equipment + serial
-            )
+            calculated_check = self._calculate_check_digit(owner + equipment + serial)
 
             self.owner_code = owner
             self.equipment_category = self._get_equipment_name(equipment)
@@ -160,34 +213,11 @@ def _():
                 self.validation_message = "✓ Valid container number"
 
         def _calculate_check_digit(self, code: str) -> int:
-            """ISO 6346 check digit algorithm."""
             letter_values = {
-                "A": 10,
-                "B": 12,
-                "C": 13,
-                "D": 14,
-                "E": 15,
-                "F": 16,
-                "G": 17,
-                "H": 18,
-                "I": 19,
-                "J": 20,
-                "K": 21,
-                "L": 23,
-                "M": 24,
-                "N": 25,
-                "O": 26,
-                "P": 27,
-                "Q": 28,
-                "R": 29,
-                "S": 30,
-                "T": 31,
-                "U": 32,
-                "V": 34,
-                "W": 35,
-                "X": 36,
-                "Y": 37,
-                "Z": 38,
+                "A": 10, "B": 12, "C": 13, "D": 14, "E": 15, "F": 16, "G": 17,
+                "H": 18, "I": 19, "J": 20, "K": 21, "L": 23, "M": 24, "N": 25,
+                "O": 26, "P": 27, "Q": 28, "R": 29, "S": 30, "T": 31, "U": 32,
+                "V": 34, "W": 35, "X": 36, "Y": 37, "Z": 38,
             }
             total = sum(
                 (letter_values[c] if c.isalpha() else int(c)) * (2**i)
@@ -210,6 +240,12 @@ def _():
 def _(ContainerValidationWidget):
     myc = ContainerValidationWidget()
     myc
+    return (myc,)
+
+
+@app.cell
+def _(myc):
+    myc.is_valid
     return
 
 
@@ -263,7 +299,7 @@ def _(all_containers):
             SELECT container_number
         WHERE line = 'IOT'
         """,
-        output=False,
+        output=False
     )
     return
 
@@ -280,10 +316,18 @@ def _():
 def _(all_containers):
     _df = mo.sql(
         f"""
-        FROM all_containers 
-        WHERE line <> 'IOT'
+        FROM all_containers
+        WHERE line IN ('CMA CGM','MAERSK')
         """
     )
+    return
+
+
+@app.cell(hide_code=True)
+def _():
+    mo.md(r"""
+    ---
+    """)
     return
 
 
@@ -349,9 +393,7 @@ class PolarsEnum(StrEnum):
         if key in lower_map:
             return lower_map[key]
 
-        raise ValueError(
-            f"Invalid {cls.__name__}: {value!r}. Allowed: {cls.list_all()}"
-        )
+        raise ValueError(f"Invalid {cls.__name__}: {value!r}. Allowed: {cls.list_all()}")
 
     @classmethod
     def lit(cls, value: str) -> pl.Expr:
@@ -411,7 +453,6 @@ def _():
         COLLECTION = "Collection"
         SHIFTING = "Shifting"
 
-
     class ColdStoreMovementType(PolarsEnum):
         """Cold Store Movement NOTE INTERVAL is not valid"""
 
@@ -420,6 +461,25 @@ def _():
         INTERNAL = "INTERNAL"
 
     return (TransferMovementType,)
+
+
+@app.cell(hide_code=True)
+def _():
+    mo.md(r"""
+    ### Vessel Type Enum
+    """)
+    return
+
+
+@app.class_definition
+class VesselType(PolarsEnum):
+    """Vessel Type"""
+
+    PURSEINER = "PURSEINER"
+    CARGO_VESSEL = "CARGO VESSEL"
+    SUPPLY_VESSEL = "SUPPLY VESSEL"
+    LONGLINER = "LONGLINER"
+    MILITARY_VESSEL = "MILITARY VESSEL"
 
 
 @app.cell
@@ -443,9 +503,7 @@ def _():
 
 @app.cell
 def _(MASTER_VALIDATION_URL):
-    price_raw_dataf = scan_google_sheet(
-        url=MASTER_VALIDATION_URL, sheet_name="Price"
-    )
+    price_raw_dataf = scan_google_sheet(url=MASTER_VALIDATION_URL, sheet_name="Price")
     return (price_raw_dataf,)
 
 
@@ -471,7 +529,7 @@ def _(price_raw_dataf):
         WHERE
             "EndingDate" = ''
         """,
-        output=False,
+        output=False
     )
     return (price_df,)
 
@@ -510,6 +568,8 @@ def _(price_df):
 def _():
     mo.md(r"""
     ### For only one service
+
+    📓 To prepare a function for this
     """)
     return
 
@@ -528,6 +588,77 @@ def _():
 @app.cell(column=2, hide_code=True)
 def _():
     mo.md(r"""
+    # Customers
+    """)
+    return
+
+
+@app.cell
+def _(MASTER_VALIDATION_URL):
+    client_raw_dataf = scan_google_sheet(url=MASTER_VALIDATION_URL, sheet_name="Client")
+    return (client_raw_dataf,)
+
+
+@app.cell(hide_code=True)
+def _():
+    mo.md(r"""
+    #### Vessel list ⛴️
+    """)
+    return
+
+
+@app.cell
+def _():
+    select_vessel = mo.ui.text(label="Search Vessel: ")
+    select_vessel
+    return (select_vessel,)
+
+
+@app.cell
+def _():
+    iotc_vessel = pl.read_excel(source="./rav_search_2026-04-17T16_05_23.033Z.xlsx")
+    return (iotc_vessel,)
+
+
+@app.cell(hide_code=True)
+def _(iotc_vessel, select_vessel):
+    _df = mo.sql(
+        f"""
+        FROM iotc_vessel WHERE "Name" LIKE '%{select_vessel.value}%'
+        """
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(client_raw_dataf):
+    vessel_df = mo.sql(
+        f"""
+        FROM
+            client_raw_dataf
+        SELECT
+            "Vessel/Client" AS vessel,
+            "Customer" AS ship_owner
+        WHERE
+            "Type" IN (
+                '{VesselType.PURSEINER}',
+                '{VesselType.CARGO_VESSEL}',
+                '{VesselType.SUPPLY_VESSEL}',
+                '{VesselType.LONGLINER}'
+            )
+        """
+    )
+    return
+
+
+@app.cell
+def _():
+    return
+
+
+@app.cell(column=3, hide_code=True)
+def _():
+    mo.md(r"""
     ## Public Holiday DataFrame
     """)
     return
@@ -543,11 +674,10 @@ def _():
 
 @app.cell
 def _():
-    from __future__ import annotations
+    # from __future__ import annotations
 
     # from datetime import date
     from dataclasses import dataclass
-
 
     @dataclass(frozen=True, slots=True)
     class ContinuousHoliday:
@@ -562,11 +692,8 @@ def _():
         def to_date(self, year: int) -> date:
             return date(year, self.month, self.day)
 
-
     NEW_CONTINUOUS_HOLIDAYS = [
-        ContinuousHoliday(
-            start_year=2026, month=2, day=1, name="Abolition of Slavery"
-        ),
+        ContinuousHoliday(start_year=2026, month=2, day=1, name="Abolition of Slavery"),
     ]
 
     ONE_TIME_HOLIDAYS_BY_YEAR: dict[int, set[date]] = {
@@ -609,7 +736,6 @@ def _(dataclass):
     #     NEW_CONTINUOUS_HOLIDAYS,
     #     ONE_TIME_HOLIDAYS_BY_YEAR,
     # )
-
 
     @dataclass(slots=True)
     class PublicHolidayCalendar:
@@ -660,17 +786,11 @@ def _(dataclass):
 
         def to_lazyframe(self, year: int) -> pl.LazyFrame:
             holidays = sorted(self.get_holidays(year))
-            return pl.LazyFrame({"date": holidays}).with_columns(
-                pl.lit("PH").alias("day_name")
-            )
+            return pl.LazyFrame({"date": holidays}).with_columns(pl.lit("PH").alias("day_name"))
 
         @staticmethod
         def _get_monday_after_sunday_holidays(holidays: set[date]) -> set[date]:
-            return {
-                holiday + timedelta(days=1)
-                for holiday in holidays
-                if holiday.weekday() == 6
-            }
+            return {holiday + timedelta(days=1) for holiday in holidays if holiday.weekday() == 6}
 
         @staticmethod
         def _calculate_easter_sunday(year: int) -> date:
@@ -715,7 +835,7 @@ def _(public_holidays_lf):
     return (public_holiday_dates,)
 
 
-@app.cell(column=3, hide_code=True)
+@app.cell(column=4, hide_code=True)
 def _():
     mo.md(r"""
     # Shore Crane Rental Data
@@ -870,7 +990,7 @@ def _(price_df, public_holiday_dates, shore_crane_raw):
 
         FROM priced;
         """,
-        output=False,
+        output=False
     )
     return (shore_crane_raw_df,)
 
@@ -954,7 +1074,7 @@ def _(shore_crane_raw_df):
             WHERE validation_status = 'OK'
         ORDER BY service_date, start_time;
         """,
-        output=False,
+        output=False
     )
     return (final_shore_crane_df,)
 
@@ -978,7 +1098,7 @@ def _(final_shore_crane_df):
     return
 
 
-@app.cell(column=4, hide_code=True)
+@app.cell(column=5, hide_code=True)
 def _():
     mo.md(r"""
     # Openpyxl Styling for Excel
@@ -989,10 +1109,9 @@ def _():
 @app.cell
 def _():
     from openpyxl import load_workbook
-    from openpyxl.styles import Font, PatternFill, Border, Side, Alignment
-    from openpyxl.worksheet.table import TableStyleInfo
+    from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
     from openpyxl.utils import get_column_letter
-
+    from openpyxl.worksheet.table import TableStyleInfo
 
     def format_shore_crane_report(
         xlsx_path: str,
@@ -1030,9 +1149,7 @@ def _():
         # ------------------------------------------------------------------
         # Header / footer
         # ------------------------------------------------------------------
-        header_text = (
-            f"{vessel_name} | {start_date:%d-%b-%Y} to {end_date:%d-%b-%Y}"
-        )
+        header_text = f"{vessel_name} | {start_date:%d-%b-%Y} to {end_date:%d-%b-%Y}"
 
         # Centered header, centered footer
         ws.oddHeader.center.text = header_text
@@ -1087,9 +1204,7 @@ def _():
         # ------------------------------------------------------------------
         header_fill = PatternFill("solid", fgColor=header_color)
         header_font = Font(color="FFFFFF", bold=True)
-        header_alignment = Alignment(
-            horizontal="center", vertical="center", wrap_text=True
-        )
+        header_alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
 
         for cell in ws[1]:
             cell.fill = header_fill
@@ -1101,9 +1216,7 @@ def _():
         # ------------------------------------------------------------------
         # Number formats
         # ------------------------------------------------------------------
-        header_map = {
-            ws.cell(row=1, column=c).value: c for c in range(1, max_col + 1)
-        }
+        header_map = {ws.cell(row=1, column=c).value: c for c in range(1, max_col + 1)}
 
         currency_cols = ["Price / Hour ($)", "Total Price ($)"]
         int_cols = ["Hours", "Overtime Hours"]
@@ -1195,9 +1308,7 @@ def _():
                     value = ws.cell(r, c).value
                     if value is not None:
                         max_len = max(max_len, len(str(value)))
-                ws.column_dimensions[col_letter].width = min(
-                    max(max_len + 2, 10), 30
-                )
+                ws.column_dimensions[col_letter].width = min(max(max_len + 2, 10), 30)
 
         # ------------------------------------------------------------------
         # Hide unused rows/columns to mimic "hide empty cells"
@@ -1406,7 +1517,7 @@ def _():
     return
 
 
-@app.cell(column=5, hide_code=True)
+@app.cell(column=6, hide_code=True)
 def _():
     mo.md(r"""
     ## Data to process to Excel
