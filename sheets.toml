@@ -1,0 +1,21 @@
+# Sheet configurations. Add one [section] per sheet group.
+#
+[master]
+url="https://docs.google.com/spreadsheets/d/1ai-zQMtbPUx0LeQeLmXcpPgKvL5cyvwDfSJqRzxfUQg/edit?gid=0#gid=0"
+sheets = { price = "Price", client = "Client" }
+
+[operations]
+url="https://docs.google.com/spreadsheets/d/1PvTkl6DYZdhtaiNshz0qwtSPxC8S1OOeu905NmhFKNs/edit?gid=1960309715#gid=1960309715"
+sheets = {net_list = "UnloadingSummary"}
+
+[miscellaneous]
+url="https://docs.google.com/spreadsheets/d/1VbfiiWsp8yxs6KSR1CXpw1S_35tYlWV8UjjWah9Afpw/edit?pli=1&gid=61862422#gid=61862422"
+sheets = {iphs_truck = "IPHSTruck"}
+
+[stuffing]
+url="https://docs.google.com/spreadsheets/d/1L0HlevB-asshOgXMmIQ14bysq56lUPp0lYCrHPB0iGg/edit?gid=76354553#gid=76354553"
+sheets = {ops_activity = "containerOperations"}
+
+[salt]
+url="https://docs.google.com/spreadsheets/d/1R1M5La8lqF7NjJa7qspfPYvHU_Ej2o4YX7gduxb-Zu8/edit?gid=136190424#gid=136190424"
+sheets = {salt_ops = "SaltOperation"}

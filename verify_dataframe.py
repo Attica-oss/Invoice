@@ -345,7 +345,7 @@ def _(all_containers):
             SELECT container_number
         WHERE line = 'IOT'
         """,
-        output=False,
+        output=False
     )
     return (iot_soc_list,)
 
@@ -531,12 +531,86 @@ class VesselType(PolarsEnum):
     MILITARY_VESSEL = "MILITARY VESSEL"
 
 
-@app.cell
+@app.cell(column=1, hide_code=True)
 def _():
+    mo.md(r"""
+    # Configs
+
+    Google Sheets Urls and tab name (sheet name)
+    """)
     return
 
 
-@app.cell(column=1, hide_code=True)
+@app.cell
+def _(dataclass):
+    import tomllib
+    from pathlib import Path
+    from types import MappingProxyType
+    from typing import Mapping
+
+
+    DEFAULT_CONFIG_PATH = Path(__file__).parent / "sheets.toml"
+
+
+    def _template(key: str) -> str:
+        return f"""\
+    # Sheet configurations. Add one [section] per sheet group.
+    #
+    # [{key}]
+    # url = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit"
+    # sheets = {{ price = "Price", client = "Client" }}
+    """
+
+
+    @dataclass(frozen=True, slots=True)
+    class SheetConfig:
+        url: str
+        sheets: Mapping[str, str]
+
+        def __repr__(self) -> str:
+            return f"SheetConfig(sheets={list(self.sheets)})"
+
+        @classmethod
+        def from_toml(
+            cls,
+            key: str,
+            path: str | Path = DEFAULT_CONFIG_PATH,
+        ) -> "SheetConfig":
+            path = Path(path)
+
+            if not path.exists():
+                path.write_text(_template(key))
+                raise FileNotFoundError(
+                    f"No config found. Created template at {path}. "
+                    f"Uncomment and fill in the [{key}] section, then retry."
+                )
+
+            with open(path, "rb") as f:
+                data = tomllib.load(f)
+
+            if key not in data:
+                raise KeyError(
+                    f"Section [{key}] not found in {path}. "
+                    f"Available sections: {list(data) or '(none)'}"
+                )
+
+            section = data[key]
+            return cls(
+                url=section["url"],
+                sheets=MappingProxyType(dict(section["sheets"])),
+            )
+
+        def sheet(self, key: str) -> str:
+            if key not in self.sheets:
+                raise KeyError(
+                    f"Sheet key {key!r} not in config. Available: {list(self.sheets)}"
+                )
+            return self.sheets[key]
+
+    return Path, SheetConfig
+
+
+@app.cell(column=2, hide_code=True)
 def _():
     mo.md(r"""
     ## Price DataFrame
@@ -545,16 +619,14 @@ def _():
 
 
 @app.cell
-def _():
-    MASTER_VALIDATION_URL = "https://docs.google.com/spreadsheets/d/1ai-zQMtbPUx0LeQeLmXcpPgKvL5cyvwDfSJqRzxfUQg/edit?gid=0#gid=0"
-    return (MASTER_VALIDATION_URL,)
+def _(SheetConfig):
+    master = SheetConfig.from_toml("master")
+    return (master,)
 
 
 @app.cell
-def _(MASTER_VALIDATION_URL):
-    price_raw_dataf = scan_google_sheet(
-        url=MASTER_VALIDATION_URL, sheet_name="Price"
-    )
+def _(master):
+    price_raw_dataf = scan_google_sheet(url=master.url, sheet_name=master.sheet("price"))
     return (price_raw_dataf,)
 
 
@@ -580,7 +652,7 @@ def _(price_raw_dataf):
         WHERE
             "EndingDate" = ''
         """,
-        output=False,
+        output=False
     )
     return (price_df,)
 
@@ -636,7 +708,7 @@ def _():
     return
 
 
-@app.cell(column=2, hide_code=True)
+@app.cell(column=3, hide_code=True)
 def _():
     mo.md(r"""
     # Customers
@@ -645,9 +717,9 @@ def _():
 
 
 @app.cell
-def _(MASTER_VALIDATION_URL):
+def _(master):
     client_raw_dataf = scan_google_sheet(
-        url=MASTER_VALIDATION_URL, sheet_name="Client"
+        url=master.url, sheet_name=master.sheet("client")
     )
     return (client_raw_dataf,)
 
@@ -702,7 +774,7 @@ def _(client_raw_dataf):
                 '{VesselType.LONGLINER}'
             )
         """,
-        output=False,
+        output=False
     )
     return
 
@@ -733,7 +805,7 @@ def _():
     return
 
 
-@app.cell(column=3, hide_code=True)
+@app.cell(column=4, hide_code=True)
 def _():
     mo.md(r"""
     ## Public Holiday DataFrame
@@ -923,7 +995,59 @@ def _(public_holidays_lf):
     return (public_holiday_dates,)
 
 
-@app.cell(column=4, hide_code=True)
+@app.cell(column=5, hide_code=True)
+def _():
+    mo.md(r"""
+    # Salt Operation 🧂
+    """)
+    return
+
+
+@app.cell
+def _(SheetConfig):
+    salt = SheetConfig.from_toml("salt")
+    return (salt,)
+
+
+@app.cell
+def _(salt):
+    salt_raw = scan_google_sheet(url=salt.url,sheet_name=salt.sheet("salt_ops"))
+    return (salt_raw,)
+
+
+@app.cell
+def _(price_df):
+    _df = mo.sql(
+        f"""
+        SELECT
+                    service AS pricing_service,
+                    unit_price
+                FROM
+                    price_df
+                WHERE
+                    service_type = '{ServiceGroupType.SALT}'
+        """
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(salt_raw):
+    _df = mo.sql(
+        f"""
+        FROM salt_raw
+        WHERE YEAR(date) = 2026 AND start_time <> ''
+        """
+    )
+    return
+
+
+@app.cell
+def _():
+    return
+
+
+@app.cell(column=6, hide_code=True)
 def _():
     mo.md(r"""
     # Shore Crane Rental Data
@@ -1078,7 +1202,7 @@ def _(price_df, public_holiday_dates, shore_crane_raw):
 
         FROM priced;
         """,
-        output=False,
+        output=False
     )
     return (shore_crane_raw_df,)
 
@@ -1162,7 +1286,7 @@ def _(shore_crane_raw_df):
             WHERE validation_status = 'OK'
         ORDER BY service_date, start_time;
         """,
-        output=False,
+        output=False
     )
     return (final_shore_crane_df,)
 
@@ -1186,7 +1310,7 @@ def _(final_shore_crane_df):
     return
 
 
-@app.cell(column=5, hide_code=True)
+@app.cell(column=7, hide_code=True)
 def _():
     mo.md(r"""
     # Net List // Unloading Records
@@ -1195,43 +1319,23 @@ def _():
 
 
 @app.cell
-def _():
-    operations_activity_url = "https://docs.google.com/spreadsheets/d/1PvTkl6DYZdhtaiNshz0qwtSPxC8S1OOeu905NmhFKNs/edit?gid=1960309715#gid=1960309715"
-
-    miscellaneous_activity_url = "https://docs.google.com/spreadsheets/d/1VbfiiWsp8yxs6KSR1CXpw1S_35tYlWV8UjjWah9Afpw/edit?pli=1&gid=61862422#gid=61862422"
-
-    stuffing_and_plugin_url = "https://docs.google.com/spreadsheets/d/1L0HlevB-asshOgXMmIQ14bysq56lUPp0lYCrHPB0iGg/edit?gid=76354553#gid=76354553"
-
-    unloading_summary_sheet = "UnloadingSummary"
-    iphs_truck_sheet = "IPHSTruck"
-    container_operations_sheet = "containerOperations"
-    return (
-        container_operations_sheet,
-        iphs_truck_sheet,
-        miscellaneous_activity_url,
-        operations_activity_url,
-        stuffing_and_plugin_url,
-        unloading_summary_sheet,
-    )
+def _(SheetConfig):
+    operations = SheetConfig.from_toml("operations")
+    miscellaneous = SheetConfig.from_toml("miscellaneous")
+    stuffing = SheetConfig.from_toml("stuffing")
+    return miscellaneous, operations, stuffing
 
 
 @app.cell
-def _(
-    container_operations_sheet,
-    iphs_truck_sheet,
-    miscellaneous_activity_url,
-    operations_activity_url,
-    stuffing_and_plugin_url,
-    unloading_summary_sheet,
-):
+def _(miscellaneous, operations, stuffing):
     net_list_raw = scan_google_sheet(
-        url=operations_activity_url, sheet_name=unloading_summary_sheet
+        url=operations.url, sheet_name=operations.sheet("net_list")
     )
     to_cold_store_via_truck_raw = scan_google_sheet(
-        url=miscellaneous_activity_url, sheet_name=iphs_truck_sheet
+        url=miscellaneous.url, sheet_name=miscellaneous.sheet("iphs_truck")
     )
     container_stuffing_raw = scan_google_sheet(
-        url=stuffing_and_plugin_url, sheet_name=container_operations_sheet
+        url=stuffing.url, sheet_name=stuffing.sheet("ops_activity")
     )
     return container_stuffing_raw, net_list_raw, to_cold_store_via_truck_raw
 
@@ -1325,7 +1429,7 @@ def _(net_list_raw, to_cold_store_via_truck_raw):
             AND r.storage_type = a.storage_type
             AND r.overtime = a.overtime
         """,
-        output=False,
+        output=False
     )
     return (cold_store_adjusted_dataf,)
 
@@ -1614,6 +1718,36 @@ def _(final_net_df):
 
 
 @app.cell
+def _(Path):
+    t_cols = {"total_tonnage": "sum", "total_price": "sum"}
+
+
+    def save_to_excel(
+        df: pl.DataFrame, file_path: str | Path, sheet: str, totals: dict[str, str]
+    ) -> None:
+        """Save raw to Excel"""
+        return df.write_excel(
+            workbook=file_path,
+            worksheet=sheet,
+            table_name=str(sheet).strip().lower().replace(" ", "_"),
+            table_style="Table Style Medium 2",
+            dtype_formats={
+                pl.Date: "yyyy-mm-dd",
+                pl.Time: "hh:mm"
+            },
+            column_totals=totals,
+        )
+
+    return
+
+
+@app.cell
+def _(final_net_df):
+    final_net_df
+    return
+
+
+@app.cell
 def _(final_net_df):
     final_net_df.write_excel(
         "shore_crane_report.xlsx",
@@ -1836,7 +1970,7 @@ def _(format_generic_report, meta, xlsx_path):
     return
 
 
-@app.cell(column=6, hide_code=True)
+@app.cell(column=8, hide_code=True)
 def _():
     mo.md(r"""
     ### Summary Sheet
@@ -2089,7 +2223,7 @@ def _():
     return
 
 
-@app.cell(column=7, hide_code=True)
+@app.cell(column=9, hide_code=True)
 def _():
     mo.md(r"""
     # Openpyxl Styling for Excel
@@ -2669,7 +2803,7 @@ def _():
     return
 
 
-@app.cell(column=8, hide_code=True)
+@app.cell(column=10, hide_code=True)
 def _():
     mo.md(r"""
     ## Data to process to Excel
