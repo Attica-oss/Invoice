@@ -345,7 +345,7 @@ def _(all_containers):
             SELECT container_number
         WHERE line = 'IOT'
         """,
-        output=False
+        output=False,
     )
     return (iot_soc_list,)
 
@@ -626,7 +626,9 @@ def _(SheetConfig):
 
 @app.cell
 def _(master):
-    price_raw_dataf = scan_google_sheet(url=master.url, sheet_name=master.sheet("price"))
+    price_raw_dataf = scan_google_sheet(
+        url=master.url, sheet_name=master.sheet("price")
+    )
     return (price_raw_dataf,)
 
 
@@ -652,7 +654,7 @@ def _(price_raw_dataf):
         WHERE
             "EndingDate" = ''
         """,
-        output=False
+        output=False,
     )
     return (price_df,)
 
@@ -703,12 +705,40 @@ def _(price_df):
     return
 
 
+@app.cell(column=3, hide_code=True)
+def _():
+    mo.md(r"""
+    ## BC Service List
+    """)
+    return
+
+
+@app.cell
+def _():
+    data_path = r"C:\Users\gmounac\Downloads\Items.xlsx"
+
+    bc_service_list = pl.read_excel(data_path)
+    return (bc_service_list,)
+
+
+@app.cell(hide_code=True)
+def _(bc_service_list):
+    bc_list = mo.sql(
+        f"""
+        FROM bc_service_list
+            SELECT "No.","Description","Sheet","Mapping"
+        WHERE Report = 'STO'
+        """
+    )
+    return (bc_list,)
+
+
 @app.cell
 def _():
     return
 
 
-@app.cell(column=3, hide_code=True)
+@app.cell(column=4, hide_code=True)
 def _():
     mo.md(r"""
     # Customers
@@ -774,7 +804,7 @@ def _(client_raw_dataf):
                 '{VesselType.LONGLINER}'
             )
         """,
-        output=False
+        output=False,
     )
     return
 
@@ -805,7 +835,7 @@ def _():
     return
 
 
-@app.cell(column=4, hide_code=True)
+@app.cell(column=5, hide_code=True)
 def _():
     mo.md(r"""
     ## Public Holiday DataFrame
@@ -995,7 +1025,7 @@ def _(public_holidays_lf):
     return (public_holiday_dates,)
 
 
-@app.cell(column=5, hide_code=True)
+@app.cell(column=6, hide_code=True)
 def _():
     mo.md(r"""
     # Salt Operation 🧂
@@ -1011,7 +1041,7 @@ def _(SheetConfig):
 
 @app.cell
 def _(salt):
-    salt_raw = scan_google_sheet(url=salt.url,sheet_name=salt.sheet("salt_ops"))
+    salt_raw = scan_google_sheet(url=salt.url, sheet_name=salt.sheet("salt_ops"))
     return (salt_raw,)
 
 
@@ -1047,7 +1077,7 @@ def _():
     return
 
 
-@app.cell(column=6, hide_code=True)
+@app.cell(column=7, hide_code=True)
 def _():
     mo.md(r"""
     # Shore Crane Rental Data
@@ -1202,7 +1232,7 @@ def _(price_df, public_holiday_dates, shore_crane_raw):
 
         FROM priced;
         """,
-        output=False
+        output=False,
     )
     return (shore_crane_raw_df,)
 
@@ -1286,7 +1316,7 @@ def _(shore_crane_raw_df):
             WHERE validation_status = 'OK'
         ORDER BY service_date, start_time;
         """,
-        output=False
+        output=False,
     )
     return (final_shore_crane_df,)
 
@@ -1310,7 +1340,7 @@ def _(final_shore_crane_df):
     return
 
 
-@app.cell(column=7, hide_code=True)
+@app.cell(column=8, hide_code=True)
 def _():
     mo.md(r"""
     # Net List // Unloading Records
@@ -1429,7 +1459,7 @@ def _(net_list_raw, to_cold_store_via_truck_raw):
             AND r.storage_type = a.storage_type
             AND r.overtime = a.overtime
         """,
-        output=False
+        output=False,
     )
     return (cold_store_adjusted_dataf,)
 
@@ -1708,10 +1738,48 @@ def _(end_date, final_net_list_df, start_date, vessel_name):
 
 
 @app.cell(hide_code=True)
-def _(final_net_df):
+def _(bc_list):
     _df = mo.sql(
         f"""
-        FROM final_net_df
+        FROM bc_list
+        WHERE sheet = 'NetList'
+        """
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(bc_list, final_net_df):
+    _df = mo.sql(
+        f"""
+        WITH
+            final AS (
+                FROM
+                    final_net_df
+            ),
+            maped AS (
+                FROM
+                    bc_list
+                WHERE
+                    sheet = 'NetList'
+            ),
+            joined AS (
+                SELECT
+                    m."No.",
+                    f.*,
+                    CASE
+                        WHEN f.overtime = 'normal hours' THEN 'STD'
+                        WHEN f.overtime = 'overtime 150%' THEN '150%'
+                        ELSE '200%'
+                    END AS "Variant Code"
+                FROM
+                    final f
+                    LEFT JOIN maped m ON m.Mapping = f.service || ' - ' || f.storage_type
+            )
+
+        FROM joined
+        SELECT 'Item' AS "Type","No.",' ' AS Description,"Variant Code",CAST(SUM(total_tonnage) AS DECIMAL) AS Quantity
+        GROUP BY ALL
         """
     )
     return
@@ -1731,10 +1799,7 @@ def _(Path):
             worksheet=sheet,
             table_name=str(sheet).strip().lower().replace(" ", "_"),
             table_style="Table Style Medium 2",
-            dtype_formats={
-                pl.Date: "yyyy-mm-dd",
-                pl.Time: "hh:mm"
-            },
+            dtype_formats={pl.Date: "yyyy-mm-dd", pl.Time: "hh:mm"},
             column_totals=totals,
         )
 
@@ -1970,7 +2035,7 @@ def _(format_generic_report, meta, xlsx_path):
     return
 
 
-@app.cell(column=8, hide_code=True)
+@app.cell(column=9, hide_code=True)
 def _():
     mo.md(r"""
     ### Summary Sheet
@@ -2223,7 +2288,7 @@ def _():
     return
 
 
-@app.cell(column=9, hide_code=True)
+@app.cell(column=10, hide_code=True)
 def _():
     mo.md(r"""
     # Openpyxl Styling for Excel
@@ -2803,7 +2868,7 @@ def _():
     return
 
 
-@app.cell(column=10, hide_code=True)
+@app.cell(column=11, hide_code=True)
 def _():
     mo.md(r"""
     ## Data to process to Excel
@@ -2825,6 +2890,192 @@ def _(ReportMeta):
         end_date=end_date,
     )
     return end_date, meta, start_date, vessel_name
+
+
+@app.cell(column=12, hide_code=True)
+def _():
+    mo.md(r"""
+    # Daily Unloading ✔️
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(client_raw_dataf):
+    vessel_list = mo.sql(
+        f"""
+        FROM
+            client_raw_dataf
+        SELECT
+            "Vessel/Client" AS vessel,
+            -- "Customer" AS ship_owner
+        WHERE
+            "Type" IN (
+                '{VesselType.PURSEINER}')
+        """,
+        output=False,
+    )
+    return (vessel_list,)
+
+
+@app.cell(hide_code=True)
+def _(date_select, final_net_list_df, vessel_select):
+    time_df = mo.sql(
+        f"""
+        FROM final_net_list_df
+            SELECT MIN(start_time) AS start_time,
+            MAX(end_time) AS end_time
+
+        WHERE vessel = '{vessel_select.value}' AND service_date = '{date_select.value}'
+        GROUP BY ALL
+        """,
+        output=False,
+    )
+    return (time_df,)
+
+
+@app.cell(hide_code=True)
+def _(operations):
+    genesis_df = scan_google_sheet(
+        url=operations.url, sheet_name=operations.sheet("genesis")
+    )
+
+    well_to_well_df = scan_google_sheet(
+        url=operations.url, sheet_name=operations.sheet("well_to_well")
+    )
+    return genesis_df, well_to_well_df
+
+
+@app.cell(hide_code=True)
+def _(date_select, vessel_select, well_to_well_df):
+    well_df = mo.sql(
+        f"""
+        FROM well_to_well_df
+            SELECT Tonnage
+        WHERE Vessel = '{vessel_select.value}' AND Date = '{date_select.value}'
+        """,
+        output=False
+    )
+    return (well_df,)
+
+
+@app.cell(hide_code=True)
+def _(date_select, genesis_df, vessel_select):
+    side_working = mo.sql(
+        f"""
+        FROM genesis_df
+            SELECT STRING_AGG(DISTINCT "Side Working",',') AS side_worked
+        WHERE UPPER(Vessel) = '{vessel_select.value}' AND Date = '{date_select.value}'
+        """,
+        output=False,
+    )
+    return (side_working,)
+
+
+@app.cell(hide_code=True)
+def _(date_select, final_net_list_df, vessel_select):
+    _df = mo.sql(
+        f"""
+        FROM final_net_list_df
+        WHERE vessel = '{vessel_select.value}' AND service_date = '{date_select.value}'
+        """
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(date_select, final_net_list_df, vessel_select):
+    summary_unloading = mo.sql(
+        f"""
+        FROM final_net_list_df
+            SELECT day_name,
+            -- destination,
+            overtime,
+            storage_type,
+            CAST(SUM(total_tonnage) AS DECIMAL) AS tonnage
+
+        WHERE vessel = '{vessel_select.value}' AND service_date = '{date_select.value}'
+
+        GROUP BY ALL
+        """,
+        output=False,
+    )
+    return (summary_unloading,)
+
+
+@app.cell(hide_code=True)
+def _(date_select, final_net_list_df, vessel_select):
+    overtime_table = mo.sql(
+        f"""
+        WITH add_ot AS (FROM final_net_list_df
+            SELECT *,CASE WHEN day_name IN ('PH','Sun') AND overtime = 'overtime 200%' THEN 'OT' WHEN day_name NOT IN ('Sun','PH') AND overtime = 'overtime 150%' THEN 'OT' ELSE NULL END AS checked_ot
+        WHERE vessel = '{vessel_select.value}' AND service_date = '{date_select.value}')
+
+        FROM add_ot
+            SELECT service,overtime,storage_type,MAX(end_time) AS end_time,ROUND(SUM(total_tonnage),3) AS overtime_tonnage
+        WHERE checked_ot = 'OT'
+        GROUP BY ALL
+        """
+    )
+    return (overtime_table,)
+
+
+@app.cell(hide_code=True)
+def _(side_working, summary_unloading, time_df, well_df):
+    start = mo.md(
+        f"Start: {time_df.get_column('start_time').first().strftime(format='%H:%M')}"
+    )
+    end = mo.md(
+        f"End: {time_df.get_column('end_time').first().strftime(format='%H:%M')}"
+    )
+    side = mo.md(f"Sides: {side_working.get_column('side_worked').first()}")
+
+    well = mo.md(f"Well to Well: {well_df.get_column('Tonnage').first()} tons")
+    total = mo.md(
+        f"Total: {summary_unloading.select(pl.col('tonnage').cast(pl.Float64)).sum().to_series().to_list()[0]:,.3f}"
+    )
+    return end, side, start, total, well
+
+
+@app.cell(hide_code=True)
+def _(vessel_list):
+    vessel_select = mo.ui.dropdown(
+        options=vessel_list.to_series(), label="Vessel: ", searchable=True
+    )
+    date_select = mo.ui.date(label="Date: ")
+
+    mo.vstack([vessel_select, date_select])
+    return date_select, vessel_select
+
+
+@app.cell(hide_code=True)
+def _(
+    date_select,
+    end,
+    overtime_table,
+    side,
+    start,
+    summary_unloading,
+    total,
+    vessel_select,
+    well,
+):
+    mo.vstack(
+        [
+            mo.hstack([vessel_select.value, date_select.value]),
+            start,
+            end,
+            mo.md("---"),
+            side,
+            mo.ui.table(summary_unloading),
+            well,
+            total,
+            mo.md("---"),
+            mo.md("overtime."),
+            overtime_table,
+        ]
+    )
+    return
 
 
 @app.cell

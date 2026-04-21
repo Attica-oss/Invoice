@@ -6,7 +6,7 @@ sheets = { price = "Price", client = "Client" }
 
 [operations]
 url="https://docs.google.com/spreadsheets/d/1PvTkl6DYZdhtaiNshz0qwtSPxC8S1OOeu905NmhFKNs/edit?gid=1960309715#gid=1960309715"
-sheets = {net_list = "UnloadingSummary"}
+sheets = {net_list = "UnloadingSummary", genesis = "RawData", well_to_well = "WelltoWell"}
 
 [miscellaneous]
 url="https://docs.google.com/spreadsheets/d/1VbfiiWsp8yxs6KSR1CXpw1S_35tYlWV8UjjWah9Afpw/edit?pli=1&gid=61862422#gid=61862422"
