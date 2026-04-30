@@ -123,7 +123,7 @@ shore_crane: pl.LazyFrame = (
         pl.col("customer"),
         pl.col("location"),
         pl.col("operation_type"),
-        pl.col("remarks"),
+        # pl.col("remarks"),
         pl.col("invoiced_to"),
         pl.col("unit_price"),
         pl.col("total_price"),

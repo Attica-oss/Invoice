@@ -345,7 +345,7 @@ def _(all_containers):
             SELECT container_number
         WHERE line = 'IOT'
         """,
-        output=False,
+        output=False
     )
     return (iot_soc_list,)
 
@@ -654,7 +654,7 @@ def _(price_raw_dataf):
         WHERE
             "EndingDate" = ''
         """,
-        output=False,
+        output=False
     )
     return (price_df,)
 
@@ -804,7 +804,7 @@ def _(client_raw_dataf):
                 '{VesselType.LONGLINER}'
             )
         """,
-        output=False,
+        output=False
     )
     return
 
@@ -1232,7 +1232,7 @@ def _(price_df, public_holiday_dates, shore_crane_raw):
 
         FROM priced;
         """,
-        output=False,
+        output=False
     )
     return (shore_crane_raw_df,)
 
@@ -1316,7 +1316,7 @@ def _(shore_crane_raw_df):
             WHERE validation_status = 'OK'
         ORDER BY service_date, start_time;
         """,
-        output=False,
+        output=False
     )
     return (final_shore_crane_df,)
 
@@ -1387,7 +1387,7 @@ def _(net_list_raw, to_cold_store_via_truck_raw):
                 FROM
                     to_cold_store_via_truck_raw
                 WHERE
-                    YEAR(date) = 2026
+                    YEAR(date) >= 2025
                     AND operation_type = 'To CCCS via Truck'
             ),
             normal AS (
@@ -1445,7 +1445,7 @@ def _(net_list_raw, to_cold_store_via_truck_raw):
                     "endTime" AS end_time,
                     "Total Tonnage" AS total_tonnage
                 WHERE
-                    YEAR(date) = 2026
+                    YEAR(date) >= 2025
                     AND destination LIKE '%CCCS%'
             )
 
@@ -1459,7 +1459,7 @@ def _(net_list_raw, to_cold_store_via_truck_raw):
             AND r.storage_type = a.storage_type
             AND r.overtime = a.overtime
         """,
-        output=False,
+        output=False
     )
     return (cold_store_adjusted_dataf,)
 
@@ -1537,7 +1537,7 @@ def _(
                     "endTime" AS end_time,
                     "Total Tonnage" AS total_tonnage
                 WHERE
-                    YEAR(date) = 2026
+                    YEAR(date) >= 2025
                     AND destination NOT LIKE '%CCCS%'
             ),
             cold_store AS (
@@ -1568,7 +1568,7 @@ def _(
                     tonnage
                 WHERE
                     (
-                        YEAR(date_out) = 2026
+                        YEAR(date_out) >= 2025
                         OR date_out IS NULL
                     )
                     AND (
@@ -1721,7 +1721,9 @@ def _(final_net_list_df):
     _df = mo.sql(
         f"""
         FROM final_net_list_df
-        LIMIT 5
+            SELECT
+            SUM(total_tonnage)
+        WHERE  vessel = 'EGALABUR' AND service_date BETWEEN '2025-12-03' AND '2025-12-04' AND remarks = 'AMIRANTE'
         """
     )
     return
@@ -2913,7 +2915,7 @@ def _(client_raw_dataf):
             "Type" IN (
                 '{VesselType.PURSEINER}')
         """,
-        output=False,
+        output=False
     )
     return (vessel_list,)
 
@@ -2929,7 +2931,7 @@ def _(date_select, final_net_list_df, vessel_select):
         WHERE vessel = '{vessel_select.value}' AND service_date = '{date_select.value}'
         GROUP BY ALL
         """,
-        output=False,
+        output=False
     )
     return (time_df,)
 
@@ -2967,7 +2969,7 @@ def _(date_select, genesis_df, vessel_select):
             SELECT STRING_AGG(DISTINCT "Side Working",',') AS side_worked
         WHERE UPPER(Vessel) = '{vessel_select.value}' AND Date = '{date_select.value}'
         """,
-        output=False,
+        output=False
     )
     return (side_working,)
 
@@ -2978,7 +2980,8 @@ def _(date_select, final_net_list_df, vessel_select):
         f"""
         FROM final_net_list_df
         WHERE vessel = '{vessel_select.value}' AND service_date = '{date_select.value}'
-        """
+        """,
+        output=False
     )
     return
 
@@ -2998,7 +3001,7 @@ def _(date_select, final_net_list_df, vessel_select):
 
         GROUP BY ALL
         """,
-        output=False,
+        output=False
     )
     return (summary_unloading,)
 
