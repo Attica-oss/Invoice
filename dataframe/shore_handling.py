@@ -19,6 +19,7 @@ from type_casting.dates import (
     Days,
     duration_to_hhmm,
     public_holiday,
+    CURRENT_YEAR,
 )
 from type_casting.validations import MovementType, OvertimePerc
 
@@ -159,6 +160,13 @@ durations = pl.col("date").dt.combine(pl.col("end_time")) - pl.col("date").dt.co
 
 salt: pl.LazyFrame = (
     load_gsheet_data(sheet_id=SHORE_HANDLING_ID, sheet_name=salt_sheet)
+    .filter(
+        pl.col("date")
+        .dt.year()
+        .eq(CURRENT_YEAR)
+        .and_(pl.col("start_time").is_not_null())
+        .and_(pl.col("end_time").is_not_null())
+    )
     .select(
         pl.col("date").days.add_day_name(),
         pl.col("date"),

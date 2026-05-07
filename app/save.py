@@ -43,7 +43,9 @@ class SaveResult:
     error: Exception | None = None
 
 
-def save_to_csv(name: str, lf: pl.LazyFrame, output_dir: Path = OUTPUT_DIR) -> SaveResult:
+def save_to_csv(
+    name: str, lf: pl.LazyFrame, output_dir: Path = OUTPUT_DIR
+) -> SaveResult:
     """Save a LazyFrame to CSV and return a result object."""
     output_dir.mkdir(parents=True, exist_ok=True)
     path = output_dir / f"{name}.csv"

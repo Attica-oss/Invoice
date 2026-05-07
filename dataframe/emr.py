@@ -30,6 +30,7 @@ WASHING = get_price(["Container Cleaning"]).select(pl.col("Price")).to_series()[
 # Shifting Data Set
 shifting: pl.LazyFrame = (
     load_gsheet_data(sheet_id=EMR_SHEET_ID, sheet_name=shifting_sheet)
+    .filter(pl.col("date").dt.year().eq(CURRENT_YEAR))
     # Add the day name column to invoice overtime calculation
     .with_columns(
         pl.col("date").days.add_day_name()
@@ -55,6 +56,7 @@ shifting: pl.LazyFrame = (
 # PTI staging Data Set
 _pti: pl.LazyFrame = (
     load_gsheet_data(EMR_SHEET_ID, pti_sheet)
+    .filter(pl.col("datetime_start").dt.year().eq(CURRENT_YEAR))
     .select(
         pl.col("datetime_start"),
         pl.col("container_number").cast(dtype=containers_enum),
@@ -68,9 +70,15 @@ _pti: pl.LazyFrame = (
         pl.col("plugged_on").alias("generator"),
     )
     .with_columns(
-        hours=(pl.col("datetime_end") - pl.col("datetime_start")).dt.total_minutes()
-        / 60,
-        plugin_price=PLUGIN,
+        [
+            (
+                (pl.col("datetime_end") - pl.col("datetime_start")).dt.total_minutes()
+                / 60
+            )
+            .round(2)
+            .alias("hours"),
+            pl.lit(PLUGIN).alias("plugin_price"),
+        ]
     )
     .with_columns(
         above_8_hours=pl.when(pl.col("hours").gt(pl.lit(8))).then(2).otherwise(1)
@@ -145,6 +153,21 @@ pti: pl.LazyFrame = (
             + pl.col("electricity_price")
             + pl.col("shifting_price")
         ).alias("total_price")
+    )
+    .select(
+        pl.col("datetime_start"),
+        pl.col("container_number"),
+        pl.col("set_point"),
+        pl.col("invoice_to"),
+        pl.col("datetime_end"),
+        pl.col("hours").cast(pl.Int128),
+        pl.col("status"),
+        pl.col("plugin_price"),
+        pl.col("electricity_price"),
+        pl.when(pl.col("no_shifting")).then(1).otherwise(0).alias("no_shifting"),
+        pl.col("generator"),
+        pl.col("shifting_price"),
+        pl.col("total_price"),
     )
 )
 

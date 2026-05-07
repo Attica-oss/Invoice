@@ -130,7 +130,7 @@ cccs_record = (
             + ")"
         )
         .select(
-            pl.col("day"),
+            pl.col("day_name"),
             pl.col("date"),
             pl.col("movement_type"),
             pl.col("destination"),
@@ -151,7 +151,11 @@ cccs_record = (
 cccs_adjusted_records = (
     (
         load_gsheet_data(sheet_id=OPS_SHEET_ID, sheet_name=raw_sheet)
-        .filter(pl.col("Container (Destination)").str.contains("CCCS"))
+        .filter(
+            pl.col("Container (Destination)")
+            .str.contains("CCCS")
+            .and_(pl.col("Date").dt.year().eq(CURRENT_YEAR))
+        )
         .select(
             pl.col("Day"),
             pl.col("Date").alias("date"),
@@ -337,6 +341,7 @@ netList = (
     )
     .with_columns(invoice_value=(pl.col("Price") * pl.col("total_tonnage")).round(3))
     .select(
+        pl.col("Day").alias("day_name"),
         pl.col("date"),
         pl.col("vessel"),
         pl.col("start_time"),

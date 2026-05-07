@@ -14,13 +14,20 @@ from type_casting import (
     enum_customer,
     shipper,
     shipping_line,
+    CURRENT_YEAR,
 )
 
 # Price
-LINER_PRICE = get_price(["Plastic Liner Installation"]).select(pl.col("Price")).to_series()[0]
-MAGNUM_ELECTRICITY = get_price(["Electricity Price Magnum"]).select(pl.col("Price")).to_series()[0]
+LINER_PRICE = (
+    get_price(["Plastic Liner Installation"]).select(pl.col("Price")).to_series()[0]
+)
+MAGNUM_ELECTRICITY = (
+    get_price(["Electricity Price Magnum"]).select(pl.col("Price")).to_series()[0]
+)
 MONITORING_PRICE = get_price(["Monitoring"]).select(pl.col("Price")).to_series()[0]
-PALLET_IOT_PRICE = get_price(["Pallets(+ Wedges) Usage"]).select(pl.col("Price")).to_series()[0]
+PALLET_IOT_PRICE = (
+    get_price(["Pallets(+ Wedges) Usage"]).select(pl.col("Price")).to_series()[0]
+)
 PALLET_PRICE = get_price(["Pallets"]).select(pl.col("Price")).to_series()[0]
 PLUGIN_PRICE = get_price(["Plugin"]).select(pl.col("Price")).to_series()[0]
 S_FREEZER_ELECTRICITY = (
@@ -36,43 +43,49 @@ transfer_direct: pl.Expr = pl.col("operation_type").str.contains("Direct")
 exchange_hands: pl.Expr = pl.col("operation_type").str.contains("Exchange")
 
 
-on_plug_or_partially_stuffed: pl.Expr = pl.col("location").is_in(["For Completion", "On Plug"])
+on_plug_or_partially_stuffed: pl.Expr = pl.col("location").is_in(
+    ["For Completion", "On Plug"]
+)
 on_plug: pl.Expr = pl.col("location").is_in(["On Plug"])
 partially_stuffed: pl.Expr = pl.col("location").is_in(["For Completion"])
 plugged_only: pl.Expr = pl.col("location") == "Plugin Only"
 
 # Durations
-duration: pl.Expr = ((pl.col("date_out") - pl.col("date_plugged")).dt.total_hours() / 24).cast(
-    pl.Int64
-)
+duration: pl.Expr = (
+    (pl.col("date_out") - pl.col("date_plugged")).dt.total_hours() / 24
+).cast(pl.Int64)
 
 
 def load_pallet_dataset() -> pl.LazyFrame:
     """load the pallet and liner datasets"""
-    return load_gsheet_data(sheet_id=STUFFING_SHEET_ID, sheet_name=liner_pallet_sheet).select(
-        pl.col("date"),
-        pl.col("container_number").cast(dtype=containers_enum),
-        pl.col("shipping_line").cast(dtype=pl.Enum(shipping_line + ["SAPMER"])),
-        pl.col("assigned_to").str.to_uppercase(),
-        pl.col("remarks").cast(dtype=PalletType.enum_dtype()),
+    return (
+        load_gsheet_data(sheet_id=STUFFING_SHEET_ID, sheet_name=liner_pallet_sheet)
+        .filter(pl.col("date").dt.year().eq(CURRENT_YEAR))
+        .select(
+            pl.col("date"),
+            pl.col("container_number").cast(dtype=containers_enum),
+            pl.col("shipping_line").cast(dtype=pl.Enum(shipping_line + ["SAPMER"])),
+            pl.col("assigned_to").str.to_uppercase(),
+            pl.col("remarks").cast(dtype=PalletType.enum_dtype()),
+        )
     )
 
 
 # Pallet and Liner Dataframe
 pallet: pl.LazyFrame = load_pallet_dataset().with_columns(
     pallet_price=pl.when(
-        (pl.col("remarks").cast(pl.Utf8).str.contains(pl.lit("Pallet"), strict=True)).and_(
-            pl.col("shipping_line").eq(pl.lit("IOT"))
-        )
+        (
+            pl.col("remarks").cast(pl.Utf8).str.contains(pl.lit("Pallet"), strict=True)
+        ).and_(pl.col("shipping_line").eq(pl.lit("IOT")))
     )
     .then(PALLET_IOT_PRICE)
     .when(pl.col("remarks").cast(pl.Utf8).str.contains(pl.lit("Pallet"), strict=True))
     .then(PALLET_PRICE)
     .otherwise(FREE),
     liner_price=pl.when(
-        (pl.col("remarks").cast(pl.Utf8).str.contains(pl.lit("Liner"), strict=True)).and_(
-            pl.col("shipping_line").eq(pl.lit("CMA CGM"))
-        )
+        (
+            pl.col("remarks").cast(pl.Utf8).str.contains(pl.lit("Liner"), strict=True)
+        ).and_(pl.col("shipping_line").eq(pl.lit("CMA CGM")))
     )
     .then(LINER_PRICE)
     .otherwise(FREE),
@@ -80,6 +93,9 @@ pallet: pl.LazyFrame = load_pallet_dataset().with_columns(
 
 coa: pl.LazyFrame = (
     load_gsheet_data(sheet_id=STUFFING_SHEET_ID, sheet_name=plugin_sheet)
+    .filter(
+        pl.col("date_out").dt.year().eq(CURRENT_YEAR).or_(pl.col("date_out").is_null())
+    )
     .select(
         pl.col("vessel_client").str.to_uppercase().cast(dtype=enum_customer()),
         pl.col("customer").cast(dtype=pl.Enum(shipper)),
@@ -104,8 +120,12 @@ coa: pl.LazyFrame = (
         .when(partially_stuffed)
         .then(duration)
         .otherwise(duration + 1),
-        plugin_price=pl.when(transfer_direct | exchange_hands).then(FREE).otherwise(PLUGIN_PRICE),
-        monitoring_price=pl.when(transfer_direct | on_plug_or_partially_stuffed | plugged_only)
+        plugin_price=pl.when(transfer_direct | exchange_hands)
+        .then(FREE)
+        .otherwise(PLUGIN_PRICE),
+        monitoring_price=pl.when(
+            transfer_direct | on_plug_or_partially_stuffed | plugged_only
+        )
         .then(FREE)
         .otherwise(MONITORING_PRICE),
     )
@@ -118,8 +138,12 @@ coa: pl.LazyFrame = (
         .then(MAGNUM_ELECTRICITY)
         .otherwise(STANDARD_ELECTRICITY)
     )
-    .with_columns(total_electricity=pl.col("electricity_unit_price") * pl.col("days_on_plug"))
     .with_columns(
-        total=pl.col("plugin_price") + pl.col("monitoring_price") + pl.col("total_electricity")
+        total_electricity=pl.col("electricity_unit_price") * pl.col("days_on_plug")
+    )
+    .with_columns(
+        total=pl.col("plugin_price")
+        + pl.col("monitoring_price")
+        + pl.col("total_electricity")
     )
 )

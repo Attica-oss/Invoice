@@ -8,6 +8,7 @@ from .miscellaneous import (
     cross_stuffing,
     dispatch_to_cargo,
     from_cccs_to_vessel,
+    truck_to_cccs_via_skiff,
 )
 from .netlist import iot_cargo, iot_stuffing, netList, oss
 
@@ -24,6 +25,7 @@ __all__ = [
     "washing",
     "pti",
     "shifting",
+    "truck_to_cccs_via_skiff",
     "forklift",
     "shore_crane",
     "transfer",

@@ -36,6 +36,7 @@ miscellaneous_dataframes: dict[str, pl.LazyFrame] = {
     "cccs_stuffing": miscellaneous.cccs_stuffing,
     "bycatch": miscellaneous.by_catch,
     "from_cccs_to_vessel": miscellaneous.from_cccs_to_vessel,
+    "truck_to_cccs_via_skiff": miscellaneous.truck_to_cccs_via_skiff,
 }
 
 netlist_dataframes: dict[str, pl.LazyFrame] = {

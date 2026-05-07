@@ -5,7 +5,7 @@ import polars as pl
 from data_source.make_dataset import load_gsheet_data
 from data_source.sheet_ids import (
     ALL_CCCS_DATA_SHEET,
-    BY_CATCH_SHEET,
+    IPHS_TRUCK_SHEET,
     CCCS_STUFFING_SHEET,
     CROSS_STUFFING_SHEET,
     MISC_SHEET_ID,
@@ -33,17 +33,18 @@ def miscellaneous() -> pl.LazyFrame:
         load_gsheet_data(sheet_id=MISC_SHEET_ID, sheet_name=ALL_CCCS_DATA_SHEET)
         .filter(pl.col("date").dt.year().eq(CURRENT_YEAR))
         .select(
-            pl.col("day").cast(dtype=DayName.enum_dtype()),
+            pl.col("day_name").cast(dtype=DayName.enum_dtype()),
             pl.col("date"),
             pl.col("movement_type"),
             pl.col("customer"),
             pl.col("origin"),
             pl.col("vessel"),
             pl.col("storage_type"),
-            pl.col("operation_type"),
+            pl.col("service").alias("operation_type"),
             _to_f64("total_tonnage").alias("total_tonnage"),
             pl.col("bins_in").str.replace("", "0").cast(pl.Int64),
-            pl.col("bins_out").str.strip_chars("-").replace("", "0").cast(pl.Int64) * -1,
+            pl.col("bins_out").str.strip_chars("-").replace("", "0").cast(pl.Int64)
+            * -1,
             _to_f64("static_loader").alias("static_loader"),
             _to_f64("overtime_tonnage").alias("overtime_tonnage"),
         )
@@ -57,7 +58,7 @@ def cross_stuffing() -> pl.LazyFrame:
         .with_columns(storage_type=pl.lit("Dry", dtype=pl.Utf8))
         .filter(pl.col("date").dt.year().eq(CURRENT_YEAR))
         .select(
-            pl.col("day").cast(dtype=DayName.enum_dtype()),
+            pl.col("day_name").cast(dtype=DayName.enum_dtype()),
             pl.col("vessel_client"),
             pl.col("date"),
             pl.col("origin"),  # .cast(dtype=containers_enum)
@@ -77,17 +78,22 @@ def cross_stuffing() -> pl.LazyFrame:
 def by_catch_transfer() -> pl.LazyFrame:
     """by catch transfer sheet"""
     return (
-        load_gsheet_data(MISC_SHEET_ID, BY_CATCH_SHEET)
-        .filter(pl.col("date").dt.year().eq(CURRENT_YEAR))
-        .with_columns(day=pl.col("date").days.add_day_name())
+        load_gsheet_data(MISC_SHEET_ID, IPHS_TRUCK_SHEET)
+        .filter(
+            pl.col("date")
+            .dt.year()
+            .eq(CURRENT_YEAR)
+            .and_(pl.col("operation_type").eq("Transfer of By-catch"))
+        )
+        .with_columns(day_name=pl.col("date").days.add_day_name())
         .select(
-            pl.col("day"),
+            pl.col("day_name").cast(dtype=DayName.enum_dtype()),
             pl.col("date"),
             pl.col("movement_type"),
             pl.col("customer"),
             pl.col("vessel"),
-            pl.col("service").alias("operation_type"),
-            pl.col("storage_type"),
+            pl.col("operation_type"),
+            pl.col("storage").alias("storage_type"),
             _to_f64("total_tonnage").round(3).alias("total_tonnage"),
             _to_f64("overtime_tonnage").round(3).alias("overtime_tonnage"),
         )
@@ -110,5 +116,30 @@ def cccs_container_stuffing() -> pl.LazyFrame:
             _to_f64("total_tonnage").alias("total_tonnage"),
             _to_f64("overtime_tonnage").alias("overtime_tonnage"),
             pl.col("invoiced"),
+        )
+    )
+
+
+def via_skiff_transfer() -> pl.LazyFrame:
+    """Via skiff transfer sheet"""
+    return (
+        load_gsheet_data(MISC_SHEET_ID, IPHS_TRUCK_SHEET)
+        .filter(
+            pl.col("date")
+            .dt.year()
+            .eq(CURRENT_YEAR)
+            .and_(pl.col("operation_type").eq("Truck to CCCS via Skiff"))
+        )
+        .with_columns(day_name=pl.col("date").days.add_day_name())
+        .select(
+            pl.col("day_name").cast(dtype=DayName.enum_dtype()),
+            pl.col("date"),
+            pl.col("movement_type"),
+            pl.col("customer"),
+            pl.col("vessel"),
+            pl.col("operation_type"),
+            pl.col("storage").alias("storage_type"),
+            _to_f64("total_tonnage").round(3).alias("total_tonnage"),
+            _to_f64("overtime_tonnage").round(3).alias("overtime_tonnage"),
         )
     )
