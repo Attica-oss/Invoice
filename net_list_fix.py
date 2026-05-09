@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.20.4"
+__generated_with = "0.23.1"
 app = marimo.App(width="medium")
 
 with app.setup:
@@ -19,6 +19,7 @@ def _(mo, netlist):
     _df = mo.sql(
         f"""
         FROM netList
+        WHERE remarks = 'AMIRANTE' AND vessel = 'ARTZA'
         """
     )
     return
