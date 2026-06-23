@@ -20,7 +20,9 @@ def load_gsheet_data(sheet_id: str, sheet_name: str) -> pl.LazyFrame:
         Exception: If there is an error loading the Google Sheet.
     """
 
-    return scan_google_sheet(sheet_id=sheet_id, sheet_name=sheet_name)
+    return scan_google_sheet(
+        sheet_id=sheet_id, sheet_name=sheet_name, parse_dates=True, timeout=20
+    )
 
 
 def load_excel(file_path: ExcelFiles) -> pl.LazyFrame:
@@ -34,4 +36,4 @@ def load_excel(file_path: ExcelFiles) -> pl.LazyFrame:
         pl.LazyFrame: A LazyFrame containing the Excel data.
     """
     file, sheet = file_path.value
-    return pl.read_excel(file, sheet_name=sheet).lazy()
+    return pl.read_excel(source=file, sheet_name=sheet).lazy()

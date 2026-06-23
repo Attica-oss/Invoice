@@ -4,37 +4,47 @@ from datetime import timedelta
 
 import polars as pl
 
-from data.price import FREE, get_price
+from data.price import get_price
 from data_source.make_dataset import load_gsheet_data
-from data_source.sheet_ids import STUFFING_SHEET_ID, liner_pallet_sheet, plugin_sheet
+from data_source.sheet_ids import (
+    LINER_PALLET_SHEET_NAME,
+    PLUGIN_SHEET_NAME,
+    STUFFING_SHEET_ID,
+)
 from type_casting import (
+    CURRENT_YEAR,
     PLUGGED_STATUS,
     PalletType,
     containers_enum,
     enum_customer,
     shipper,
     shipping_line,
-    CURRENT_YEAR,
 )
 
 # Price
 LINER_PRICE = (
-    get_price(["Plastic Liner Installation"]).select(pl.col("Price")).to_series()[0]
+    get_price(["Plastic Liner Installation"])
+    .select(pl.col("unit_price"))
+    .to_series()[0]
 )
 MAGNUM_ELECTRICITY = (
-    get_price(["Electricity Price Magnum"]).select(pl.col("Price")).to_series()[0]
+    get_price(["Electricity Price Magnum"]).select(pl.col("unit_price")).to_series()[0]
 )
-MONITORING_PRICE = get_price(["Monitoring"]).select(pl.col("Price")).to_series()[0]
+MONITORING_PRICE = get_price(["Monitoring"]).select(pl.col("unit_price")).to_series()[0]
 PALLET_IOT_PRICE = (
-    get_price(["Pallets(+ Wedges) Usage"]).select(pl.col("Price")).to_series()[0]
+    get_price(["Pallets(+ Wedges) Usage"]).select(pl.col("unit_price")).to_series()[0]
 )
-PALLET_PRICE = get_price(["Pallets"]).select(pl.col("Price")).to_series()[0]
-PLUGIN_PRICE = get_price(["Plugin"]).select(pl.col("Price")).to_series()[0]
+PALLET_PRICE = get_price(["Pallets"]).select(pl.col("unit_price")).to_series()[0]
+PLUGIN_PRICE = get_price(["Plugin"]).select(pl.col("unit_price")).to_series()[0]
 S_FREEZER_ELECTRICITY = (
-    get_price(["Electricity Price S Freezer"]).select(pl.col("Price")).to_series()[0]
+    get_price(["Electricity Price S Freezer"])
+    .select(pl.col("unit_price"))
+    .to_series()[0]
 )
 STANDARD_ELECTRICITY = (
-    get_price(["Electricity Price Standard"]).select(pl.col("Price")).to_series()[0]
+    get_price(["Electricity Price Standard"])
+    .select(pl.col("unit_price"))
+    .to_series()[0]
 )
 
 
@@ -59,7 +69,7 @@ duration: pl.Expr = (
 def load_pallet_dataset() -> pl.LazyFrame:
     """load the pallet and liner datasets"""
     return (
-        load_gsheet_data(sheet_id=STUFFING_SHEET_ID, sheet_name=liner_pallet_sheet)
+        load_gsheet_data(sheet_id=STUFFING_SHEET_ID, sheet_name=LINER_PALLET_SHEET_NAME)
         .filter(pl.col("date").dt.year().eq(CURRENT_YEAR))
         .select(
             pl.col("date"),
@@ -81,18 +91,18 @@ pallet: pl.LazyFrame = load_pallet_dataset().with_columns(
     .then(PALLET_IOT_PRICE)
     .when(pl.col("remarks").cast(pl.Utf8).str.contains(pl.lit("Pallet"), strict=True))
     .then(PALLET_PRICE)
-    .otherwise(FREE),
+    .otherwise(0),
     liner_price=pl.when(
         (
             pl.col("remarks").cast(pl.Utf8).str.contains(pl.lit("Liner"), strict=True)
         ).and_(pl.col("shipping_line").eq(pl.lit("CMA CGM")))
     )
     .then(LINER_PRICE)
-    .otherwise(FREE),
+    .otherwise(0),
 )
 
 coa: pl.LazyFrame = (
-    load_gsheet_data(sheet_id=STUFFING_SHEET_ID, sheet_name=plugin_sheet)
+    load_gsheet_data(sheet_id=STUFFING_SHEET_ID, sheet_name=PLUGIN_SHEET_NAME)
     .filter(
         pl.col("date_out").dt.year().eq(CURRENT_YEAR).or_(pl.col("date_out").is_null())
     )
@@ -121,12 +131,12 @@ coa: pl.LazyFrame = (
         .then(duration)
         .otherwise(duration + 1),
         plugin_price=pl.when(transfer_direct | exchange_hands)
-        .then(FREE)
+        .then(0)
         .otherwise(PLUGIN_PRICE),
         monitoring_price=pl.when(
             transfer_direct | on_plug_or_partially_stuffed | plugged_only
         )
-        .then(FREE)
+        .then(0)
         .otherwise(MONITORING_PRICE),
     )
     .with_columns(

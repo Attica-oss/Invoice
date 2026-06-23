@@ -6,16 +6,16 @@ import polars as pl
 from data.price import get_price
 from data_source.excel_file_path import ExcelFiles
 from data_source.make_dataset import load_gsheet_data
-from data_source.sheet_ids import OPS_SHEET_ID, raw_sheet
+from data_source.sheet_ids import OPS_SHEET_ID, RAW_DATA_SHEET_NAME
 from type_casting.dates import CURRENT_YEAR, SPECIAL_DAYS, DayName, public_holiday
 from type_casting.validations import FISH_STORAGE, OvertimePerc
 
 # To move the Price to the Price module
 
-EXTRAMEN: pl.DataFrame = get_price(["Extra Men"]).with_columns(date=pl.col("date")).drop("end")
+EXTRAMEN: pl.DataFrame = get_price(["Extra Men"]).with_columns(date=pl.col("date"))
 
-WELL_TO_WELL: pl.DataFrame = (
-    get_price(["Well to Well Transfer"]).with_columns(date=pl.col("date")).drop("end")
+WELL_TO_WELL: pl.DataFrame = get_price(["Well to Well Transfer"]).with_columns(
+    date=pl.col("date")
 )
 
 
@@ -24,14 +24,14 @@ TARE_RATE: pl.DataFrame = (
     .with_columns(date=pl.col("date"))
     .select(
         pl.col("date").alias("effective_date"),
-        pl.col("Service").alias("service"),
-        pl.col("Price").alias("unit_price"),
+        pl.col("service").alias("service"),
+        pl.col("unit_price").alias("unit_price"),
     )
 )
 
 
-ADDITIONAL_OVERTIME: pl.DataFrame = (
-    get_price(["Additional Overtime"]).with_columns(date=pl.col("date")).drop("end")
+ADDITIONAL_OVERTIME: pl.DataFrame = get_price(["Additional Overtime"]).with_columns(
+    date=pl.col("date")
 )
 
 # Path to the operations activity file
@@ -46,7 +46,7 @@ berth: pl.LazyFrame = pl.read_excel(
 
 # Operations Activity Unloading Lazyframe
 ops: pl.LazyFrame = (
-    load_gsheet_data(sheet_id=OPS_SHEET_ID, sheet_name=raw_sheet)
+    load_gsheet_data(sheet_id=OPS_SHEET_ID, sheet_name=RAW_DATA_SHEET_NAME)
     .filter(pl.col("Date").dt.year().eq(CURRENT_YEAR))
     .select(
         pl.col("Day"),
@@ -79,7 +79,9 @@ def add_day_name_column(date_col: pl.Expr) -> pl.Expr:
 
 
 main_file: pl.LazyFrame = (
-    pl.read_excel(OPS_ACTIVITY_PATH[0], sheet_name=OPS_ACTIVITY_PATH[1], engine="calamine")
+    pl.read_excel(
+        OPS_ACTIVITY_PATH[0], sheet_name=OPS_ACTIVITY_PATH[1], engine="calamine"
+    )
     .filter(pl.col("DAY") != "", pl.col("DAY") != "Total")
     .lazy()
 )
@@ -115,7 +117,7 @@ split_again = (
     .str.strip_chars()
 )
 
-extramen: pl.DataFrame = (
+extramen: pl.LazyFrame = (
     handling_activity.select(
         pl.col("day_name"),
         pl.col("date"),
@@ -126,29 +128,29 @@ extramen: pl.DataFrame = (
         pl.col("remarks"),
     )
     .with_columns(check=(pl.col("Number of Stevedores") - 47).eq(pl.col("extra_men")))
-    .with_columns(Service=pl.lit("Extra Men"))
+    .with_columns(service=pl.lit("Extra Men"))
     .filter(pl.col("extra_men") > 0)
     .sort(by="date")
-    .join_asof(EXTRAMEN.lazy(), by="Service", on="date", strategy="backward")
+    .join_asof(EXTRAMEN.lazy(), by="service", on="date", strategy="backward")
     .with_columns(
         total_price=pl.when(pl.col("day_name").is_in(SPECIAL_DAYS))
         .then(
             OvertimePerc.overtime_150
-            * pl.col("Price")
+            * pl.col("unit_price")
             * pl.col("total_tonnage")
             * pl.col("extra_men")
         )
         .otherwise(
             OvertimePerc.normal_hour
-            * pl.col("Price")
+            * pl.col("unit_price")
             * pl.col("total_tonnage")
             * pl.col("extra_men")
         )
     )
     .with_columns(
         price=pl.when(pl.col("day_name").is_in(SPECIAL_DAYS))
-        .then(OvertimePerc.overtime_150 * pl.col("Price"))
-        .otherwise(OvertimePerc.normal_hour * pl.col("Price"))
+        .then(OvertimePerc.overtime_150 * pl.col("unit_price"))
+        .otherwise(OvertimePerc.normal_hour * pl.col("unit_price"))
     )
     .with_columns(
         remarks=pl.when(split_remarks.str.starts_with("OT"))
@@ -160,9 +162,11 @@ extramen: pl.DataFrame = (
         pl.col("date"),
         pl.col("vessel"),
         pl.col("total_tonnage").round(3),
-        (pl.when(pl.col("check")).then(pl.col("extra_men")).otherwise(pl.lit("check"))).alias(
-            "extra_men"
-        ),
+        (
+            pl.when(pl.col("check"))
+            .then(pl.col("extra_men"))
+            .otherwise(pl.lit("check"))
+        ).alias("extra_men"),
         pl.col("price").round(2),
         pl.col("total_price").round(3),
         pl.col("remarks"),
@@ -181,24 +185,32 @@ hatch_to_hatch: pl.LazyFrame = (
         pl.col("vessel_name").alias("vessel"),
         pl.col("Well-to-Well Transfer"),
     )
-    .with_columns(Service=pl.lit("Well to Well Transfer"))
-    .join_asof(WELL_TO_WELL.lazy(), by="Service", on="date", strategy="backward")
+    .with_columns(service=pl.lit("Well to Well Transfer"))
+    .join_asof(WELL_TO_WELL.lazy(), by="service", on="date", strategy="backward")
     .with_columns(
         total_price=pl.when(pl.col("day_name").is_in(SPECIAL_DAYS))
-        .then(OvertimePerc.overtime_150 * pl.col("Price") * pl.col("Well-to-Well Transfer"))
-        .otherwise(OvertimePerc.normal_hour * pl.col("Price") * pl.col("Well-to-Well Transfer"))
+        .then(
+            OvertimePerc.overtime_150
+            * pl.col("unit_price")
+            * pl.col("Well-to-Well Transfer")
+        )
+        .otherwise(
+            OvertimePerc.normal_hour
+            * pl.col("unit_price")
+            * pl.col("Well-to-Well Transfer")
+        )
     )
     .with_columns(
         price=pl.when(pl.col("day_name").is_in(SPECIAL_DAYS))
-        .then(OvertimePerc.overtime_150 * pl.col("Price"))
-        .otherwise(OvertimePerc.normal_hour * pl.col("Price"))
+        .then(OvertimePerc.overtime_150 * pl.col("unit_price"))
+        .otherwise(OvertimePerc.normal_hour * pl.col("unit_price"))
     )
     .select(
         pl.col("day_name"),
         pl.col("date"),
         pl.col("vessel"),
         pl.col("Well-to-Well Transfer").alias("tonnage"),
-        pl.col("price"),
+        pl.col("unit_price"),
         pl.col("total_price"),
     )
 )
@@ -217,12 +229,21 @@ tare: pl.LazyFrame = (
                 .unique()
                 .sort(by="date")
                 .group_by(["date", "vessel"], maintain_order=True)
-                .agg(pl.col("side_working").unique().sort().str.join(", ").alias("side_working"))
+                .agg(
+                    pl.col("side_working")
+                    .unique()
+                    .sort()
+                    .str.join(", ")
+                    .alias("side_working")
+                )
             )
             .with_columns(
                 [
                     pl.lit(1, dtype=pl.Int64).alias("rental_of_weight"),
-                    pl.col("side_working").str.split(", ").list.len().alias("number_of_sides"),
+                    pl.col("side_working")
+                    .str.split(", ")
+                    .list.len()
+                    .alias("number_of_sides"),
                     pl.lit("Rental of Calibration").alias("service"),
                 ]
             )
@@ -237,7 +258,11 @@ tare: pl.LazyFrame = (
             .drop(["service", "effective_date"])
         )
         .with_columns(
-            [(pl.col("unit_price") * pl.col("rental_of_weight")).alias("price_per_rental")]
+            [
+                (pl.col("unit_price") * pl.col("rental_of_weight")).alias(
+                    "price_per_rental"
+                )
+            ]
         )
         .drop("unit_price")
     )
@@ -252,11 +277,19 @@ tare: pl.LazyFrame = (
     )
     .drop(["service", "effective_date"])
     .with_columns(
-        [(pl.col("unit_price") * pl.col("number_of_sides")).alias("price_per_calibrations")]
+        [
+            (pl.col("unit_price") * pl.col("number_of_sides")).alias(
+                "price_per_calibrations"
+            )
+        ]
     )
     .drop("unit_price")
     .with_columns(
-        [(pl.col("price_per_rental") + pl.col("price_per_calibrations")).alias("total_price")]
+        [
+            (pl.col("price_per_rental") + pl.col("price_per_calibrations")).alias(
+                "total_price"
+            )
+        ]
     )
 )
 
@@ -269,6 +302,7 @@ additional: pl.LazyFrame = (
         sheet_name=ADDITIONAL_OVERTIME_PATH[1],
         engine="calamine",
     )
+    .lazy()
     .select(
         pl.col("Day"),
         pl.col("Date").alias("date"),
@@ -282,11 +316,15 @@ additional: pl.LazyFrame = (
         .alias("number_of_stevedores"),
     )
     .with_columns(
-        Service=pl.lit("Additional Overtime"),
+        service=pl.lit("Additional Overtime"),
     )
     .sort(by="date")
-    .join_asof(ADDITIONAL_OVERTIME, by="Service", on="date", strategy="backward")
-    .with_columns(total_price=pl.col("Price") * pl.col("hours") * pl.col("number_of_stevedores"))
+    .join_asof(ADDITIONAL_OVERTIME.lazy(), by="service", on="date", strategy="backward")
+    .with_columns(
+        total_price=pl.col("unit_price")
+        * pl.col("hours")
+        * pl.col("number_of_stevedores")
+    )
     # .with_columns(date_and_time=pl.col("date").dt.combine(pl.col("end_time")))
     .select(
         pl.col("date"),
@@ -294,7 +332,7 @@ additional: pl.LazyFrame = (
         pl.col("number_of_stevedores"),
         pl.col("hours").alias("number_of_hours"),
         pl.col("overtime_tonnage"),
-        pl.col("Price"),
+        pl.col("unit_price"),
         pl.col("total_price"),
     )
     .filter(pl.col("number_of_stevedores") > 0)

@@ -15,11 +15,11 @@ class ContainerValidator:
             container_numbers = data
             return [number.strip() for number in container_numbers]
         container_numbers = input(
-            "Enter container numbers separated by commas: ").split(',')
+            "Enter container numbers separated by commas: "
+        ).split(",")
         return [number.strip() for number in container_numbers]
 
-
-    def validate_container_number(self,container_number:list[str]):
+    def validate_container_number(self, container_number: str):
         """validates the container numbers"""
 
         pattern = re.compile(r"[A-Z]{4}[0-9]{6}[0-9]$")
@@ -85,7 +85,7 @@ class ContainerValidator:
         check_digit %= 10
         return check_digit == int(container_number[10])
 
-    def validate_container_numbers(self,container_numbers):
+    def validate_container_numbers(self, container_numbers):
         """Validate the container numbers"""
 
         results = {}

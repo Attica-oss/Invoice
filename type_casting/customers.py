@@ -3,9 +3,9 @@
 import polars as pl
 
 from data_source.make_dataset import load_gsheet_data
-from data_source.sheet_ids import MASTER_ID, client_sheet
+from data_source.sheet_ids import CLIENT_SHEET_NAME, MASTER_ID
 
-CUSTOMERS: pl.LazyFrame = load_gsheet_data(MASTER_ID, client_sheet)
+CUSTOMERS: pl.LazyFrame = load_gsheet_data(MASTER_ID, CLIENT_SHEET_NAME)
 
 
 def enum_customer() -> pl.Enum:
@@ -49,7 +49,9 @@ supply_vessel = customers("SUPPLY VESSEL")
 military_vessel = customers("MILITARY VESSEL")
 tug_boat = customers("TUG BOAT")
 
-vessels: list[str] = purseiner + longliner + cargo + tug_boat + supply_vessel + military_vessel
+vessels: list[str] = (
+    purseiner + longliner + cargo + tug_boat + supply_vessel + military_vessel
+)
 enum_vessel: pl.Enum = pl.Enum(vessels)
 
 factory = customers("FACTORY")

@@ -15,9 +15,12 @@ from .netlist import iot_cargo, iot_stuffing, netList, oss
 # from .operations import tare
 from .shore_handling import forklift_salt, salt
 from .stuffing import coa, pallet
-from .transport import forklift, shore_crane, transfer
+from .transport import forklift, scow_transfer, shore_crane, transfer
+from .washing import washing
 
 forklift_for_salt = forklift_salt()
+
+washing_lf = washing()
 
 __all__ = [
     "full_scows",
@@ -42,5 +45,7 @@ __all__ = [
     "salt",
     "forklift_for_salt",
     "coa",
+    "scow_transfer",
     "pallet",
+    "washing_lf",
 ]

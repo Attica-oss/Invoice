@@ -4,9 +4,14 @@ from __future__ import annotations
 
 import polars as pl
 
-from data.price import FREE, OVERTIME_150, get_price
+from data.price import OVERTIME_150, get_price
 from data_source.make_dataset import load_gsheet_data
-from data_source.sheet_ids import EMR_SHEET_ID, pti_sheet, shifting_sheet, washing_sheet
+from data_source.sheet_ids import (
+    EMR_SHEET_ID,
+    PTI_SHEET_NAME,
+    SHIFTING_SHEET_NAME,
+    WASHING_SHEET_NAME,
+)
 from type_casting.containers import containers_enum
 from type_casting.dates import CURRENT_YEAR, SPECIAL_DAYS
 from type_casting.validations import SETPOINTS, SetPoint
@@ -14,22 +19,22 @@ from type_casting.validations import SETPOINTS, SetPoint
 # Price
 
 MAGNUM_PTI_ELECTRICITY = (
-    get_price(["PTI Magnum"]).select(pl.col("Price")).to_series()[0]
+    get_price(["PTI Magnum"]).select(pl.col("unit_price")).to_series()[0]
 )
-PLUGIN = get_price(["Plugin"]).select(pl.col("Price")).to_series()[0]
+PLUGIN = get_price(["Plugin"]).select(pl.col("unit_price")).to_series()[0]
 S_FREEZER_PTI_ELECTRICITY = (
-    get_price(["PTI S Freezer"]).select(pl.col("Price")).to_series()[0]
+    get_price(["PTI S Freezer"]).select(pl.col("unit_price")).to_series()[0]
 )
-SHIFTING = get_price(["Shifting"]).select(pl.col("Price")).to_series()[0]
+SHIFTING = get_price(["Shifting"]).select(pl.col("unit_price")).to_series()[0]
 STANDARD_PTI_ELECTRICITY = (
-    get_price(["PTI Standard"]).select(pl.col("Price")).to_series()[0]
+    get_price(["PTI Standard"]).select(pl.col("unit_price")).to_series()[0]
 )
-WASHING = get_price(["Container Cleaning"]).select(pl.col("Price")).to_series()[0]
+WASHING = get_price(["Container Cleaning"]).select(pl.col("unit_price")).to_series()[0]
 
 
 # Shifting Data Set
 shifting: pl.LazyFrame = (
-    load_gsheet_data(sheet_id=EMR_SHEET_ID, sheet_name=shifting_sheet)
+    load_gsheet_data(sheet_id=EMR_SHEET_ID, sheet_name=SHIFTING_SHEET_NAME)
     .filter(pl.col("date").dt.year().eq(CURRENT_YEAR))
     # Add the day name column to invoice overtime calculation
     .with_columns(
@@ -55,7 +60,7 @@ shifting: pl.LazyFrame = (
 
 # PTI staging Data Set
 _pti: pl.LazyFrame = (
-    load_gsheet_data(EMR_SHEET_ID, pti_sheet)
+    load_gsheet_data(EMR_SHEET_ID, PTI_SHEET_NAME)
     .filter(pl.col("datetime_start").dt.year().eq(CURRENT_YEAR))
     .select(
         pl.col("datetime_start"),
@@ -97,7 +102,7 @@ _pti: pl.LazyFrame = (
             .then(MAGNUM_PTI_ELECTRICITY)
             .when(pl.col("set_point") == SetPoint.standard)
             .then(STANDARD_PTI_ELECTRICITY)
-            .otherwise(FREE)
+            .otherwise(0)
         )
         * pl.col("above_8_hours")
     )
@@ -145,7 +150,7 @@ pti: pl.LazyFrame = (
         )
     )
     .with_columns(
-        shifting_price=pl.when(pl.col("no_shifting")).then(SHIFTING).otherwise(FREE)
+        shifting_price=pl.when(pl.col("no_shifting")).then(SHIFTING).otherwise(0)
     )
     .with_columns(
         (
@@ -173,7 +178,7 @@ pti: pl.LazyFrame = (
 
 # Washing Data Set
 washing = (
-    load_gsheet_data(EMR_SHEET_ID, washing_sheet)
+    load_gsheet_data(EMR_SHEET_ID, WASHING_SHEET_NAME)
     .filter(pl.col("date").dt.year().eq(CURRENT_YEAR))
     .select(
         pl.col("date"),
@@ -209,7 +214,7 @@ washing = (
     .with_columns(
         price=pl.when(pl.col("invoice_to") != "INVALID")
         .then(WASHING)
-        .otherwise(FREE)
+        .otherwise(0)
         .cast(pl.Int64)
     )
 )

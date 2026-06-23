@@ -28,6 +28,7 @@ class DataFrameType(Enum):
 
     ALL = "all"
     EMR = "emr"
+    WASHING = "washing"
     OPERATIONS = "operations"
     NETLIST = "netlist"
     BIN_DISPATCH = "bin_dispatch"
@@ -82,7 +83,8 @@ class App:
     def get_dataframe_selection(self) -> str | None:
         """Prompts user for dataframe selection with validation"""
         options_text = "\n".join(
-            f"            {df.value} : {self._get_df_description(df)}" for df in DataFrameType
+            f"            {df.value} : {self._get_df_description(df)}"
+            for df in DataFrameType
         )
 
         print(options_text)
@@ -101,6 +103,7 @@ class App:
         descriptions = {
             DataFrameType.ALL: "For all of the dataframes",
             DataFrameType.EMR: "For shifting, PTI and Washing",
+            DataFrameType.WASHING: "For Container Washing",
             DataFrameType.OPERATIONS: "Operations data",
             DataFrameType.NETLIST: "Genesis data sets",
             DataFrameType.BIN_DISPATCH: "IOT Scow transfer data",

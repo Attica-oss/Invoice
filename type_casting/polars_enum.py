@@ -58,7 +58,9 @@ class PolarsEnum(StrEnum):
         if key in lower_map:
             return lower_map[key]
 
-        raise ValueError(f"Invalid {cls.__name__}: {value!r}. Allowed: {cls.list_all()}")
+        raise ValueError(
+            f"Invalid {cls.__name__}: {value!r}. Allowed: {cls.list_all()}"
+        )
 
     @classmethod
     def lit(cls, value: str) -> pl.Expr:

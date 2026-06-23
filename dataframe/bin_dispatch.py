@@ -2,10 +2,16 @@
 
 import polars as pl
 
-from data.price import ALL_PRICE, NORMAL_HOUR, OVERTIME_150, OVERTIME_200
+from data.price import (
+    NORMAL_HOUR,
+    OVERTIME_150,
+    OVERTIME_200,
+    ServiceType,
+    get_price_by_type,
+)
 from data_source.make_dataset import load_gsheet_data
 from data_source.sheet_ids import (
-    ALL_CCCS_DATA_SHEET,
+    ALL_CCCS_DATA_SHEET_NAME,
     MISC_SHEET_ID,
 )
 from dataframe.transport import scow_transfer
@@ -29,12 +35,14 @@ ph_list: pl.Series = public_holiday()
 
 
 # Price
-SCOW_TRANSFER = ALL_PRICE.filter(pl.col("Service").eq(pl.lit("CCCS Movement in/out")))
+SCOW_TRANSFER = get_price_by_type(service_type=ServiceType.cold_store).filter(
+    pl.col("service").eq(pl.lit("CCCS Movement in/out"))
+)
 
 
 # Full Scows
 bin_dispatch_base: pl.LazyFrame = (
-    load_gsheet_data(MISC_SHEET_ID, ALL_CCCS_DATA_SHEET)
+    load_gsheet_data(MISC_SHEET_ID, ALL_CCCS_DATA_SHEET_NAME)
     .filter(
         pl.col("service").is_in(BIN_DISPATCH_SERVICE),
         pl.col("date").dt.year().eq(CURRENT_YEAR),

@@ -16,11 +16,13 @@ from all_dataframes.all_dataframes import (
     shore_handling_dataframes,
     stuffing_dataframes,
     transport_dataframes,
+    washing_dataframe,
 )
 from app.logger import logger
 
 df_dict = {
     "emr": emr_dataframes,
+    "washing": washing_dataframe,
     "operations": operations_dataframes,
     "netlist": netlist_dataframes,
     "bin_dispatch": bin_dispatch_dataframes,

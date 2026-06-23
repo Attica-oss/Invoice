@@ -198,7 +198,7 @@ def create_weekly_table(year: Year) -> pl.DataFrame:
     )
 
 
-def month_range(month_name: str, year: Year = CURRENT_YEAR) -> tuple[date, date]:
+def month_range(month_name: MonthName, year: Year = CURRENT_YEAR) -> tuple[date, date]:
     """
     Calculates the start and end date of a given month within a specified year.
 
@@ -220,7 +220,7 @@ def month_range(month_name: str, year: Year = CURRENT_YEAR) -> tuple[date, date]
 
 
 # To move these functions to the date module
-def get_monthly_range(month: str) -> int:
+def get_monthly_range(month: MonthName) -> int:
     """Turns a month name to it's corresponding month number"""
     return Month.to_number(month)
 

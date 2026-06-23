@@ -1,6 +1,9 @@
 """Stores all dataframes as list and dicts"""
 
+from types import LambdaType
+
 import polars as pl
+from polars.lazyframe.frame import LazyFrame
 
 from dataframe import (
     bin_dispatch,
@@ -11,6 +14,7 @@ from dataframe import (
     shore_handling,
     stuffing,
     transport,
+    washing_lf,
 )
 
 # EMR Dataframes
@@ -20,6 +24,9 @@ emr_dataframes: dict[str, pl.LazyFrame] = {
     "washing": emr.washing,
     "pti": emr.pti,
 }
+
+washing_dataframe: dict[str, pl.LazyFrame] = {"washing": washing_lf}
+
 
 # Miscellaneous Daframes
 
@@ -48,10 +55,11 @@ netlist_dataframes: dict[str, pl.LazyFrame] = {
 
 operations_dataframes: dict[str, pl.LazyFrame] = {
     "ops": operations.ops,
-    # "extramen": operations.extramen,
-    # "hatch_to_hatch": operations.hatch_to_hatch,
-    # "additional_overtime":operations.additional,
+    "extramen": operations.extramen,
+    "hatch_to_hatch": operations.hatch_to_hatch,
+    "additional_overtime": operations.additional,
     "tare_calibration": operations.tare,
+    "berth_dues": operations.berth,
 }
 
 shore_handling_dataframes: dict[str, pl.LazyFrame] = {

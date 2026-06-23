@@ -4,10 +4,10 @@ import polars as pl
 
 from data_source.make_dataset import load_gsheet_data
 from data_source.sheet_ids import (
-    ALL_CCCS_DATA_SHEET,
-    IPHS_TRUCK_SHEET,
-    CCCS_STUFFING_SHEET,
-    CROSS_STUFFING_SHEET,
+    ALL_CCCS_DATA_SHEET_NAME,
+    CCCS_STUFFING_SHEET_NAME,
+    CROSS_STUFFING_SHEET_NAME,
+    IPHS_TRUCK_SHEET_NAME,
     MISC_SHEET_ID,
 )
 from type_casting.containers import containers_enum
@@ -30,7 +30,7 @@ def _to_f64(column: str) -> pl.Expr:
 def miscellaneous() -> pl.LazyFrame:
     """Miscellaneous main sheet"""
     return (
-        load_gsheet_data(sheet_id=MISC_SHEET_ID, sheet_name=ALL_CCCS_DATA_SHEET)
+        load_gsheet_data(sheet_id=MISC_SHEET_ID, sheet_name=ALL_CCCS_DATA_SHEET_NAME)
         .filter(pl.col("date").dt.year().eq(CURRENT_YEAR))
         .select(
             pl.col("day_name").cast(dtype=DayName.enum_dtype()),
@@ -51,10 +51,10 @@ def miscellaneous() -> pl.LazyFrame:
     )
 
 
-def cross_stuffing() -> pl.LazyFrame:
+def _cross_stuffing() -> pl.LazyFrame:
     """Cross stuffing sheet"""
     return (
-        load_gsheet_data(MISC_SHEET_ID, CROSS_STUFFING_SHEET)
+        load_gsheet_data(MISC_SHEET_ID, CROSS_STUFFING_SHEET_NAME)
         .with_columns(storage_type=pl.lit("Dry", dtype=pl.Utf8))
         .filter(pl.col("date").dt.year().eq(CURRENT_YEAR))
         .select(
@@ -78,7 +78,7 @@ def cross_stuffing() -> pl.LazyFrame:
 def by_catch_transfer() -> pl.LazyFrame:
     """by catch transfer sheet"""
     return (
-        load_gsheet_data(MISC_SHEET_ID, IPHS_TRUCK_SHEET)
+        load_gsheet_data(MISC_SHEET_ID, IPHS_TRUCK_SHEET_NAME)
         .filter(
             pl.col("date")
             .dt.year()
@@ -103,7 +103,7 @@ def by_catch_transfer() -> pl.LazyFrame:
 def cccs_container_stuffing() -> pl.LazyFrame:
     """CCCS container stuffing dataframe clean up"""
     return (
-        load_gsheet_data(MISC_SHEET_ID, CCCS_STUFFING_SHEET)
+        load_gsheet_data(MISC_SHEET_ID, CCCS_STUFFING_SHEET_NAME)
         .filter(pl.col("date").dt.year().eq(CURRENT_YEAR))
         .with_columns(storage_type=pl.lit("Dry", dtype=pl.Utf8))
         .select(
@@ -123,7 +123,7 @@ def cccs_container_stuffing() -> pl.LazyFrame:
 def via_skiff_transfer() -> pl.LazyFrame:
     """Via skiff transfer sheet"""
     return (
-        load_gsheet_data(MISC_SHEET_ID, IPHS_TRUCK_SHEET)
+        load_gsheet_data(MISC_SHEET_ID, IPHS_TRUCK_SHEET_NAME)
         .filter(
             pl.col("date")
             .dt.year()

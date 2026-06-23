@@ -5,11 +5,12 @@ import polars as pl
 # from data_source import expressions as exp
 from data.price import get_price
 from data_source.make_dataset import load_gsheet_data
-from data_source.sheet_ids import SHORE_HANDLING_ID, salt_sheet
+from data_source.sheet_ids import SALT_OPERATION_SHEET_NAME, SHORE_HANDLING_ID
 
 # from type_casting import MovementType
 from type_casting.customers import purseiner, ship_owner
 from type_casting.dates import (
+    CURRENT_YEAR,
     LOWER_BOUND,
     NULL_DURATION,
     SPECIAL_DAYS,
@@ -19,17 +20,16 @@ from type_casting.dates import (
     Days,
     duration_to_hhmm,
     public_holiday,
-    CURRENT_YEAR,
 )
 from type_casting.validations import MovementType, OvertimePerc
 
 BIN_TIPPING_PRICE = (
-    get_price(["CCCS Movement in/out"]).select(pl.col("Price")).to_series()[0]
+    get_price(["CCCS Movement in/out"]).select(pl.col("unit_price")).to_series()[0]
 )
 
-SALT_PRICE = (
+SALT_PRICE: float = (
     get_price(["Loading (Quay to Ship)", "Loading @ Zone 14"])
-    .select(pl.col("Price"))
+    .select(pl.col("unit_price"))
     .to_series()[0]
 )
 
@@ -159,7 +159,7 @@ durations = pl.col("date").dt.combine(pl.col("end_time")) - pl.col("date").dt.co
 
 
 salt: pl.LazyFrame = (
-    load_gsheet_data(sheet_id=SHORE_HANDLING_ID, sheet_name=salt_sheet)
+    load_gsheet_data(sheet_id=SHORE_HANDLING_ID, sheet_name=SALT_OPERATION_SHEET_NAME)
     .filter(
         pl.col("date")
         .dt.year()

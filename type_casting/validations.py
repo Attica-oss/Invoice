@@ -2,6 +2,9 @@
 
 from dataclasses import dataclass
 
+import polars as pl
+from polars.datatypes.classes import Enum
+
 from .polars_enum import PolarsEnum
 
 # Paller types
@@ -49,13 +52,13 @@ CARGO_DISPATCH_SERVICE: list[str] = [
 class MovementType(PolarsEnum):
     """Classification of Movement"""
 
-    delivery: str = "Delivery"
-    collection: str = "Collection"
-    shifting: str = "Shifting"  # Not used
-    external: str = "External"
-    in_: str = "IN"
-    out: str = "OUT"
-    internal: str = "INTERNAL"
+    delivery = "Delivery"
+    collection = "Collection"
+    shifting = "Shifting"  # Not used
+    external = "External"
+    in_ = "IN"
+    out = "OUT"
+    internal = "INTERNAL"
 
 
 # Movement Type -> CCCS' Perspective
@@ -95,13 +98,12 @@ class Overtime:
     normal_hour_text: str = "normal hours"
 
 
-@dataclass
 class OvertimePerc:
     """Overtime Percentage rates"""
 
-    overtime_150: float = 1.5
-    overtime_200: float = 2.0
-    normal_hour: float = 1.0
+    overtime_150 = 1.5
+    overtime_200 = 2.0
+    normal_hour = 1.0
 
 
 # Stuffing Validations

@@ -4,16 +4,16 @@ from datetime import date
 
 import polars as pl
 
-from data.price import FREE, get_price
+from data.price import get_price
 from data_source.all_dataframe import miscellaneous
 from data_source.make_dataset import load_gsheet_data
 from data_source.sheet_ids import (
+    NET_LIST_SHEET_NAME,
     # MISC_SHEET_ID,
     OPS_SHEET_ID,
-    net_list_sheet,
     # by_catch_sheet,
     # all_cccs_data_sheet,
-    raw_sheet,
+    RAW_DATA_SHEET_NAME,
 )
 from dataframe.stuffing import coa
 from type_casting.containers import iot_soc
@@ -150,7 +150,7 @@ cccs_record = (
 
 cccs_adjusted_records = (
     (
-        load_gsheet_data(sheet_id=OPS_SHEET_ID, sheet_name=raw_sheet)
+        load_gsheet_data(sheet_id=OPS_SHEET_ID, sheet_name=RAW_DATA_SHEET_NAME)
         .filter(
             pl.col("Container (Destination)")
             .str.contains("CCCS")
@@ -237,7 +237,7 @@ cccs_adjusted_records = (
 netList = (
     pl.concat(
         [
-            load_gsheet_data(OPS_SHEET_ID, net_list_sheet)
+            load_gsheet_data(sheet_id=OPS_SHEET_ID, sheet_name=NET_LIST_SHEET_NAME)
             .filter(pl.col("Date").dt.year().eq(CURRENT_YEAR))
             .filter(~pl.col("Container (Destination)").str.contains("CCCS"))
             .select(
@@ -322,16 +322,16 @@ netList = (
             ]
         )
     )
-    .with_columns(Service=pl.col("service") + " - " + pl.col("storage_type"))
+    .with_columns(service=pl.col("service") + " - " + pl.col("storage_type"))
     .sort(by="date")
-    .join_asof(UNLOADING_PRICE.lazy(), by="Service", on="date", strategy="backward")
-    .select(pl.all().exclude(["Service", "end"]))
+    .join_asof(UNLOADING_PRICE.lazy(), by="service", on="date", strategy="backward")
+    .select(pl.all().exclude(["service"]))
     .with_columns(
         Price=pl.when(pl.col("overtime") == Overtime.overtime_200_text)
-        .then(pl.col("Price") * OvertimePerc.overtime_200)
+        .then(pl.col("unit_price") * OvertimePerc.overtime_200)
         .when(pl.col("overtime") == Overtime.overtime_150_text)
-        .then(pl.col("Price") * OvertimePerc.overtime_150)
-        .otherwise(pl.col("Price"))
+        .then(pl.col("unit_price") * OvertimePerc.overtime_150)
+        .otherwise(pl.col("unit_price"))
     )
     .with_columns(
         pl.when(pl.col("vessel_client").ne(pl.col("vessel")))
@@ -351,7 +351,7 @@ netList = (
         pl.col("end_time"),
         pl.col("total_tonnage"),
         pl.col("service"),
-        pl.col("Price"),
+        pl.col("unit_price"),
         pl.col("invoice_value"),
         pl.col("remarks"),
     )
@@ -360,7 +360,7 @@ netList = (
 
 # Maersk OSS stuffing list ; Separated between Full and Basic OSS
 oss = (
-    netList.select(pl.all().exclude(["Price", "invoice_value"]))
+    netList.select(pl.all().exclude(["unit_price", "invoice_value"]))
     .filter(pl.col("service").str.contains("OSS"))
     .with_columns(
         vessel=pl.when(pl.col("remarks").is_null())
@@ -368,20 +368,22 @@ oss = (
         .otherwise(pl.col("remarks"))
     )
     .with_columns(
-        Service=pl.when(pl.col("service") == pl.lit("Full OSS"))
+        service=pl.when(pl.col("service") == pl.lit("Full OSS"))
         .then(pl.lit("Container Stuffing") + " - " + pl.col("storage_type"))
         .otherwise(pl.lit("Stuffing"))
     )
-    .join_asof(OSS_STUFFING_PRICE.lazy(), by="Service", on="date", strategy="backward")
-    .select(pl.all().exclude(["Service", "end"]))
+    .join_asof(OSS_STUFFING_PRICE.lazy(), by="service", on="date", strategy="backward")
+    .select(pl.all().exclude(["service"]))
     .with_columns(
         Price=pl.when(pl.col("overtime") == Overtime.overtime_200_text)
-        .then(pl.col("Price") * OvertimePerc.overtime_200)
+        .then(pl.col("unit_price") * OvertimePerc.overtime_200)
         .when(pl.col("overtime") == Overtime.overtime_150_text)
-        .then(pl.col("Price") * OvertimePerc.overtime_150)
-        .otherwise(pl.col("Price"))
+        .then(pl.col("unit_price") * OvertimePerc.overtime_150)
+        .otherwise(pl.col("unit_price"))
     )
-    .with_columns(invoice_value=(pl.col("Price") * pl.col("total_tonnage")).round(3))
+    .with_columns(
+        invoice_value=(pl.col("unit_price") * pl.col("total_tonnage")).round(3)
+    )
     .select(pl.all().exclude("remarks"))
 )
 
@@ -421,7 +423,7 @@ iot_coa = (
 
 iot_cargo = (
     (
-        load_gsheet_data(OPS_SHEET_ID, net_list_sheet)
+        load_gsheet_data(OPS_SHEET_ID, NET_LIST_SHEET_NAME)
         .select(
             pl.col("Date").alias("date"),
             pl.col("Vessel").str.to_uppercase().alias("vessel"),
@@ -438,24 +440,28 @@ iot_cargo = (
         day_name=pl.when(pl.col("date").is_in(ph_list))
         .then(pl.lit("PH"))
         .otherwise(pl.col("date").dt.to_string(format="%a")),
-        Service=pl.lit("Loading to Cargo") + " - " + pl.col("storage"),
+        service=pl.lit("Loading to Cargo") + " - " + pl.col("storage"),
     )
     .join_asof(
         IOT_CARGO_PRICE.lazy(),
-        by="Service",
+        by="service",
         left_on="date",
         right_on="date",
         strategy="backward",
     )
-    .drop("Service")
+    .drop("service")
     .with_columns(
         total_price=pl.when(pl.col("overtime") == "normal hours")
-        .then(pl.col("total_tonnage") * pl.col("Price") * OvertimePerc.normal_hour)
+        .then(pl.col("total_tonnage") * pl.col("unit_price") * OvertimePerc.normal_hour)
         .when(pl.col("overtime") == "overtime 150%")
-        .then(pl.col("total_tonnage") * pl.col("Price") * OvertimePerc.overtime_150)
+        .then(
+            pl.col("total_tonnage") * pl.col("unit_price") * OvertimePerc.overtime_150
+        )
         .when(pl.col("overtime") == "overtime 200%")
-        .then(pl.col("total_tonnage") * pl.col("Price") * OvertimePerc.overtime_200)
-        .otherwise(FREE)
+        .then(
+            pl.col("total_tonnage") * pl.col("unit_price") * OvertimePerc.overtime_200
+        )
+        .otherwise(0)
     )
     .select(
         pl.col("vessel"),
@@ -467,14 +473,14 @@ iot_cargo = (
         pl.col("overtime"),
         pl.col("total_tonnage"),
         pl.col("storage"),
-        pl.col("Price").alias("unit_price"),
+        pl.col("unit_price").alias("unit_price"),
         pl.col("total_price").round(3),
     )
 )
 
 # IOT SOC Stuffing DataFrame
 iot_stuffing = (
-    load_gsheet_data(OPS_SHEET_ID, net_list_sheet)
+    load_gsheet_data(OPS_SHEET_ID, NET_LIST_SHEET_NAME)
     .filter(pl.col("Date").dt.year().eq(CURRENT_YEAR))
     .select(
         pl.col("Date").alias("date"),
@@ -491,7 +497,7 @@ iot_stuffing = (
         day_name=pl.when(pl.col("date").is_in(ph_list))
         .then(pl.lit("PH"))
         .otherwise(pl.col("date").dt.to_string(format="%a")),
-        Service=pl.lit("Stuffing"),
+        service=pl.lit("Stuffing"),
     )
     .join_asof(
         STUFFING_PRICE.lazy(),
@@ -500,15 +506,19 @@ iot_stuffing = (
         right_on="date",
         strategy="backward",
     )
-    .select(pl.all().exclude(["Service"]))
+    .select(pl.all().exclude(["service"]))
     .with_columns(
         total_price=pl.when(pl.col("overtime") == "normal hours")
-        .then(pl.col("total_tonnage") * pl.col("Price") * OvertimePerc.normal_hour)
+        .then(pl.col("total_tonnage") * pl.col("unit_price") * OvertimePerc.normal_hour)
         .when(pl.col("overtime") == "overtime 150%")
-        .then(pl.col("total_tonnage") * pl.col("Price") * OvertimePerc.overtime_150)
+        .then(
+            pl.col("total_tonnage") * pl.col("unit_price") * OvertimePerc.overtime_150
+        )
         .when(pl.col("overtime") == "overtime 200%")
-        .then(pl.col("total_tonnage") * pl.col("Price") * OvertimePerc.overtime_200)
-        .otherwise(FREE)
+        .then(
+            pl.col("total_tonnage") * pl.col("unit_price") * OvertimePerc.overtime_200
+        )
+        .otherwise(0)
     )
     .select(
         pl.col(
@@ -522,7 +532,7 @@ iot_stuffing = (
                 "overtime",
                 "total_tonnage",
                 "storage",
-                "Price",
+                "unit_price",
                 "total_price",
             ]
         )
