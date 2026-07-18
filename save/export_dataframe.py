@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any,cast
 
 import polars as pl
+import polars.selectors as cs
 import xlsxwriter
 from xlsxwriter.worksheet import Worksheet
 

@@ -1,8 +1,6 @@
 """Transport Lazyframe"""
 
 from datetime import date
-from decimal import Decimal
-from multiprocessing import set_start_method
 
 import polars as pl
 import polars.selectors as cs
@@ -175,7 +173,7 @@ transfer = (
     )
     .select(pl.all().exclude("invoice_to"))
     .with_columns(
-        day_name=pl.col("date").days.add_day_name(),
+        day_name=pl.col("date").days.add_day_name(), # type: ignore[attr-defined]
         service=pl.when(pl.col("size") == "40'")
         .then(pl.lit("Haulage FEU"))
         .when(pl.col("size") == "20'")

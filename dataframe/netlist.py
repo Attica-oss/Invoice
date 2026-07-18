@@ -157,7 +157,7 @@ cccs_adjusted_records = (
             .and_(pl.col("Date").dt.year().eq(CURRENT_YEAR))
         )
         .select(
-            pl.col("Date").days.add_day_name(),
+            pl.col("Date").days.add_day_name(), # type: ignore[attr-defined]
             pl.col("Date").alias("date"),
             pl.col("Time"),
             pl.col("overtime"),
@@ -241,7 +241,7 @@ netList = (
             .filter(pl.col("Date").dt.year().eq(CURRENT_YEAR))
             .filter(~pl.col("Container (Destination)").str.contains("CCCS"))
             .select(
-                pl.col("Date").days.add_day_name(),
+                pl.col("Date").days.add_day_name(), # type: ignore[attr-defined]
                 pl.col("Date").alias("date"),
                 pl.col("Vessel").str.to_uppercase().alias("vessel"),
                 pl.col("startTime").alias("start_time"),

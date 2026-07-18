@@ -54,27 +54,12 @@ def save_to_csv(
     output_dir.mkdir(parents=True, exist_ok=True)
     path = output_dir / f"{name}.csv"
 
-    # try:
-    #     logger.info("Saving %s -> %s", name, path)
-    #     logger.info("Plan for %s:\n%s", name, lf.explain())
-
-    #     df = lf.collect()
-    #     logger.info("Collected %s with shape %s", name, df.shape)
-    #     df.write_csv(path)
-
-    #     logger.info("Wrote %s -> %s", name, path)
-    #     return SaveResult(name=name, path=path)
-
-    # except Exception as e:
-    #     logger.exception("Failed writing %s -> %s", name, path)
-    #     return SaveResult(name=name, path=path, error=e)
-
     try:
         # Prefer streaming write if available
         if hasattr(lf, "sink_csv"):
             lf.sink_csv(path)  # Polars streaming write
         else:
-            lf.collect(streaming=True).write_csv(path)
+            lf.collect(engine="streaming").write_csv(path)
 
         logger.info("Wrote %s -> %s", name, path)
         return SaveResult(name=name, path=path)

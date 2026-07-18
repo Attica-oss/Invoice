@@ -16,12 +16,11 @@ from type_casting.dates import (
     SPECIAL_DAYS,
     UPPER_BOUND,
     UPPER_BOUND_SPECIAL_DAY,
-    DayName,
     Days,
     duration_to_hhmm,
     public_holiday,
 )
-from type_casting.validations import MovementType, OvertimePerc
+from type_casting.validations import OvertimePerc
 
 BIN_TIPPING_PRICE = (
     get_price(["CCCS Movement in/out"]).select(pl.col("unit_price")).to_series()[0]

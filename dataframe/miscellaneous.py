@@ -1,8 +1,5 @@
 """Miscellaneous Dataframe"""
 
-from datetime import date
-from turtle import st
-
 import polars as pl
 
 from data.price import (
