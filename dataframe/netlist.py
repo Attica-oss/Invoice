@@ -157,7 +157,7 @@ cccs_adjusted_records = (
             .and_(pl.col("Date").dt.year().eq(CURRENT_YEAR))
         )
         .select(
-            pl.col("Day"),
+            pl.col("Date").days.add_day_name(),
             pl.col("Date").alias("date"),
             pl.col("Time"),
             pl.col("overtime"),
@@ -185,7 +185,7 @@ cccs_adjusted_records = (
         .with_columns(
             tonnage_select=pl.when(
                 (
-                    (pl.col("Day").is_in(SPECIAL_DAYS)).and_(
+                    (pl.col("day_name").is_in(SPECIAL_DAYS)).and_(
                         pl.col("overtime").eq(Overtime.overtime_150_text)
                     )
                 ).or_(pl.col("overtime") == Overtime.normal_hour_text)
@@ -209,7 +209,7 @@ cccs_adjusted_records = (
         .otherwise(pl.col("overtime_tonnage") / pl.col("tons"))
     )
     .with_columns(adjusted_tonnage=pl.col("total_tonnage") * pl.col("perc_diff"))
-    .group_by(["Day", "date", "overtime", "vessel", "destination", "storage_type"])
+    .group_by(["day_name", "date", "overtime", "vessel", "destination", "storage_type"])
     .agg(
         start_time=pl.col("Time").min(),
         end_time=pl.col("Time").max(),
@@ -217,7 +217,7 @@ cccs_adjusted_records = (
     )
     .select(
         [
-            "Day",
+            "day_name",
             "date",
             "vessel",
             "start_time",
@@ -241,7 +241,7 @@ netList = (
             .filter(pl.col("Date").dt.year().eq(CURRENT_YEAR))
             .filter(~pl.col("Container (Destination)").str.contains("CCCS"))
             .select(
-                pl.col("Date").days.add_day_name().cast(pl.Utf8).alias("Day"),
+                pl.col("Date").days.add_day_name(),
                 pl.col("Date").alias("date"),
                 pl.col("Vessel").str.to_uppercase().alias("vessel"),
                 pl.col("startTime").alias("start_time"),
@@ -313,21 +313,28 @@ netList = (
     .select(
         pl.all().exclude(
             [
-                "operation_type",
+                # "operation_type",
                 "stuffing",
                 "customer",
-                "operation_type_ox",
+                "customer_ox",
+                # "operation_type_ox",
                 "stuffing_ox",
                 "date_plugged",
             ]
         )
     )
-    .with_columns(service=pl.col("service") + " - " + pl.col("storage_type"))
+    .with_columns(Service=pl.col("service") + " - " + pl.col("storage_type"))
     .sort(by="date")
-    .join_asof(UNLOADING_PRICE.lazy(), by="service", on="date", strategy="backward")
-    .select(pl.all().exclude(["service"]))
+    .join_asof(
+        UNLOADING_PRICE.lazy(),
+        by_left="Service",
+        by_right="service",
+        on="date",
+        strategy="backward",
+    )
+    .select(pl.all().exclude(["Service", "service_type"]))
     .with_columns(
-        Price=pl.when(pl.col("overtime") == Overtime.overtime_200_text)
+        unit_price=pl.when(pl.col("overtime") == Overtime.overtime_200_text)
         .then(pl.col("unit_price") * OvertimePerc.overtime_200)
         .when(pl.col("overtime") == Overtime.overtime_150_text)
         .then(pl.col("unit_price") * OvertimePerc.overtime_150)
@@ -339,9 +346,12 @@ netList = (
         .otherwise(pl.lit(None))
         .alias("remarks")
     )
-    .with_columns(invoice_value=(pl.col("Price") * pl.col("total_tonnage")).round(3))
+    .drop("vessel_client")
+    .with_columns(
+        invoice_value=(pl.col("unit_price") * pl.col("total_tonnage")).round(3)
+    )
     .select(
-        pl.col("Day").alias("day_name"),
+        pl.col("day_name"),
         pl.col("date"),
         pl.col("vessel"),
         pl.col("start_time"),

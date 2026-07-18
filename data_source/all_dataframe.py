@@ -69,7 +69,7 @@ def _cross_stuffing() -> pl.LazyFrame:
             _to_f64("total_tonnage").round(3).alias("total_tonnage"),
             _to_f64("overtime_tonnage").round(3).alias("overtime_tonnage"),
             pl.col("is_origin_empty"),
-            pl.col("service").alias("Service"),
+            pl.col("service"),
             pl.col("invoiced"),
         )
     )
@@ -78,7 +78,7 @@ def _cross_stuffing() -> pl.LazyFrame:
 def by_catch_transfer() -> pl.LazyFrame:
     """by catch transfer sheet"""
     return (
-        load_gsheet_data(MISC_SHEET_ID, IPHS_TRUCK_SHEET_NAME)
+        load_gsheet_data(sheet_id=MISC_SHEET_ID, sheet_name=IPHS_TRUCK_SHEET_NAME)
         .filter(
             pl.col("date")
             .dt.year()
@@ -111,7 +111,7 @@ def cccs_container_stuffing() -> pl.LazyFrame:
             pl.col("date"),
             pl.col("container_number").cast(dtype=containers_enum),
             pl.col("customer"),
-            pl.col("service").alias("Service"),
+            pl.col("service"),
             pl.col("storage_type"),
             _to_f64("total_tonnage").alias("total_tonnage"),
             _to_f64("overtime_tonnage").alias("overtime_tonnage"),

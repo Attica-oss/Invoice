@@ -2,15 +2,11 @@
 Docstring for type_casting
 """
 
-from .polars_enum import PolarsEnum
 from .containers import containers_enum
-from .customers import enum_customer, shipping_line, shipper
-from .validations import (
-    MovementType,
-    PalletType,
-    PLUGGED_STATUS,
-)
+from .customers import enum_customer, shipper, shipping_line
 from .dates import CURRENT_YEAR, DayName, Days
+from .polars_enum import PolarsEnum
+from .validations import PLUGGED_STATUS, MovementType, PalletType, SetPoint
 
 __all__ = [
     "PolarsEnum",
@@ -24,4 +20,5 @@ __all__ = [
     "MovementType",
     "PalletType",
     "PLUGGED_STATUS",
+    "SetPoint",
 ]

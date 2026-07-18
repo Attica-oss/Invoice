@@ -14,7 +14,7 @@ from data_source.sheet_ids import (
 )
 from type_casting.containers import containers_enum
 from type_casting.dates import CURRENT_YEAR, SPECIAL_DAYS
-from type_casting.validations import SETPOINTS, SetPoint
+from type_casting.validations import SetPoint
 
 # Price
 
@@ -65,7 +65,7 @@ _pti: pl.LazyFrame = (
     .select(
         pl.col("datetime_start"),
         pl.col("container_number").cast(dtype=containers_enum),
-        pl.col("set_point").cast(pl.Utf8).cast(dtype=pl.Enum(SETPOINTS)),
+        pl.col("set_point").cast(pl.Utf8).cast(dtype=SetPoint.enum_dtype()),
         pl.col("unit_manufacturer"),
         pl.col("datetime_end"),
         pl.col("status").cast(dtype=pl.Enum(["PASSED", "FAILED"])),

@@ -2,6 +2,7 @@
 
 from datetime import date
 from decimal import Decimal
+from multiprocessing import set_start_method
 
 import polars as pl
 import polars.selectors as cs
@@ -68,7 +69,7 @@ shore_crane: pl.LazyFrame = (
         pl.when(
             (pl.col("day").is_in(SPECIAL_DAYS)).and_(pl.col("date").ge(CUT_OFF_DATE))
         )
-        .then(SHORE_CRANE_PRICE * OvertimePerc.overtime_150 * INCREASE_10_PERCENT)
+        .then(SHORE_CRANE_PRICE * 1.6)
         .when(pl.col("day").is_in(SPECIAL_DAYS))
         .then(SHORE_CRANE_PRICE * OvertimePerc.overtime_150)
         .otherwise(SHORE_CRANE_PRICE)
@@ -82,14 +83,14 @@ shore_crane: pl.LazyFrame = (
             (
                 pl.col("normal_hours").cast(pl.Decimal(precision=3))
                 * pl.lit(SHORE_CRANE_PRICE, dtype=pl.Decimal(precision=3))
-                * pl.lit(OvertimePerc.overtime_150, dtype=pl.Decimal(precision=3))
-                * pl.lit(INCREASE_10_PERCENT, dtype=pl.Decimal(precision=3))
+                * pl.lit(1.6, dtype=pl.Decimal(precision=3))
+                # * pl.lit(INCREASE_10_PERCENT, dtype=pl.Decimal(precision=3))
             )
             + (
                 pl.col("overtime_hours").cast(pl.Decimal(precision=3))
                 * pl.lit(SHORE_CRANE_PRICE, dtype=pl.Decimal(precision=3))
-                * pl.lit(OvertimePerc.overtime_200, dtype=pl.Decimal(precision=3))
-                * pl.lit(INCREASE_10_PERCENT, dtype=pl.Decimal(precision=3))
+                * pl.lit(2.1, dtype=pl.Decimal(precision=3))
+                # * pl.lit(INCREASE_10_PERCENT, dtype=pl.Decimal(precision=3))
             )
         )
         .when(pl.col("day").is_in(SPECIAL_DAYS))
@@ -105,7 +106,7 @@ shore_crane: pl.LazyFrame = (
                 * pl.lit(OvertimePerc.overtime_200, dtype=pl.Decimal(precision=3))
             )
         )
-        .when(pl.col("date").ge(date(2026, 1, 1)))
+        .when(pl.col("date").ge(date(2026, 3, 1)))
         .then(
             (
                 pl.col("normal_hours").cast(pl.Decimal(precision=3))
@@ -115,8 +116,8 @@ shore_crane: pl.LazyFrame = (
             + (
                 pl.col("overtime_hours").cast(pl.Decimal(precision=3))
                 * pl.lit(SHORE_CRANE_PRICE, dtype=pl.Decimal(precision=3))
-                * pl.lit(OvertimePerc.overtime_150, dtype=pl.Decimal(precision=3))
-                * pl.lit(INCREASE_10_PERCENT, dtype=pl.Decimal(precision=3))
+                * pl.lit(1.6, dtype=pl.Decimal(precision=3))
+                # * pl.lit(INCREASE_10_PERCENT, dtype=pl.Decimal(precision=3))
             )
         )
         .otherwise(
@@ -175,7 +176,7 @@ transfer = (
     .select(pl.all().exclude("invoice_to"))
     .with_columns(
         day_name=pl.col("date").days.add_day_name(),
-        Service=pl.when(pl.col("size") == "40'")
+        service=pl.when(pl.col("size") == "40'")
         .then(pl.lit("Haulage FEU"))
         .when(pl.col("size") == "20'")
         .then(pl.lit("Haulage TEU"))
@@ -186,10 +187,10 @@ transfer = (
         .then(pl.col("time_out"))
         .otherwise(pl.time()),
     )
-    .sort(["Service", "date"])
+    .sort(["service", "date"])
     .join_asof(
-        TRANSFER_PRICE.lazy().sort(["Service", "date"]),
-        by="Service",
+        TRANSFER_PRICE.lazy().sort(["service", "date"]),
+        by="service",
         right_on="date",
         left_on="date",
         strategy="backward",
@@ -218,15 +219,15 @@ transfer = (
             (pl.col("day_name").is_in(SPECIAL_DAYS))
             & (pl.col("time") > UPPER_BOUND_SPECIAL_DAY)
         )
-        .then(pl.col("Price") * OvertimePerc.overtime_200)
+        .then(pl.col("unit_price") * OvertimePerc.overtime_200)
         .when(
             (
                 (pl.col("day_name").is_in(SPECIAL_DAYS))
                 | (pl.col("time") > UPPER_BOUND)
             ).or_(pl.col("time").is_between(MIDNIGHT, LOWER_BOUND))
         )
-        .then(pl.col("Price") * OvertimePerc.overtime_150)
-        .otherwise(pl.col("Price")),
+        .then(pl.col("unit_price") * OvertimePerc.overtime_150)
+        .otherwise(pl.col("unit_price")),
     )
     .select(
         [

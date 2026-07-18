@@ -1,6 +1,7 @@
 """Miscellaneous Dataframe"""
 
 from datetime import date
+from turtle import st
 
 import polars as pl
 
@@ -66,15 +67,15 @@ static_loader: pl.LazyFrame = (
     )
     .filter(pl.col("static_loader") > 0)
     .with_columns(
-        Service=pl.when(pl.col("operation_type").str.contains("Dispatch"))
+        service=pl.when(pl.col("operation_type").str.contains("Dispatch"))
         .then(pl.lit("Static Loader"))
         .otherwise(pl.lit(""))
     )
-    .filter(pl.col("Service") == pl.lit("Static Loader"))
+    .filter(pl.col("service") == pl.lit("Static Loader"))
     .sort(by=pl.col("date"))
     .join_asof(
         STATIC_LOADER.lazy(),
-        by="Service",
+        by="service",
         left_on="date",
         right_on="date",
         strategy="backward",
@@ -84,23 +85,27 @@ static_loader: pl.LazyFrame = (
         total_price=pl.when(pl.col("day_name").is_in(SPECIAL_DAYS))
         .then(
             (
-                pl.col("Price")
+                pl.col("unit_price")
                 * (pl.col("static_loader") - pl.col("overtime_tonnage"))
                 * OvertimePerc.overtime_150
             )
             + (
-                pl.col("Price")
+                pl.col("unit_price")
                 * (pl.col("overtime_tonnage"))
                 * OvertimePerc.overtime_200
             )
         )
         .otherwise(
             (
-                pl.col("Price")
+                pl.col("unit_price")
                 * (pl.col("static_loader") - pl.col("overtime_tonnage"))
                 * OvertimePerc.normal_hour
             )
-            + (pl.col("Price") * pl.col("overtime_tonnage") * OvertimePerc.overtime_150)
+            + (
+                pl.col("unit_price")
+                * pl.col("overtime_tonnage")
+                * OvertimePerc.overtime_150
+            )
         )
     )
 )
@@ -120,31 +125,33 @@ dispatch_to_cargo: pl.LazyFrame = (
         pl.col("total_tonnage").abs(),
         pl.col("overtime_tonnage").cast(pl.Float64),
     )
-    .with_columns(Service=pl.lit("Tipping Truck"))
+    .with_columns(service=pl.lit("Tipping Truck"))
     .sort(by="date")
     .join_asof(
         TRUCK_PRICE.lazy(),
-        by="Service",
+        by="service",
         left_on="date",
         right_on="date",
         strategy="backward",
     )
-    .select(pl.all().exclude(["Service"]))
+    .select(pl.all().exclude(["service"]))
     .with_columns(
         normal_tonnage=pl.col("total_tonnage") - pl.col("overtime_tonnage"),
-        Service=pl.lit("Loading to Cargo"),
+        service=pl.lit("Loading to Cargo"),
         cccs_movement_fee=pl.lit(CCCS_MOVEMENT_FEE),
     )
     .sort(by="date")
     .join_asof(
         CARGO_LOADING_PRICE.lazy(),
-        by="Service",
+        by="service",
         left_on="date",
         right_on="date",
         strategy="backward",
     )
     .with_columns(
-        price=pl.col("Price") + pl.col("Price_right") + pl.col("cccs_movement_fee")
+        price=pl.col("unit_price")
+        + pl.col("unit_price_right")
+        + pl.col("cccs_movement_fee")
     )
     .with_columns(
         total_price=pl.when(pl.col("day_name").is_in(SPECIAL_DAYS))
@@ -157,24 +164,26 @@ dispatch_to_cargo: pl.LazyFrame = (
             + (pl.col("overtime_tonnage") * OvertimePerc.overtime_150 * pl.col("price"))
         ),
     )
-    .select(pl.all().exclude(["Service", "normal_tonnage", "price"]))
-    .with_columns(
-        Price=pl.when(
-            pl.col("customer").eq("DARDANEL").and_(pl.col("date").lt(date(2025, 9, 1)))
-        )
-        .then(pl.col("Price") - 1.0)  # Need a better way to represent this 1.0.
-        .otherwise(pl.col("Price")),
-        cccs_movement_fee=pl.when(
-            pl.col("customer").eq("DARDANEL").and_(pl.col("date").lt(date(2025, 9, 1)))
-        )
-        .then(pl.lit(0))
-        .otherwise(pl.col("cccs_movement_fee")),
-        Price_right=pl.when(
-            pl.col("customer").eq("DARDANEL").and_(pl.col("date").lt(date(2025, 9, 1)))
-        )
-        .then(pl.col("Price_right") - 3.0)  # Need a better way to represent this 3.0.
-        .otherwise(pl.col("Price_right")),
-    )
+    .select(pl.all().exclude(["service", "normal_tonnage", "price"]))
+    # .with_columns(
+    #     price=pl.when(
+    #         pl.col("customer").eq("DARDANEL").and_(pl.col("date").lt(date(2025, 9, 1)))
+    #     )
+    #     .then(pl.col("unit_price") - 1.0)  # Need a better way to represent this 1.0.
+    #     .otherwise(pl.col("unit_price")),
+    #     cccs_movement_fee=pl.when(
+    #         pl.col("customer").eq("DARDANEL").and_(pl.col("date").lt(date(2025, 9, 1)))
+    #     )
+    #     .then(pl.lit(0))
+    #     .otherwise(pl.col("cccs_movement_fee")),
+    #     Price_right=pl.when(
+    #         pl.col("customer").eq("DARDANEL").and_(pl.col("date").lt(date(2025, 9, 1)))
+    #     )
+    #     .then(
+    #         pl.col("unit_price_right") - 3.0
+    #     )  # Need a better way to represent this 3.0.
+    #     .otherwise(pl.col("unit_price_right")),
+    # )
     .select(
         pl.col("day_name").alias("day_name"),
         pl.col("date"),
@@ -185,9 +194,9 @@ dispatch_to_cargo: pl.LazyFrame = (
         pl.col("storage_type"),
         pl.col("total_tonnage"),
         pl.col("overtime_tonnage"),
-        pl.col("Price").alias("truck_price"),
+        pl.col("unit_price").alias("truck_price"),
         pl.col("cccs_movement_fee"),
-        pl.col("Price_right").alias("stevedores_on_cargo_fee"),
+        pl.col("unit_price_right").alias("stevedores_on_cargo_fee"),
         pl.col("total_price"),
     )
 )
@@ -207,10 +216,10 @@ from_cccs_to_vessel = (
         pl.col("overtime_tonnage").cast(pl.Float64),
     )
     .sort(by="date", descending=False)
-    .with_columns(Service=pl.lit("Tipping Truck", dtype=pl.Utf8))
+    .with_columns(service=pl.lit("Tipping Truck", dtype=pl.Utf8))
     .join_asof(
         TRUCK_PRICE.lazy(),
-        by="Service",
+        by="service",
         left_on="date",
         right_on="date",
         strategy="backward",
@@ -219,21 +228,32 @@ from_cccs_to_vessel = (
         CCCS_incoming_fee=CCCS_MOVEMENT_FEE,
         operation_type=pl.lit("From CCCS to Vessel"),
     )
-    .with_columns(Price=pl.col("Price") + pl.col("CCCS_incoming_fee"))
-    .drop(["Service", "CCCS_incoming_fee"])
+    .with_columns(unit_price=pl.col("unit_price") + pl.col("CCCS_incoming_fee"))
+    .drop(["service", "CCCS_incoming_fee"])
     .with_columns(
         total_price=pl.when(pl.col("day_name").is_in(SPECIAL_DAYS))
         .then(
             (
                 (pl.col("total_tonnage") - pl.col("overtime_tonnage"))
-                * pl.col("Price")
+                * pl.col("unit_price")
                 * OvertimePerc.overtime_150
             )
-            + (pl.col("overtime_tonnage") * pl.col("Price") * OvertimePerc.overtime_200)
+            + (
+                pl.col("overtime_tonnage")
+                * pl.col("unit_price")
+                * OvertimePerc.overtime_200
+            )
         )
         .otherwise(
-            ((pl.col("total_tonnage") - pl.col("overtime_tonnage")) * pl.col("Price"))
-            + (pl.col("overtime_tonnage") * pl.col("Price") * OvertimePerc.overtime_150)
+            (
+                (pl.col("total_tonnage") - pl.col("overtime_tonnage"))
+                * pl.col("unit_price")
+            )
+            + (
+                pl.col("overtime_tonnage")
+                * pl.col("unit_price")
+                * OvertimePerc.overtime_150
+            )
         )
     )
 )
@@ -260,7 +280,7 @@ truck_to_cccs = (
     .group_by(["day_name", "date", "customer", "vessel"])
     .agg(pl.col("total_tonnage").sum(), pl.col("overtime_tonnage").sum())
     .sort(by="date", descending=False)
-    .with_columns(Service=pl.lit("Tipping Truck", dtype=pl.Utf8))
+    .with_columns(service=pl.lit("Tipping Truck", dtype=pl.Utf8))
     .join_asof(
         TRUCK_PRICE.lazy(),
         by="service",
@@ -282,7 +302,7 @@ truck_to_cccs = (
                 )
                 + (
                     pl.col("overtime_tonnage")
-                    * pl.col("Price")
+                    * pl.col("unit_price")
                     * OvertimePerc.overtime_200
                 )
             )
@@ -337,7 +357,7 @@ cross_stuffing: pl.LazyFrame = (
         strategy="backward",
     )
     .with_columns(
-        Price=pl.when(
+        unit_price=pl.when(
             pl.col("invoiced")
             .is_in(["AMIRANTE", "OCEAN BASKET", "ISLAND CATCH"])
             .and_(pl.col("service").eq(pl.lit("Unstuffing to CCCS")))

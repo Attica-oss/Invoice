@@ -1,13 +1,11 @@
 """Stores all dataframes as list and dicts"""
 
-from types import LambdaType
-
 import polars as pl
-from polars.lazyframe.frame import LazyFrame
 
 from dataframe import (
     bin_dispatch,
     emr,
+    invoice,
     miscellaneous,
     netlist,
     operations,
@@ -17,6 +15,17 @@ from dataframe import (
     washing_lf,
 )
 
+# Invoice Dataframes
+
+invoice_dataframes: dict[str, pl.LazyFrame] = {
+    "sto_invoice_status": invoice.sto_invoice_status(),
+    "full_oss_invoice_status": invoice.full_oss_invoice_status(),
+    "basic_oss_invoice_status": invoice.basic_oss_invoice_status(),
+    "all_invoice_status": invoice.clean_all_invoice_status(),
+    "cccs_oss_invoice_status": invoice.cccs_oss_invoice_status(),
+}
+
+
 # EMR Dataframes
 
 emr_dataframes: dict[str, pl.LazyFrame] = {
@@ -25,6 +34,7 @@ emr_dataframes: dict[str, pl.LazyFrame] = {
     "pti": emr.pti,
 }
 
+# Washing DataFrame
 washing_dataframe: dict[str, pl.LazyFrame] = {"washing": washing_lf}
 
 

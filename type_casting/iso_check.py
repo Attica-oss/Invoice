@@ -9,7 +9,7 @@ class ContainerValidator:
     def __init__(self) -> None:
         pass
 
-    def read_input(self, data: list[str] = None):
+    def read_input(self, data: list[str]):
         """Reads the container numbers"""
         if data:
             container_numbers = data

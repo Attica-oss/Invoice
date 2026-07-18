@@ -18,24 +18,23 @@ def filter_containers(lf: pl.LazyFrame) -> pl.LazyFrame:
     )
 
 
-def load_containers() -> pl.DataFrame:
+def load_containers() -> pl.LazyFrame:
     """Loads the containers data as a collected Polars DataFrame."""
-    return (
-        load_gsheet_data(TRANSPORT_SHEET_ID, TRANSFER_SHEET_NAME)
-        .pipe(filter_containers)
-        .collect()
-    )
+    return load_gsheet_data(
+        sheet_id=TRANSPORT_SHEET_ID, sheet_name=TRANSFER_SHEET_NAME
+    ).pipe(filter_containers)
 
 
 # Single network call — reuse throughout
-_containers_df: pl.DataFrame = load_containers()
+_containers_df: pl.LazyFrame = load_containers()
 
 container_list: list[str] = (
-    _containers_df.get_column("container_number").unique().to_list()
+    _containers_df.collect().get_column("container_number").unique().to_list()
 )
 
 iot_soc: list[str] = (
     _containers_df.filter(pl.col("line").eq("IOT"))
+    .collect()
     .get_column("container_number")
     .unique()
     .to_list()

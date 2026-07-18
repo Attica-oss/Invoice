@@ -194,10 +194,10 @@ full_scows: pl.LazyFrame = (
         )
         .then(pl.lit(0.0))
         .when(pl.col("overtime") == Overtime.normal_hour_text)
-        .then(pl.col("tonnage") * NORMAL_HOUR * pl.col("Price"))
+        .then(pl.col("tonnage") * NORMAL_HOUR * pl.col("unit_price"))
         .when(pl.col("overtime") == Overtime.overtime_150_text)
-        .then(pl.col("tonnage") * OVERTIME_150 * pl.col("Price"))
-        .otherwise(pl.col("tonnage") * OVERTIME_200 * pl.col("Price"))
+        .then(pl.col("tonnage") * OVERTIME_150 * pl.col("unit_price"))
+        .otherwise(pl.col("tonnage") * OVERTIME_200 * pl.col("unit_price"))
         .round(3)
         .cast(pl.Float64),
         movement_type=pl.when(pl.col("movement_type") == MovementType.out)
@@ -218,7 +218,7 @@ full_scows: pl.LazyFrame = (
             "num_of_scows",
             "storage_type",
             "tonnage",
-            "Price",
+            "unit_price",
             "total_price",
         ]
     )
@@ -268,10 +268,10 @@ empty_scows: pl.LazyFrame = (
     )
     .with_columns(
         total_price=pl.when(pl.col("overtime") == Overtime.normal_hour_text)
-        .then(pl.col("num_of_scows") * NORMAL_HOUR * pl.col("Price"))
+        .then(pl.col("num_of_scows") * NORMAL_HOUR * pl.col("unit_price"))
         .when(pl.col("overtime") == Overtime.overtime_150_text)
-        .then(pl.col("num_of_scows") * OVERTIME_150 * pl.col("Price"))
-        .otherwise(pl.col("num_of_scows") * OVERTIME_200 * pl.col("Price")),
+        .then(pl.col("num_of_scows") * OVERTIME_150 * pl.col("unit_price"))
+        .otherwise(pl.col("num_of_scows") * OVERTIME_200 * pl.col("unit_price")),
         movement_type=pl.when(pl.col("movement_type") == MovementType.out)
         .then(pl.lit("IPHS Delivery of Empty Scows to IOT"))
         .when(pl.col("movement_type") == MovementType.in_)

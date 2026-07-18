@@ -10,6 +10,7 @@ import polars as pl
 from all_dataframes.all_dataframes import (
     bin_dispatch_dataframes,
     emr_dataframes,
+    invoice_dataframes,
     miscellaneous_dataframes,
     netlist_dataframes,
     operations_dataframes,
@@ -22,6 +23,7 @@ from app.logger import logger
 
 df_dict = {
     "emr": emr_dataframes,
+    "invoice": invoice_dataframes,
     "washing": washing_dataframe,
     "operations": operations_dataframes,
     "netlist": netlist_dataframes,

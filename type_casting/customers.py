@@ -33,7 +33,7 @@ def customers(customer_type: str) -> list[str]:
 def ship_owner() -> list[str]:
     """Calls the master validation sheet and get a list of ship owners/operators"""
     return (
-        CUSTOMERS.filter(pl.col("Type") == "PURSEINER")
+        CUSTOMERS.filter(pl.col("Type").eq("PURSEINER"))
         .select(pl.col("Customer"))
         .unique()
         .collect()

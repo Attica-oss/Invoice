@@ -27,6 +27,7 @@ class DataFrameType(Enum):
     """Available dataframe types"""
 
     ALL = "all"
+    INVOICE = "invoice"
     EMR = "emr"
     WASHING = "washing"
     OPERATIONS = "operations"
@@ -102,6 +103,7 @@ class App:
         """Returns description for each dataframe type"""
         descriptions = {
             DataFrameType.ALL: "For all of the dataframes",
+            DataFrameType.INVOICE: "For Invoice data",
             DataFrameType.EMR: "For shifting, PTI and Washing",
             DataFrameType.WASHING: "For Container Washing",
             DataFrameType.OPERATIONS: "Operations data",

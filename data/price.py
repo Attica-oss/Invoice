@@ -13,11 +13,6 @@ from type_casting import PolarsEnum
 # Date formatting
 DATE_FMT: str = "%d/%m/%Y"
 
-# ServiceType DataClass
-
-
-#
-
 
 class ServiceType(PolarsEnum):
     """Types of service"""

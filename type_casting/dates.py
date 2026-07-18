@@ -281,7 +281,10 @@ def __get_public_holidays(year: int) -> list[date]:
             date(2025, 10, 11),
             date(2025, 10, 13),
             date(2025, 10, 27),
-        }
+        },
+        2026: {
+            date(2026, 6, 30),
+        },
     }
     holidays |= one_time.get(year, set())
 

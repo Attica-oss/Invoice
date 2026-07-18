@@ -2,9 +2,6 @@
 
 from dataclasses import dataclass
 
-import polars as pl
-from polars.datatypes.classes import Enum
-
 from .polars_enum import PolarsEnum
 
 # Paller types
@@ -13,9 +10,9 @@ from .polars_enum import PolarsEnum
 class PalletType(PolarsEnum):
     """Pallet Type"""
 
-    PALLET: str = "Pallet"
-    LINER_PALLET: str = "Liner & Pallet"
-    LINER: str = "Liner"
+    PALLET = "Pallet"
+    LINER_PALLET = "Liner & Pallet"
+    LINER = "Liner"
 
 
 class ShippingLine(PolarsEnum):
@@ -125,18 +122,9 @@ PLUGGED_STATUS: list[str] = [
 ]
 
 
-@dataclass
-class SetPoint:
+class SetPoint(PolarsEnum):
     """Classifies the main 3 set point"""
 
-    standard: str = "-25"
-    magnum: str = "-35"
-    s_freezer: str = "-60"
-
-    @classmethod
-    def list_all(cls) -> list[str]:
-        """list all set point"""
-        return [cls.standard, cls.magnum, cls.s_freezer]
-
-
-SETPOINTS: list[str] = [SetPoint.standard, SetPoint.magnum, SetPoint.s_freezer]
+    standard = "-25"
+    magnum = "-35"
+    s_freezer = "-60"
