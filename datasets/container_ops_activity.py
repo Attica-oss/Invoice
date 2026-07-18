@@ -46,7 +46,6 @@ from utils.config import (
 from utils import (
     CURRENT_YEAR,
     PLUGGED_STATUS,
-    PalletType,
     containers_enum
 )
 

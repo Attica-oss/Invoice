@@ -13,7 +13,7 @@ from .price import (
 )
 from .salt import load_salt
 from .truck_to_cold_store import cccs_adjusted_records
-from .coa import coa,ELECTRICITY_DATASET,stuffing_issues,PALLET_DATASET, LINER_DATASET
+from .container_ops_activity import coa,ELECTRICITY_DATASET,stuffing_issues,PALLET_DATASET, LINER_DATASET
 from .stuffing import iot_coa,stuffing_type
 from .net_list import net_list
 
