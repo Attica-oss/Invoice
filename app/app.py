@@ -11,8 +11,6 @@ from app.logger import logger
 from app.save import save_df_to_csv
 from app.view import forklift_logistics_dataset, view_data
 
-# from app.check import check_data
-
 
 class MenuOption(Enum):
     """Menu options enumeration"""
@@ -84,8 +82,7 @@ class App:
     def get_dataframe_selection(self) -> str | None:
         """Prompts user for dataframe selection with validation"""
         options_text = "\n".join(
-            f"            {df.value} : {self._get_df_description(df)}"
-            for df in DataFrameType
+            f"            {df.value} : {self._get_df_description(df)}" for df in DataFrameType
         )
 
         print(options_text)

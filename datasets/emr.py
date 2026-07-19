@@ -35,26 +35,42 @@ from dataclasses import dataclass
 from functools import lru_cache
 
 import polars as pl
+from scan_google_sheet import scan_google_sheet
 
 from datasets import unit_price
-from scan_google_sheet import scan_google_sheet
+from utils import CURRENT_YEAR, SPECIAL_DAYS, OvertimePerc, SetPoint, containers_enum
 from utils.config import (
     EMR_SHEET_ID,
     PTI_SHEET_NAME,
     SHIFTING_SHEET_NAME,
     WASHING_SHEET_NAME,
 )
-from utils import containers_enum,CURRENT_YEAR,SPECIAL_DAYS,OvertimePerc, SetPoint
 
 # TODO: move these vocabularies into type_casting so they can't drift
 # per call site (same as the SAPMER patch in the stuffing module).
 PTI_STATUS: list[str] = ["PASSED", "FAILED"]
 PTI_INVOICE_TO: list[str] = ["MAERSKLINE", "IOT", "INVALID", "CMA CGM"]
 WASHING_INVOICE_TO: list[str] = [
-    "CMA CGM", "ECHEBASTAR", "ATUNSA", "INPESCA", "INPESCA S.A", "INVALID",
-    "IPHS", "IOT", "IOT IMPORT", "PEVASA", "RAWANQ", "OMAN PELAGIC",
-    "MAERSKLINE", "SAPMER", "OCEAN BASKET", "IOT EXP", "CCCS", "AMIRANTE",
-    "JMARR", "HARTSWATER",
+    "CMA CGM",
+    "ECHEBASTAR",
+    "ATUNSA",
+    "INPESCA",
+    "INPESCA S.A",
+    "INVALID",
+    "IPHS",
+    "IOT",
+    "IOT IMPORT",
+    "PEVASA",
+    "RAWANQ",
+    "OMAN PELAGIC",
+    "MAERSKLINE",
+    "SAPMER",
+    "OCEAN BASKET",
+    "IOT EXP",
+    "CCCS",
+    "AMIRANTE",
+    "JMARR",
+    "HARTSWATER",
 ]
 
 # A session longer than this bills electricity at double the base rate.
@@ -140,9 +156,7 @@ def _electricity_price(prices: EmrPrices) -> pl.Expr:
     presumably missing ``* <IOT daily rate>``. Preserved as-is; get the
     rate from ops before touching it.
     """
-    days_elapsed = (
-        (pl.col("datetime_end") - pl.col("datetime_start")).dt.total_hours() / 24
-    )
+    days_elapsed = (pl.col("datetime_end") - pl.col("datetime_start")).dt.total_hours() / 24
     return (
         pl.when(pl.col("invoice_to").eq(pl.lit("IOT")))
         .then(days_elapsed + 1)
@@ -179,19 +193,13 @@ def pti_staging() -> pl.LazyFrame:
             plugin_price=pl.lit(prices.plugin),
         )
         .with_columns(
-            above_8_hours=pl.when(pl.col("hours") > LONG_SESSION_HOURS)
-            .then(2)
-            .otherwise(1)
+            above_8_hours=pl.when(pl.col("hours") > LONG_SESSION_HOURS).then(2).otherwise(1)
         )
-        .with_columns(
-            electricity_price=_electricity_price(prices) * pl.col("above_8_hours")
-        )
+        .with_columns(electricity_price=_electricity_price(prices) * pl.col("above_8_hours"))
         # Chronological order BEFORE numbering, so "previous session"
         # means previous in time, not previous in the sheet.
         .sort("datetime_start")
-        .with_columns(
-            cum_count=pl.col("container_number").cum_count().over("container_number")
-        )
+        .with_columns(cum_count=pl.col("container_number").cum_count().over("container_number"))
     )
 
 
@@ -216,17 +224,12 @@ def pti(staging: pl.LazyFrame | None = None) -> pl.LazyFrame:
         )
         .with_columns(
             no_shifting=(
-                (
-                    (pl.col("datetime_start") - pl.col("datetime_end_right"))
-                    > SHIFTING_GAP
-                )
+                ((pl.col("datetime_start") - pl.col("datetime_end_right")) > SHIFTING_GAP)
                 & (pl.col("generator_right") == pl.col("generator"))
             ).fill_null(True)  # first session for the container
         )
         .with_columns(
-            shifting_price=pl.when(pl.col("no_shifting"))
-            .then(emr_prices().shifting)
-            .otherwise(0)
+            shifting_price=pl.when(pl.col("no_shifting")).then(emr_prices().shifting).otherwise(0)
         )
         .with_columns(
             total_price=pl.col("plugin_price")

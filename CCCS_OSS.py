@@ -1,19 +1,76 @@
 import marimo
 
-__generated_with = "0.23.1"
+__generated_with = "0.23.14"
 app = marimo.App(width="columns")
 
 with app.setup:
+    from concurrent.futures import ThreadPoolExecutor
     from datetime import date
-    import re
     from calendar import monthrange
     import polars as pl
-    from typing import Any
-    import polars.selectors as cs
-    import xlsxwriter
-    from pathlib import Path
     import marimo as mo
-    from dataframe import cccs_stuffing, coa, transfer, shore_crane
+
+    from data import bc_items_lf
+    from save import export_dataframes
+    from datasets import cccs_stuffing, coa, transfer, shore_crane
+
+    with ThreadPoolExecutor(max_workers=5) as _pool:
+        _f_stuffing = _pool.submit(lambda: cccs_stuffing().collect())
+        _f_elec     = _pool.submit(lambda: coa().collect())
+        _f_transfer = _pool.submit(lambda: transfer().collect())
+        _f_crane    = _pool.submit(lambda: shore_crane().collect())
+        _f_price    = _pool.submit(lambda: bc_items_lf.collect())
+
+    def _fix_time(df: pl.DataFrame) -> pl.DataFrame:
+        # DuckDB Arrow filter pushdown doesn't support TIME_NS; cast to strings.
+        # SQL callers can still do col::TIME for comparisons.
+        time_cols = [c for c, d in zip(df.columns, df.dtypes) if d == pl.Time]
+        return df.with_columns(pl.col(c).cast(pl.Utf8) for c in time_cols) if time_cols else df
+
+    CCCS_STUFFING_DATASET = _f_stuffing.result()
+    ELECTRICITY_DATASET   = _fix_time(_f_elec.result())
+    TRANSFER_DATASET      = _fix_time(_f_transfer.result())
+    SHORE_CRANE_DATASET   = _fix_time(_f_crane.result())
+    price_df              = _f_price.result()
+
+    def _build_container_origin(df: pl.DataFrame) -> pl.DataFrame:
+        """Map every (container, date_plugged) to its chain's original vessel.
+
+        A chain start is a plug record with no predecessor — no other record
+        for the same container whose date_out equals this record's date_plugged.
+        Each subsequent record in the chain inherits that original vessel via
+        a backward join_asof, replacing the expensive recursive SQL CTE.
+        """
+        records = df.select("container_number", "date_plugged", "time_plugged", "vessel_client")
+
+        predecessors = (
+            df.select("container_number", pl.col("date_out").alias("date_plugged"))
+            .drop_nulls()
+        )
+
+        chain_starts = (
+            records
+            .join(predecessors, on=["container_number", "date_plugged"], how="anti")
+            .select(
+                "container_number",
+                "date_plugged",
+                pl.col("vessel_client").alias("original_vessel"),
+            )
+            .sort("container_number", "date_plugged")
+        )
+
+        return (
+            records.sort("container_number", "date_plugged")
+            .join_asof(
+                chain_starts,
+                by="container_number",
+                on="date_plugged",
+                strategy="backward",
+            )
+            .select("container_number", "date_plugged", "time_plugged", "original_vessel")
+        )
+
+    CONTAINER_ORIGIN = _build_container_origin(ELECTRICITY_DATASET)
 
 
 @app.function
@@ -42,26 +99,18 @@ def _():
         value="AMIRANTE",
     )
 
+    _today = date.today()
+    _years = sorted({_today.year - 1, _today.year, _today.year + 1})
     month_options = {
-        "Jan 2026": "2026-01-01",
-        "Feb 2026": "2026-02-01",
-        "Mar 2026": "2026-03-01",
-        "Apr 2026": "2026-04-01",
-        "May 2026": "2026-05-01",
-        "Jun 2026": "2026-06-01",
-        "Jul 2026": "2026-07-01",
-        "Aug 2026": "2026-08-01",
-        "Sep 2026": "2026-09-01",
-        "Oct 2026": "2026-10-01",
-        "Nov 2026": "2026-11-01",
-        "Dec 2026": "2026-12-01",
+        date(_y, _m, 1).strftime("%b %Y"): f"{_y}-{_m:02d}-01"
+        for _y in _years
+        for _m in range(1, 13)
     }
-
 
     month_selector = mo.ui.dropdown(
         options=month_options,
         label="Select invoice month",
-        value=date.today().replace(day=1).strftime(format="%b %Y"),
+        value=_today.replace(day=1).strftime("%b %Y"),
     )
     return month_selector, select_report
 
@@ -225,22 +274,21 @@ def _(
 
 
 @app.cell
-def _(service_breakdown_df):
-    grand_total = service_breakdown_df.select(pl.col("total").sum()).item()
-    return
-
-
-@app.cell
-def _(metrics_df, month_selector, select_report, summary_table):
-    # --- Header / stat cards ---
-    title = mo.md(f"# 🚢 CCCS / OSS Report  for — {select_report.value.title()}")
+def _(
+    copy_button,
+    metrics_df,
+    month_selector,
+    save_button,
+    select_report,
+    summary_table,
+):
+    title = mo.md(f"# 🚢 CCCS / OSS Report — {select_report.value.title()}")
 
     filter_bar = mo.hstack(
         [month_selector, select_report],
         justify="start",
         gap=2,
     )
-
 
     meta = mo.hstack(
         [
@@ -259,6 +307,7 @@ def _(metrics_df, month_selector, select_report, summary_table):
         gap=1,
     )
 
+    actions = mo.hstack([copy_button, save_button], justify="start", gap=1)
 
     mo.vstack(
         [
@@ -268,16 +317,40 @@ def _(metrics_df, month_selector, select_report, summary_table):
             meta,
             mo.md("---"),
             summary_table,
+            mo.md("---"),
+            actions,
         ]
     )
+    return
+
+
+@app.cell(hide_code=True)
+def _(
+    electricity_df,
+    haulage_df,
+    month_selector,
+    select_report,
+    shore_crane_df,
+    stuffing_df,
+):
+    _has_data = len(electricity_df) + len(stuffing_df) + len(shore_crane_df) + len(haulage_df) > 0
+    mo.callout(
+        mo.md(
+            f"**No records found** for **{select_report.value}** "
+            f"in **{format_datestr_to_month_year(month_selector.value)}**. "
+            "Check the vessel name or select a different month."
+        ),
+        kind="warn",
+    ) if not _has_data else None
     return
 
 
 @app.function
 def format_datestr_to_month_year(date_str: str) -> str:
     """Format the datestring to month 'year"""
-    month = date.fromisoformat(date_str).strftime(format="%B")
-    year = date.fromisoformat(date_str).strftime(format="%y")
+    date_converted = date.fromisoformat(date_str)
+    month = date_converted.strftime(format="%B")
+    year = date_converted.strftime(format="%y")
     return month + " '" + year
 
 
@@ -293,36 +366,26 @@ def _(pricing_df):
         FROM a 
          SELECT COALESCE(ROUND(SUM(total_price)::FLOAT8,2),0) AS total_price
         """,
-        output=False,
+        output=False
     )
     return (metrics_df,)
 
 
 @app.cell(hide_code=True)
-def _(month_selector, select_report):
-    stuffing_df = mo.sql(
-        f"""
-        FROM
-            cccs_stuffing
-        SELECT
-            day_name,
-            date,
-            container_number,
-            customer,
-            service,
-            total_tonnage,
-            overtime_tonnage,
-            unit_price,
-            total_price::DECIMAL AS total_price
-        WHERE
-            invoiced = 'MAERSKLINE' AND 
-            customer = '{select_report.value}'
-            AND (
-                date BETWEEN '{month_selector.value}' AND LAST_DAY(DATE '{month_selector.value}')
-            )
-        """,
-        output=False,
-    )
+def _(cccs_stuffing_dataset, month_selector, select_report):
+    with mo.status.spinner("Loading stuffing data…"):
+        stuffing_df = mo.sql(
+            f"""
+            FROM CCCS_STUFFING_DATASET
+            SELECT day_name, date, container_number, customer, service,
+                   total_tonnage, overtime_tonnage, unit_price,
+                   total_price::DECIMAL AS total_price
+            WHERE invoiced = 'MAERSKLINE'
+              AND customer = '{select_report.value}'
+              AND date BETWEEN '{month_selector.value}' AND LAST_DAY(DATE '{month_selector.value}')
+            """,
+            output=False,
+        )
     return (stuffing_df,)
 
 
@@ -331,10 +394,10 @@ def _(stuffing_df):
     stuffing_summary_df = mo.sql(
         f"""
         FROM stuffing_df
-        SELECT SUM(total_tonnage) AS tonnage,COUNT(DISTINCT container_number) AS number_stuffed
-        GROUP BY ALL
+        SELECT COALESCE(SUM(total_tonnage), 0.0) AS tonnage,
+               COUNT(DISTINCT container_number) AS number_stuffed
         """,
-        output=False,
+        output=False
     )
     return (stuffing_summary_df,)
 
@@ -346,7 +409,7 @@ def _(electricity_df):
         FROM electricity_df
         SELECT SUM(number_of_days_on_plug) AS days_plugged,COUNT (DISTINCT container_number) AS number_stuffed
         """,
-        output=False,
+        output=False
     )
     return (electricity_summary_df,)
 
@@ -358,7 +421,7 @@ def _(shore_crane_df):
         FROM shore_crane_df
         SELECT COALESCE(SUM("hours"),0) AS total_hours
         """,
-        output=False,
+        output=False
     )
     return (shore_crane_summary_df,)
 
@@ -394,309 +457,118 @@ def _(haulage_df):
         FROM
             del
         """,
-        output=False,
+        output=False
     )
     return (haulage_summary_df,)
 
 
 @app.cell(hide_code=True)
-def _(month_selector, select_report):
-    shore_crane_df = mo.sql(
-        f"""
-        FROM
-            shore_crane
-        SELECT
-            * EXCLUDE ('invoiced_to', operation_type)
-        WHERE
-            invoiced_to = 'MAERSKLINE'
-            AND customer = '{select_report.value}'
-            AND operation_type = 'CCCS Container Stuffing'
-            AND (
-                date BETWEEN '{month_selector.value}' AND LAST_DAY(DATE '{month_selector.value}')
-            )
-        """,
-        output=False,
-    )
+def _(month_selector, select_report, shore_crane_dataset):
+    with mo.status.spinner("Loading shore crane data…"):
+        shore_crane_df = mo.sql(
+            f"""
+            FROM SHORE_CRANE_DATASET
+            SELECT * EXCLUDE (invoiced_to, operation_type)
+            WHERE invoiced_to = 'MAERSKLINE'
+              AND customer = '{select_report.value}'
+              AND operation_type = 'CCCS Container Stuffing'
+              AND date BETWEEN '{month_selector.value}' AND LAST_DAY(DATE '{month_selector.value}')
+            """,
+            output=False,
+        )
     return (shore_crane_df,)
 
 
 @app.cell(hide_code=True)
-def _(month_selector, select_report):
-    electricity_df = mo.sql(
-        f"""
-        WITH
-            main_data AS (
-                SELECT
-                    *,
+def _(electricity_dataset, month_selector, select_report):
+    with mo.status.spinner("Loading live storage data…"):
+        electricity_df = mo.sql(
+            f"""
+            WITH main_data AS (
+                SELECT *,
                     GREATEST(date_plugged, DATE '{month_selector.value}') AS date_start,
                     LEAST(
                         COALESCE(date_out, LAST_DAY(DATE '{month_selector.value}')),
                         LAST_DAY(DATE '{month_selector.value}')
                     ) AS date_stop
-                FROM
-                    coa
-                WHERE
-                    (
-                        operation_type LIKE '%CCCS%'
-                        OR operation_type LIKE '%Exchange%'
-                    )
-                    AND customer = 'MAERSKLINE'
-                    AND vessel_client LIKE '%{select_report.value}%'
-                    AND date_plugged <= LAST_DAY(DATE '{month_selector.value}')
-                    AND (
-                        date_out >= DATE '{month_selector.value}'
-                        OR date_out IS NULL
-                    )
+                FROM ELECTRICITY_DATASET
+                WHERE (operation_type LIKE '%CCCS%' OR operation_type LIKE '%Exchange%')
+                  AND customer = 'MAERSKLINE'
+                  AND vessel_client LIKE '%{select_report.value}%'
+                  AND date_plugged <= LAST_DAY(DATE '{month_selector.value}')
+                  AND (date_out >= DATE '{month_selector.value}' OR date_out IS NULL)
             ),
             added_metrics AS (
-                FROM
-                    main_data
-                SELECT
-                    vessel_client,
-                    date_plugged,
-                    time_plugged,
-                    container_number,
-                    plugged_status,
-                    CASE
-                        WHEN (
-                            date_out > LAST_DAY(DATE '{month_selector.value}')
-                            OR date_out IS NULL
-                        ) THEN NULL
-                        ELSE date_out
-                    END AS date_out,
-                    CASE
-                        WHEN plugged_status = 'Partial'
-                        AND "location" = 'For Completion' THEN DATEDIFF('days', date_start, date_stop)
-                        ELSE DATEDIFF('days', date_start, date_stop) + 1
+                FROM main_data SELECT
+                    vessel_client, date_plugged, time_plugged, container_number, plugged_status,
+                    CASE WHEN (date_out > LAST_DAY(DATE '{month_selector.value}') OR date_out IS NULL)
+                         THEN NULL ELSE date_out END AS date_out,
+                    CASE WHEN plugged_status = 'Partial' AND "location" = 'For Completion'
+                         THEN DATEDIFF('days', date_start, date_stop)
+                         ELSE DATEDIFF('days', date_start, date_stop) + 1
                     END AS number_of_days_on_plug,
-                    set_point,
-                    tonnage,
-                    CASE
-                        WHEN date_plugged < '{month_selector.value}' THEN 0
-                        ELSE plugin_price
-                    END AS plugin_price,
-                    CASE
-                        WHEN (
-                            date_out > LAST_DAY(DATE '{month_selector.value}')
-                            OR date_out IS NULL
-                        ) THEN 0
-                        ELSE monitoring_price
-                    END AS monitoring_price,
+                    set_point, tonnage,
+                    CASE WHEN date_plugged < '{month_selector.value}' THEN 0 ELSE plugin_price END AS plugin_price,
+                    CASE WHEN (date_out > LAST_DAY(DATE '{month_selector.value}') OR date_out IS NULL)
+                         THEN 0 ELSE monitoring_price END AS monitoring_price,
                     electricity_unit_price
             ),
             add_storage_price AS (
-                FROM
-                    added_metrics
-                SELECT
-                    * EXCLUDE (electricity_unit_price),
+                FROM added_metrics SELECT * EXCLUDE (electricity_unit_price),
                     electricity_unit_price * number_of_days_on_plug AS storage_price
             )
-        FROM
-            add_storage_price
-        SELECT
-            vessel_client,
-           date_plugged,
-            time_plugged,
-            container_number,
-            plugged_status,
-            date_out,
-            number_of_days_on_plug,
-            set_point,
-            tonnage,
-            plugin_price,
-            monitoring_price,
-            storage_price,
-            storage_price + monitoring_price + plugin_price AS total_price
-        """,
-        output=False,
-    )
+            FROM add_storage_price SELECT
+                vessel_client, date_plugged, time_plugged, container_number, plugged_status,
+                date_out, number_of_days_on_plug, set_point, tonnage,
+                plugin_price, monitoring_price, storage_price,
+                storage_price + monitoring_price + plugin_price AS total_price
+            """,
+            output=False,
+        )
     return (electricity_df,)
 
 
 @app.cell(hide_code=True)
-def _(electricity_df, month_selector, select_report):
-    haulage_df = mo.sql(
-        f"""
-        WITH e AS (
-           WITH RECURSIVE
-
-        seeds AS (
-            SELECT
-                ROW_NUMBER() OVER (
-                    ORDER BY
-                        container_number,
-                        date_plugged,
-                        time_plugged,
-                        vessel_client
-                ) AS seed_id,
-
-                container_number,
-                vessel_client AS filtered_vessel_client,
-                date_plugged AS filtered_date_plugged,
-                time_plugged AS filtered_time_plugged
-
-            FROM electricity_df
-        ),
-
-        container_history AS (
-            /*
-            Start from each row in the filtered dataframe.
-            */
-            SELECT
-                seeds.seed_id,
-                seeds.filtered_vessel_client,
-                coa.*,
-                0 AS chain_level
-
-            FROM seeds
-
-            INNER JOIN coa
-                ON coa.container_number = seeds.container_number
-                AND coa.date_plugged = seeds.filtered_date_plugged
-                AND coa.time_plugged = seeds.filtered_time_plugged
-
-            UNION ALL
-
-            /*
-            Move backwards through the container records.
-            */
-            SELECT
-                current_record.seed_id,
-                current_record.filtered_vessel_client,
-                previous_record.*,
-                current_record.chain_level + 1 AS chain_level
-
-            FROM container_history AS current_record
-
-            INNER JOIN coa AS previous_record
-                ON previous_record.container_number =
-                    current_record.container_number
-                AND previous_record.date_out =
-                    current_record.date_plugged
-
-            WHERE NOT (
-                previous_record.date_plugged =
-                    current_record.date_plugged
-                AND 
-                    previous_record.time_plugged = 
-                    current_record.time_plugged
-
+def _(
+    container_origin,
+    electricity_df,
+    month_selector,
+    select_report,
+    transfer_dataset,
+):
+    with mo.status.spinner("Loading transfer data…"):
+        haulage_df = mo.sql(
+            f"""
+            WITH valid_containers AS (
+                SELECT DISTINCT e.container_number
+                FROM electricity_df e
+                INNER JOIN CONTAINER_ORIGIN co
+                    ON trim(e.container_number) = trim(co.container_number)
+                    AND e.date_plugged  = co.date_plugged
+                    AND e.time_plugged  = co.time_plugged
+                WHERE co.original_vessel = '{select_report.value}'
             )
-        ),
-
-        first_chain_record AS (
-            /*
-            Find the earliest record reached for each seed.
-            */
+            FROM TRANSFER_DATASET t
+            SEMI JOIN valid_containers v ON trim(t.container_number) = trim(v.container_number)
             SELECT
-                seed_id,
-                vessel_client AS first_vessel_client,
-                filtered_vessel_client
-
-            FROM container_history
-
-            QUALIFY
-                ROW_NUMBER() OVER (
-                    PARTITION BY seed_id
-                    ORDER BY
-                        chain_level DESC,
-                        date_plugged ASC,
-                        time_plugged ASC
-                ) = 1
-        ),
-
-        valid_chains AS (
-            /*
-            Keep the chain only when its first vessel matches
-            the vessel in the filtered dataframe.
-            */
-            SELECT
-                seed_id
-
-            FROM first_chain_record
-
-            WHERE
-                first_vessel_client = filtered_vessel_client
-        ),
-
-        last_chain_record AS (
-            /*
-            Return the last occurrence from each valid chain.
-            */
-            SELECT
-                history.*
-
-            FROM container_history AS history
-
-            SEMI JOIN valid_chains AS valid
-                ON history.seed_id = valid.seed_id
-
-            QUALIFY
-                ROW_NUMBER() OVER (
-                    PARTITION BY history.seed_id
-                    ORDER BY
-                        history.date_plugged DESC,
-                        history.time_plugged DESC,
-                        history.chain_level ASC
-                ) = 1
+                t.day_name,
+                t.container_number,
+                t.date,
+                t.movement_type,
+                t.destination,
+                t.status,
+                t.time_out,
+                CASE WHEN t.driver LIKE '%IPHS%' THEN 'IPHS' ELSE t.driver END AS driver,
+                t.type,
+                t.size,
+                '{select_report.value}' AS customer,
+                t.haulage_price
+            WHERE t.status = 'Full'
+              AND t.movement_type = 'Delivery'
+              AND t.date BETWEEN '{month_selector.value}' AND LAST_DAY(DATE '{month_selector.value}')
+            """,
+            output=False,
         )
-
-        SELECT
-            -- * EXCLUDE (
-            --     seed_id,
-            --     chain_level,
-            --     filtered_vessel_client
-            -- )
-            container_number,
-            date_out
-
-        FROM last_chain_record
-
-        /*
-        Multiple filtered rows may resolve to the same final container row.
-        Keep one result per container.
-        */
-        QUALIFY
-            ROW_NUMBER() OVER (
-                PARTITION BY container_number
-                ORDER BY
-                    date_plugged DESC,
-                    time_plugged DESC
-            ) = 1
-
-        ORDER BY
-            date_plugged,
-            time_plugged,
-            container_number
-        ),
-        t AS (
-            FROM transfer
-            SELECT day_name,
-            container_number,
-            date,
-            movement_type,
-            destination,
-            status,
-            time_out,
-            CASE WHEN driver LIKE '%IPHS%' THEN 'IPHS' ELSE driver END AS driver,
-            "type",
-            size,
-            '{select_report.value}' AS customer,
-            haulage_price
-            WHERE status = 'Full' AND movement_type = 'Delivery'
-        )
-
-        FROM t
-        SEMI JOIN e
-            ON trim(t.container_number) = trim(e.container_number)
-        SELECT
-            t.*
-        WHERE (
-                date BETWEEN '{month_selector.value}' AND LAST_DAY(DATE '{month_selector.value}')
-            )
-        """,
-        output=False,
-    )
     return (haulage_df,)
 
 
@@ -993,19 +865,13 @@ def _(electricity_df, haulage_df, shore_crane_df, stuffing_df):
         UNION ALL
         FROM ot_2_haulage
         """,
-        output=False,
+        output=False
     )
     return (summary_df,)
 
 
-@app.cell
-def _():
-    price_df = pl.read_excel(r"C:\Users\gmounac\Downloads\price.xlsx")
-    return (price_df,)
-
-
 @app.cell(hide_code=True)
-def _(price_df, summary_df):
+def _(summary_df):
     pricing_df = mo.sql(
         f"""
         WITH bc AS (FROM
@@ -1031,32 +897,19 @@ def _(price_df, summary_df):
             b.Description,
             b.Variant,
             s.QTY,
-            b."Unit Price"
+            b."Unit Price"::DECIMAL AS "Unit Price"
         FROM bc b LEFT JOIN summaries s ON s.Description = b.Description AND s.Variant = b.Variant
         """,
-        output=False,
+        output=False
     )
     return (pricing_df,)
-
-
-@app.cell(hide_code=True)
-def _(pricing_df):
-    _1_service_breakdown_df = mo.sql(
-        f"""
-        FROM pricing_df
-        SELECT *,(QTY * "Unit Price") AS Total
-        WHERE QTY >0
-        """,
-        output=False,
-    )
-    return
 
 
 @app.cell
 def _():
     copy_button = mo.ui.run_button(label="📋 Copy BC data to clipboard")
-    copy_button
-    return (copy_button,)
+    save_button = mo.ui.run_button(label="💾 Save XLSX report")
+    return copy_button, save_button
 
 
 @app.cell
@@ -1137,7 +990,7 @@ def _(pricing_df):
                 GROUP BY section, service, sort_order
                 ORDER BY sort_order
         """,
-        output=False,
+        output=False
     )
     return (service_breakdown_df,)
 
@@ -1174,7 +1027,7 @@ def _(electricity_df, haulage_df, month_selector):
             LEFT JOIN f ON e.container_number = f.container_number
         ORDER BY date_plugged
         """,
-        output=False,
+        output=False
     )
     return (processed_electricity_df,)
 
@@ -1282,563 +1135,8 @@ def _(
     return (reports,)
 
 
-@app.function
-def clean_table_name(name: str, index: int) -> str:
-    """
-    Create a valid, workbook-unique Excel table name.
-
-    Excel table names:
-    - cannot contain spaces
-    - should start with a letter or underscore
-    - must be unique within the workbook
-    """
-    cleaned = re.sub(r"[^A-Za-z0-9_]", "_", name)
-
-    if not cleaned or cleaned[0].isdigit():
-        cleaned = f"Table_{cleaned}"
-
-    return f"{cleaned}_{index}"
-
-
 @app.cell
-def _():
-    def write_summary_sheet(
-        workbook: xlsxwriter.Workbook,
-        worksheet: xlsxwriter.worksheet.Worksheet,
-        config: dict[str, Any],
-    ) -> None:
-        summary_rows = config.get("summary_rows", [])
-        service_df: pl.DataFrame | None = config.get("service_df")
-
-        # -------------------------------------------------
-        # Formats
-        # -------------------------------------------------
-
-        header_label_format = workbook.add_format(
-            {"align": "right", "valign": "vcenter", "bold": True, "font_size": 11}
-        )
-
-        header_value_format = workbook.add_format(
-            {"align": "center", "valign": "vcenter", "font_size": 11}
-        )
-
-        client_box_format = workbook.add_format(
-            {
-                "align": "center",
-                "valign": "vcenter",
-                "bold": True,
-                "font_color": "#FFFFFF",
-                "bg_color": "#17365D",
-                "text_wrap": True,
-                "border": 1,
-                "font_size": 11,
-            }
-        )
-
-        label_format = workbook.add_format(
-            {"align": "right", "valign": "vcenter", "font_size": 11}
-        )
-
-        italic_label_format = workbook.add_format(
-            {
-                "align": "right",
-                "valign": "vcenter",
-                "italic": True,
-                "font_size": 11,
-            }
-        )
-
-        value_format = workbook.add_format(
-            {
-                "align": "right",
-                "valign": "vcenter",
-                "bold": True,
-                "font_color": "#000080",
-                "font_size": 11,
-            }
-        )
-
-        unit_format = workbook.add_format(
-            {"align": "left", "valign": "vcenter", "italic": True, "font_size": 11}
-        )
-
-        services_heading_format = workbook.add_format(
-            {
-                "align": "center",
-                "valign": "vcenter",
-                "font_color": "#000080",
-                "font_size": 11,
-            }
-        )
-
-        section_format = workbook.add_format(
-            {"align": "left", "valign": "vcenter", "bold": True, "font_size": 11}
-        )
-
-        service_name_format = workbook.add_format(
-            {
-                "align": "right",
-                "valign": "vcenter",
-                "italic": True,
-                "font_size": 11,
-            }
-        )
-
-        price_header_format = workbook.add_format(
-            {
-                "align": "center",
-                "valign": "vcenter",
-                "bold": True,
-                "font_color": "#FFFFFF",
-                "bg_color": "#17365D",
-                "border": 1,
-                "font_size": 11,
-            }
-        )
-
-        currency_symbol_format = workbook.add_format(
-            {
-                "align": "center",
-                "valign": "vcenter",
-                "left": 1,
-                "top": 1,
-                "bottom": 1,
-                "font_size": 11,
-            }
-        )
-
-        currency_value_format = workbook.add_format(
-            {
-                "align": "right",
-                "valign": "vcenter",
-                "num_format": "#,##0.00",
-                "font_color": "#002060",
-                "top": 1,
-                "right": 1,
-                "bottom": 1,
-                "font_size": 11,
-            }
-        )
-
-        grand_total_symbol_format = workbook.add_format(
-            {
-                "align": "center",
-                "bold": True,
-                "top": 1,
-                "bottom": 6,
-                "font_size": 11,
-            }
-        )
-
-        grand_total_value_format = workbook.add_format(
-            {
-                "align": "right",
-                "bold": True,
-                "num_format": "#,##0.00",
-                "font_color": "#002060",
-                "top": 1,
-                "bottom": 6,
-                "font_size": 11,
-            }
-        )
-
-        # -------------------------------------------------
-        # Worksheet layout
-        # -------------------------------------------------
-
-        worksheet.hide_gridlines(2)
-        worksheet.set_zoom(config.get("sheet_zoom", 90))
-
-        worksheet.set_column("A:A", 4)
-        worksheet.set_column("B:B", 30)  # summary labels / section names
-        worksheet.set_column("C:C", 26)  # summary values / service names
-        worksheet.set_column("D:D", 4)  # $ (unit price)
-        worksheet.set_column("E:E", 11)  # unit price
-        worksheet.set_column("F:F", 4)  # $ (total)
-        worksheet.set_column("G:G", 13)  # total
-
-        # -------------------------------------------------
-        # Date range / client header
-        # -------------------------------------------------
-
-        current_row = 1
-
-        worksheet.write(current_row, 1, "Date Range:", header_label_format)
-        worksheet.write(
-            current_row, 2, config.get("date_range", ""), header_value_format
-        )
-        current_row += 1
-
-        worksheet.set_row(current_row, 30)
-        worksheet.write(current_row, 1, "Client:", header_label_format)
-        worksheet.write(
-            current_row, 2, config.get("client", ""), client_box_format
-        )
-        current_row += 3  # gap before the summary block
-
-        # -------------------------------------------------
-        # Summary block
-        # -------------------------------------------------
-
-        for item in summary_rows:
-            if item is None:
-                current_row += 1
-                continue
-
-            label = item["label"]
-            value = item.get("value")
-            unit = item.get("unit", "")
-
-            selected_label_format = (
-                italic_label_format if item.get("italic", False) else label_format
-            )
-
-            worksheet.write(current_row, 1, label, selected_label_format)
-
-            if value is None or value == 0:
-                worksheet.write(current_row, 2, "-", value_format)
-            elif isinstance(value, (int, float)):
-                custom_value_format = value_format
-                if number_format := item.get("number_format"):
-                    custom_value_format = workbook.add_format(
-                        {
-                            "align": "right",
-                            "valign": "vcenter",
-                            "bold": True,
-                            "font_color": "#000080",
-                            "font_size": 11,
-                            "num_format": number_format,
-                        }
-                    )
-                worksheet.write_number(
-                    current_row, 2, float(value), custom_value_format
-                )
-            else:
-                worksheet.write(current_row, 2, value, value_format)
-
-            worksheet.write(current_row, 3, unit, unit_format)
-            current_row += 1
-
-        current_row += config.get("summary_service_gap", 2)
-
-        # -------------------------------------------------
-        # Service breakdown table
-        # -------------------------------------------------
-
-        if service_df is not None and not service_df.is_empty():
-            required_columns = {"section", "service", "unit_price", "total"}
-            missing_columns = required_columns.difference(service_df.columns)
-            if missing_columns:
-                raise ValueError(
-                    f"service_df is missing columns: {sorted(missing_columns)}"
-                )
-
-            header_row = current_row
-
-            worksheet.write(header_row, 1, "Services", services_heading_format)
-            worksheet.merge_range(
-                header_row, 3, header_row, 4, "Unit Price ($)", price_header_format
-            )
-            worksheet.merge_range(
-                header_row, 5, header_row, 6, "Total ($)", price_header_format
-            )
-
-            current_row += 1
-            previous_section: str | None = None
-
-            for record in service_df.iter_rows(named=True):
-                section = record.get("section")
-                service = record.get("service")
-                unit_price = record.get("unit_price")
-                total = record.get("total")
-
-                # spacer between sections
-                if previous_section is not None and section != previous_section:
-                    current_row += 1
-
-                section_display = section if section != previous_section else ""
-                previous_section = section
-
-                worksheet.write(current_row, 1, section_display, section_format)
-                worksheet.write(current_row, 2, service or "", service_name_format)
-
-                worksheet.write(current_row, 3, "$", currency_symbol_format)
-                if unit_price is None:
-                    worksheet.write(current_row, 4, "-", currency_value_format)
-                else:
-                    worksheet.write_number(
-                        current_row, 4, float(unit_price), currency_value_format
-                    )
-
-                worksheet.write(current_row, 5, "$", currency_symbol_format)
-                if total is None or total == 0:
-                    worksheet.write(current_row, 6, "-", currency_value_format)
-                else:
-                    worksheet.write_number(
-                        current_row, 6, float(total), currency_value_format
-                    )
-
-                current_row += 1
-
-            current_row += 1
-
-            grand_total = service_df.select(pl.col("total").sum()).item() or 0
-
-            worksheet.write(current_row, 5, "$", grand_total_symbol_format)
-            worksheet.write_number(
-                current_row, 6, float(grand_total), grand_total_value_format
-            )
-
-            worksheet.print_area(0, 0, current_row + 1, 6)
-
-        # ----- printed page layout (unchanged from your version) -----
-        if config.get("landscape", False):
-            worksheet.set_landscape()
-        else:
-            worksheet.set_portrait()
-        worksheet.set_paper(config.get("paper_size", 9))
-        worksheet.fit_to_pages(
-            config.get("pages_wide", 1), config.get("pages_tall", 1)
-        )
-        worksheet.set_header(
-            config.get("print_header", "&C&B&A"),
-            {"margin": config.get("header_margin", 0.3)},
-        )
-        worksheet.set_footer(
-            config.get("print_footer", "&CPage &P of &N"),
-            {"margin": config.get("footer_margin", 0.3)},
-        )
-        if config.get("center_horizontally", True):
-            worksheet.center_horizontally()
-        worksheet.set_margins(
-            left=config.get("margin_left", 0.25),
-            right=config.get("margin_right", 0.25),
-            top=config.get("margin_top", 0.6),
-            bottom=config.get("margin_bottom", 0.6),
-        )
-
-        # -------------------------------------------------
-        # Printed page layout
-        # -------------------------------------------------
-
-        if config.get("landscape", False):
-            worksheet.set_landscape()
-        else:
-            worksheet.set_portrait()
-
-        worksheet.set_paper(config.get("paper_size", 9))
-
-        worksheet.fit_to_pages(
-            config.get("pages_wide", 1),
-            config.get("pages_tall", 1),
-        )
-
-        worksheet.set_header(
-            config.get("print_header", "&C&B&A"),
-            {
-                "margin": config.get("header_margin", 0.3),
-            },
-        )
-
-        worksheet.set_footer(
-            config.get("print_footer", "&CPage &P of &N"),
-            {
-                "margin": config.get("footer_margin", 0.3),
-            },
-        )
-
-        if config.get("center_horizontally", True):
-            worksheet.center_horizontally()
-
-        worksheet.set_margins(
-            left=config.get("margin_left", 0.25),
-            right=config.get("margin_right", 0.25),
-            top=config.get("margin_top", 0.6),
-            bottom=config.get("margin_bottom", 0.6),
-        )
-
-
-    def export_dataframes(
-        dataframes: dict[str, dict[str, Any]],
-        output_path: str | Path,
-    ) -> Path:
-        output_path = Path(output_path)
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-
-        with xlsxwriter.Workbook(output_path) as workbook:
-            for index, (sheet_name, config) in enumerate(
-                dataframes.items(),
-                start=1,
-            ):
-                safe_sheet_name = sheet_name[:31]
-                worksheet = workbook.add_worksheet(safe_sheet_name)
-
-                # -----------------------------------------
-                # Custom summary worksheet
-                # -----------------------------------------
-
-                if config.get("type") == "summary":
-                    write_summary_sheet(
-                        workbook=workbook,
-                        worksheet=worksheet,
-                        config=config,
-                    )
-                    continue
-
-                # -----------------------------------------
-                # Normal dataframe worksheet
-                # -----------------------------------------
-
-                df: pl.DataFrame = config["df"]
-
-                numeric_columns = df.select(cs.numeric()).columns
-
-                header_color = config.get(
-                    "header_color",
-                    "#4472C4",
-                )
-
-                df.write_excel(
-                    workbook=workbook,
-                    worksheet=worksheet,
-                    position="A1",
-                    table_name=clean_table_name(
-                        sheet_name,
-                        index,
-                    ),
-                    table_style={
-                        "style": config.get(
-                            "table_style",
-                            "None",
-                        ),
-                        "banded_rows": config.get(
-                            "banded_rows",
-                            True,
-                        ),
-                        "first_column": False,
-                        "last_column": False,
-                    },
-                    header_format={
-                        "bg_color": header_color,
-                        "font_color": config.get(
-                            "header_font_color",
-                            "#FFFFFF",
-                        ),
-                        "bold": True,
-                        "align": "center",
-                        "valign": "vcenter",
-                        "text_wrap": True,
-                    },
-                    column_totals=config.get(
-                        "column_totals",
-                        numeric_columns,
-                    ),
-                    dtype_formats={
-                        pl.Date: "yyyy-dd-mm",
-                        pl.Datetime: "yyyy-dd-mm hh:mm",
-                        pl.Float32: ("#,##0.00;[Red]-#,##0.00"),
-                        pl.Float64: ("#,##0.00;[Red]-#,##0.00"),
-                        pl.Int32: "#,##0;[Red]-#,##0",
-                        pl.Int64: "#,##0;[Red]-#,##0",
-                    },
-                    autofit=True,
-                    autofilter=True,
-                    freeze_panes=(1, 0),
-                    hide_gridlines=True,
-                    sheet_zoom=90,
-                )
-
-                # Limit excessively wide columns.
-                for column_index, column_name in enumerate(df.columns):
-                    maximum_length = max(
-                        len(column_name),
-                        (
-                            df[column_name]
-                            .cast(pl.String)
-                            .fill_null("")
-                            .str.len_chars()
-                            .max()
-                            or 0
-                        ),
-                    )
-
-                    worksheet.set_column(
-                        column_index,
-                        column_index,
-                        min(maximum_length + 2, 40),
-                    )
-
-                worksheet.set_row(0, 24)
-
-                # ---------------------------------
-                # Printed page layout configuration
-                # ---------------------------------
-
-                if config.get("landscape", True):
-                    worksheet.set_landscape()
-                else:
-                    worksheet.set_portrait()
-
-                worksheet.set_paper(config.get("paper_size", 9))
-
-                worksheet.fit_to_pages(
-                    config.get("pages_wide", 1),
-                    config.get("pages_tall", 1),
-                )
-
-                worksheet.set_header(
-                    config.get(
-                        "print_header",
-                        "&C&B&A",
-                    ),
-                    {
-                        "margin": config.get(
-                            "header_margin",
-                            0.3,
-                        ),
-                    },
-                )
-
-                worksheet.set_footer(
-                    config.get(
-                        "print_footer",
-                        "&CPage &P of &N",
-                    ),
-                    {
-                        "margin": config.get(
-                            "footer_margin",
-                            0.3,
-                        ),
-                    },
-                )
-
-                if config.get(
-                    "center_horizontally",
-                    True,
-                ):
-                    worksheet.center_horizontally()
-
-                worksheet.set_margins(
-                    left=config.get("margin_left", 0.25),
-                    right=config.get("margin_right", 0.25),
-                    top=config.get("margin_top", 0.6),
-                    bottom=config.get("margin_bottom", 0.6),
-                )
-
-        return output_path
-
-    return (export_dataframes,)
-
-
-@app.cell
-def _():
-    save_button = mo.ui.run_button(label="💾 Save XLSX report")
-    save_button
-    return (save_button,)
-
-
-@app.cell
-def _(export_dataframes, month_selector, reports, save_button, select_report):
+def _(month_selector, reports, save_button, select_report):
     mo.stop(
         not save_button.value, mo.md("*Click the button to generate the file.*")
     )
@@ -1848,15 +1146,6 @@ def _(export_dataframes, month_selector, reports, save_button, select_report):
         output_path=f"output/{select_report.value} CCCS - {format_datestr_to_month_year(month_selector.value)}.xlsx",
     )
     mo.md(f"✅ Saved to `{output_file}`")
-    return
-
-
-@app.cell
-def _():
-    # output_file = export_dataframes(
-    #     dataframes=reports,
-    #     output_path=f"output/{select_report.value + ' CCCS - ' + format_datestr_to_month_year(month_selector.value)}.xlsx",
-    # )
     return
 
 

@@ -1,11 +1,12 @@
-""""Miscellaneous Activity"""
+""" "Miscellaneous Activity"""
 
-import polars as pl
 from functools import lru_cache
 
-from utils.config import MISC_SHEET_ID, ALL_CCCS_DATA_SHEET_NAME
-from utils import CURRENT_YEAR,DayName
+import polars as pl
 from scan_google_sheet import scan_google_sheet
+
+from utils import CURRENT_YEAR, DayName
+from utils.config import ALL_CCCS_DATA_SHEET_NAME, MISC_SHEET_ID
 
 
 def _to_f64(column: str) -> pl.Expr:
@@ -18,8 +19,6 @@ def _to_f64(column: str) -> pl.Expr:
         .cast(pl.Float64, strict=False)
         .fill_null(0.0)
     )
-
-
 
 
 # Miscellaneous Main Sheet clean up
@@ -40,8 +39,7 @@ def miscellaneous_lf() -> pl.LazyFrame:
             pl.col("service").alias("operation_type"),
             _to_f64("total_tonnage").alias("total_tonnage"),
             pl.col("bins_in").str.replace("", "0").cast(pl.Int64),
-            pl.col("bins_out").str.strip_chars("-").replace("", "0").cast(pl.Int64)
-            * -1,
+            pl.col("bins_out").str.strip_chars("-").replace("", "0").cast(pl.Int64) * -1,
             _to_f64("static_loader").alias("static_loader"),
             _to_f64("overtime_tonnage").alias("overtime_tonnage"),
         )

@@ -5,7 +5,6 @@ right frame ordered on the ``on`` key (within ``by`` groups when used).
 The old module relied on ``get_price`` happening to return sorted data.
 """
 
-
 from __future__ import annotations
 
 from functools import lru_cache
@@ -15,9 +14,6 @@ from scan_google_sheet import scan_google_sheet
 
 # from data_source.sheet_ids import MASTER_ID, PRICE_SHEET_NAME
 from utils import PolarsEnum
-
-
-
 
 # Master Validation / Pricing
 MASTER_ID: str = "1ai-zQMtbPUx0LeQeLmXcpPgKvL5cyvwDfSJqRzxfUQg"
@@ -91,7 +87,6 @@ def unit_price(service: str) -> float:
     whichever row came first.
     """
 
-
     return get_price([service]).select("unit_price").item()
 
 
@@ -111,7 +106,6 @@ def unit_price_by_type(service_type, service: str) -> float:
         .collect()
         .item()
     )
-
 
 
 UNLOADING_SERVICES: list[str] = [

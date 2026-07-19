@@ -1,4 +1,3 @@
-
 """Stuffing pipelines: plug-in (COA) billing and pallet/liner charges.
 
 Rewrite notes
@@ -35,18 +34,14 @@ from dataclasses import dataclass
 from functools import lru_cache
 
 import polars as pl
-
-from datasets import unit_price,enum_customer,shipper,shipping_line
 from scan_google_sheet import scan_google_sheet
+
+from datasets import enum_customer, shipper, shipping_line, unit_price
+from utils import CURRENT_YEAR, PLUGGED_STATUS, containers_enum
 from utils.config import (
     LINER_PALLET_SHEET_NAME,
     PLUGIN_SHEET_NAME,
     STUFFING_SHEET_ID,
-)
-from utils import (
-    CURRENT_YEAR,
-    PLUGGED_STATUS,
-    containers_enum
 )
 
 # Set points (degrees C) that select the electricity tariff.
@@ -179,9 +174,7 @@ def coa() -> pl.LazyFrame:
 
     return (
         scan_google_sheet(sheet_id=STUFFING_SHEET_ID, sheet_name=PLUGIN_SHEET_NAME)
-        .filter(
-            pl.col("date_out").dt.year().eq(CURRENT_YEAR) | pl.col("date_out").is_null()
-        )
+        .filter(pl.col("date_out").dt.year().eq(CURRENT_YEAR) | pl.col("date_out").is_null())
         .select(
             pl.col("vessel_client").str.to_uppercase().cast(enum_customer()),
             pl.col("customer").cast(pl.Enum(shipper)),
@@ -201,9 +194,7 @@ def coa() -> pl.LazyFrame:
             pl.col("date_out").cast(pl.Date, strict=False),
         )
         .with_columns(
-            days_on_plug=pl.when(
-                still_plugged | transfer_direct | on_plug | plugged_only
-            )
+            days_on_plug=pl.when(still_plugged | transfer_direct | on_plug | plugged_only)
             .then(pl.lit(0, dtype=pl.Int64))
             .when(partially_stuffed)
             .then(_calendar_days)
@@ -212,10 +203,7 @@ def coa() -> pl.LazyFrame:
             .then(0)
             .otherwise(prices.plugin),
             monitoring_price=pl.when(
-                still_plugged
-                | transfer_direct
-                | on_plug_or_partially_stuffed
-                | plugged_only
+                still_plugged | transfer_direct | on_plug_or_partially_stuffed | plugged_only
             )
             .then(0)
             .otherwise(prices.monitoring),
@@ -229,14 +217,9 @@ def coa() -> pl.LazyFrame:
             .then(prices.magnum_electricity)
             .otherwise(prices.standard_electricity)
         )
+        .with_columns(total_electricity=pl.col("electricity_unit_price") * pl.col("days_on_plug"))
         .with_columns(
-            total_electricity=pl.col("electricity_unit_price")
-            * pl.col("days_on_plug")
-        )
-        .with_columns(
-            total=pl.col("plugin_price")
-            + pl.col("monitoring_price")
-            + pl.col("total_electricity")
+            total=pl.col("plugin_price") + pl.col("monitoring_price") + pl.col("total_electricity")
         )
     )
 
@@ -264,9 +247,7 @@ def stuffing_issues() -> pl.LazyFrame:
         .with_columns(
             issue=pl.when(pl.col("date_out") < pl.col("date_plugged"))
             .then(pl.lit("negative days"))
-            .when(
-                still_plugged & ~(on_plug | partially_stuffed | plugged_only)
-            )
+            .when(still_plugged & ~(on_plug | partially_stuffed | plugged_only))
             .then(pl.lit("still plugged, unexpected location"))
             .when(pl.col("set_point").is_null() & ~plugged_only)
             .then(pl.lit("missing set_point"))
@@ -285,10 +266,7 @@ def stuffing_issues() -> pl.LazyFrame:
 
     liner_issues = (
         pallet()
-        .filter(
-            _remark_contains("Liner")
-            & pl.col("shipping_line").cast(pl.Utf8).ne("CMA CGM")
-        )
+        .filter(_remark_contains("Liner") & pl.col("shipping_line").cast(pl.Utf8).ne("CMA CGM"))
         .select(
             pl.col("date").alias("date_plugged"),
             pl.lit(None, dtype=pl.Date).alias("date_out"),
@@ -302,6 +280,3 @@ def stuffing_issues() -> pl.LazyFrame:
     return pl.concat([plug_issues, liner_issues], how="vertical").sort("date_plugged")
 
 
-ELECTRICITY_DATASET = coa()
-PALLET_DATASET = pallet().filter(pl.col("remarks").str.contains("Pallet")).select(pl.col("*").exclude(["liner_price"]))
-LINER_DATASET = pallet().filter(pl.col("remarks").str.contains("Liner")).select(pl.col("*").exclude(["pallet_price"]))

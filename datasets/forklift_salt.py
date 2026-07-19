@@ -1,12 +1,11 @@
-""""Forklift records for salt operations"""
+""" "Forklift records for salt operations"""
 
 from __future__ import annotations
+
 import polars as pl
 
-from utils import duration_to_hhmm
 from datasets import load_salt
-
-
+from utils import duration_to_hhmm
 
 
 def forklift_salt(salt: pl.LazyFrame | None = None) -> pl.LazyFrame:
@@ -28,9 +27,7 @@ def forklift_salt(salt: pl.LazyFrame | None = None) -> pl.LazyFrame:
         "customer",
         "start_time",
         "end_time",
-        pl.format("Salt Loading ({} Tons)", pl.col("tonnage").cast(pl.Int64)).alias(
-            "purpose"
-        ),
+        pl.format("Salt Loading ({} Tons)", pl.col("tonnage").cast(pl.Int64)).alias("purpose"),
         "total_duration",
         pl.col("normal").alias("normal_hour_services"),
         pl.col("overtime_150").alias("overtime_for_normal_services"),
@@ -46,5 +43,6 @@ def forklift_salt(salt: pl.LazyFrame | None = None) -> pl.LazyFrame:
             "overtime_for_extended_services",
         ],
     )
+
 
 FORKLIFT_DATASET = forklift_salt()

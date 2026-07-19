@@ -7,7 +7,7 @@ from functools import lru_cache
 import polars as pl
 from scan_google_sheet import scan_google_sheet
 
-from data_source.sheet_ids import MASTER_ID, PRICE_SHEET_NAME
+from data_source.sheet_ids import BC_ITEMS_SHEET_NAME, MASTER_ID, PRICE_SHEET_NAME
 from type_casting import PolarsEnum
 
 # Date formatting
@@ -60,6 +60,12 @@ def get_price(services: list[str] | None = None) -> pl.DataFrame:
     if services is None:
         return df.collect()
     return df.filter(pl.col("service").is_in(services)).collect()
+
+
+def bc_items() -> pl.LazyFrame:
+    """Load + clean the BC items sheet once (small table → keep in memory)."""
+    lf: pl.LazyFrame = scan_google_sheet(sheet_id=MASTER_ID, sheet_name=BC_ITEMS_SHEET_NAME)
+    return lf
 
 
 # Overtime %

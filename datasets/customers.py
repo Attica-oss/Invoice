@@ -1,8 +1,8 @@
 """Customer Validations"""
 
 import polars as pl
-
 from scan_google_sheet import scan_google_sheet
+
 from utils.config import CLIENT_SHEET_NAME, MASTER_ID
 
 CUSTOMERS: pl.LazyFrame = scan_google_sheet(sheet_id=MASTER_ID, sheet_name=CLIENT_SHEET_NAME)
@@ -49,9 +49,7 @@ supply_vessel = customers("SUPPLY VESSEL")
 military_vessel = customers("MILITARY VESSEL")
 tug_boat = customers("TUG BOAT")
 
-vessels: list[str] = (
-    purseiner + longliner + cargo + tug_boat + supply_vessel + military_vessel
-)
+vessels: list[str] = purseiner + longliner + cargo + tug_boat + supply_vessel + military_vessel
 enum_vessel: pl.Enum = pl.Enum(vessels)
 
 factory = customers("FACTORY")

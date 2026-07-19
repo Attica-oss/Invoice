@@ -1,6 +1,7 @@
 """Sheet IDs and Sheet Name"""
 
 # Logistics E-form
+
 LOGISTICS_SHEET_ID: str = "1L9qkq9WlIa2j5DcvoLvxkqYogRg76S-e8OxAIyLruAE"
 
 CONTAINER_PLUGIN_SHEET_NAME: str = "ContainerPlugin"
@@ -52,6 +53,7 @@ RAW_DATA_SHEET_NAME: str = "RawData"
 MASTER_ID: str = "1ai-zQMtbPUx0LeQeLmXcpPgKvL5cyvwDfSJqRzxfUQg"
 PRICE_SHEET_NAME: str = "Price"
 CLIENT_SHEET_NAME: str = "Client"
+BC_ITEMS_SHEET_NAME: str = "bc_items"
 
 # Shore Handling Services
 SHORE_HANDLING_ID: str = "1R1M5La8lqF7NjJa7qspfPYvHU_Ej2o4YX7gduxb-Zu8"
