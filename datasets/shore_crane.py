@@ -26,11 +26,33 @@ CUT_OFF_DATE: date = date(2026, 3, 1)
 def shore_crane() -> pl.LazyFrame:
     price = unit_price("Shore Crane")
 
+    is_special = pl.col("day_name").is_in(SPECIAL_DAYS)
+    is_after = pl.col("date") >= CUT_OFF_DATE
+
+    normal_mult = (
+        pl.when(is_special & is_after)
+        .then(1.6)
+        .when(is_special)
+        .then(OvertimePerc.overtime_150)
+        .otherwise(OvertimePerc.normal_hour)
+    )
+    ot_mult = (
+        pl.when(is_special & is_after)
+        .then(2.1)
+        .when(is_special)
+        .then(OvertimePerc.overtime_200)
+        .when(is_after)
+        .then(1.6)
+        .otherwise(OvertimePerc.overtime_150)
+    )
+
     return (
-        scan_google_sheet(sheet_id=TRANSPORT_SHEET_ID, sheet_name=SHORE_CRANE_SHEET_NAME)
+        scan_google_sheet(
+            sheet_id=TRANSPORT_SHEET_ID, sheet_name=SHORE_CRANE_SHEET_NAME
+        )
         .filter(pl.col("date").dt.year().eq(CURRENT_YEAR))
         .select(
-            pl.col("day").cast(DayName.enum_dtype()),
+            pl.col("day").cast(DayName.enum_dtype()).alias("day_name"),
             pl.col("date"),
             pl.col("start_time"),
             pl.col("end_time"),
@@ -41,86 +63,27 @@ def shore_crane() -> pl.LazyFrame:
             pl.col("operation_type"),
             pl.col("invoiced_to"),
         )
-        .with_columns(
-            unit_price=pl.when(
-                pl.col("day").is_in(SPECIAL_DAYS) & (pl.col("date") >= CUT_OFF_DATE)
-            )
-            .then(price * 1.6)
-            .when(pl.col("day").is_in(SPECIAL_DAYS))
-            .then(price * OvertimePerc.overtime_150)
-            .otherwise(price)
-            .round(3)
-        )
         .with_columns(normal_hours=pl.col("hours") - pl.col("overtime_hours"))
         .with_columns(
-            total_price=pl.when(
-                pl.col("day").is_in(SPECIAL_DAYS) & (pl.col("date") >= CUT_OFF_DATE)
-            )
-            .then(
-                (
-                    pl.col("normal_hours").cast(pl.Decimal(precision=3))
-                    * pl.lit(price, dtype=pl.Decimal(precision=3))
-                    * pl.lit(1.6, dtype=pl.Decimal(precision=3))
-                )
-                + (
-                    pl.col("overtime_hours").cast(pl.Decimal(precision=3))
-                    * pl.lit(price, dtype=pl.Decimal(precision=3))
-                    * pl.lit(2.1, dtype=pl.Decimal(precision=3))
-                )
-            )
-            .when(pl.col("day").is_in(SPECIAL_DAYS))
-            .then(
-                (
-                    pl.col("normal_hours").cast(pl.Decimal(precision=3))
-                    * pl.lit(price, dtype=pl.Decimal(precision=3))
-                    * pl.lit(OvertimePerc.overtime_150, dtype=pl.Decimal(precision=3))
-                )
-                + (
-                    pl.col("overtime_hours").cast(pl.Decimal(precision=3))
-                    * pl.lit(price, dtype=pl.Decimal(precision=3))
-                    * pl.lit(OvertimePerc.overtime_200, dtype=pl.Decimal(precision=3))
-                )
-            )
-            .when(pl.col("date") >= CUT_OFF_DATE)
-            .then(
-                (
-                    pl.col("normal_hours").cast(pl.Decimal(precision=3))
-                    * pl.lit(price, dtype=pl.Decimal(precision=3))
-                    * pl.lit(OvertimePerc.normal_hour, dtype=pl.Decimal(precision=3))
-                )
-                + (
-                    pl.col("overtime_hours").cast(pl.Decimal(precision=3))
-                    * pl.lit(price, dtype=pl.Decimal(precision=3))
-                    * pl.lit(1.6, dtype=pl.Decimal(precision=3))
-                )
-            )
-            .otherwise(
-                (
-                    pl.col("normal_hours").cast(pl.Decimal(precision=3))
-                    * pl.lit(price, dtype=pl.Decimal(precision=3))
-                    * pl.lit(OvertimePerc.normal_hour, dtype=pl.Decimal(precision=3))
-                )
-                + (
-                    pl.col("overtime_hours").cast(pl.Decimal(precision=3))
-                    * pl.lit(price, dtype=pl.Decimal(precision=3))
-                    * pl.lit(OvertimePerc.overtime_150, dtype=pl.Decimal(precision=3))
-                )
-            )
-            .round(3)
+            unit_price=(pl.lit(price) * normal_mult).round(3),
+            total_price=(
+                pl.col("normal_hours") * price * normal_mult
+                + pl.col("overtime_hours") * price * ot_mult
+            ).round(3),
         )
         .select(
-            pl.col("day").alias("day_name"),
-            pl.col("date"),
-            pl.col("start_time"),
-            pl.col("end_time"),
-            pl.col("hours"),
-            pl.col("overtime_hours"),
-            pl.col("customer"),
-            pl.col("location"),
-            pl.col("operation_type"),
-            pl.col("invoiced_to"),
-            pl.col("unit_price"),
-            pl.col("total_price"),
+            "day_name",
+            "date",
+            "start_time",
+            "end_time",
+            "hours",
+            "overtime_hours",
+            "customer",
+            "location",
+            "operation_type",
+            "invoiced_to",
+            "unit_price",
+            "total_price",
         )
         .sort("date", "start_time")
     )

@@ -18,7 +18,7 @@ def stuffing_type() -> pl.LazyFrame:
     in :mod:`net_list.core`.
     """
     return (
-        coa.select(
+        coa().select(
             "vessel_client",
             "customer",
             "date_plugged",
@@ -56,7 +56,7 @@ def iot_coa() -> pl.LazyFrame:
     filtered, which is an inner join written confusingly).
     """
     return (
-        coa.with_columns(
+        coa().with_columns(
             pl.col("vessel_client").cast(pl.Utf8),
             pl.col("container_number").cast(pl.Utf8),
         )

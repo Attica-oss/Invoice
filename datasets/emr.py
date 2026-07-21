@@ -142,46 +142,78 @@ def shifting() -> pl.LazyFrame:
 # ---------------------------------------------------------------------------
 # PTI
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# PTI
+# ---------------------------------------------------------------------------
+
+IOT_ELECTRICITY_DAILY_RATE = 70.0
 
 
 def _hours_between(start_col: str, end_col: str) -> pl.Expr:
-    """Elapsed hours, rounded to 2 dp."""
-    return ((pl.col(end_col) - pl.col(start_col)).dt.total_minutes() / 60).round(2)
+    """Elapsed hours, rounded to 2 decimal places."""
+    return (
+        (pl.col(end_col) - pl.col(start_col)).dt.total_minutes() / 60
+    ).round(2)
+
+
+def _iot_days_between(start_col: str, end_col: str) -> pl.Expr:
+    """Inclusive number of calendar days for IOT electricity billing."""
+    return (
+        pl.col(end_col).dt.date()
+        - pl.col(start_col).dt.date()
+    ).dt.total_days() + 1
 
 
 def _electricity_price(prices: EmrPrices) -> pl.Expr:
-    """Base electricity price per PTI session (before the >8 h x2).
+    """Electricity charge for a PTI session.
 
-    TODO(tariff): the IOT branch returns a day count, not a price —
-    presumably missing ``* <IOT daily rate>``. Preserved as-is; get the
-    rate from ops before touching it.
+    IOT:
+        Inclusive calendar days × $70.
+
+    Other customers:
+        Electricity tariff based on set point, doubled when the
+        session exceeds eight hours.
     """
-    days_elapsed = (pl.col("datetime_end") - pl.col("datetime_start")).dt.total_hours() / 24
+    standard_rate = (
+        pl.when(pl.col("set_point") == SetPoint.s_freezer)
+        .then(pl.lit(prices.s_freezer_pti_electricity))
+        .when(pl.col("set_point") == SetPoint.magnum)
+        .then(pl.lit(prices.magnum_pti_electricity))
+        .when(pl.col("set_point") == SetPoint.standard)
+        .then(pl.lit(prices.standard_pti_electricity))
+        .otherwise(None)
+    )
+
     return (
-        pl.when(pl.col("invoice_to").eq(pl.lit("IOT")))
-        .then(days_elapsed + 1)
-        .when(pl.col("set_point").eq(SetPoint.s_freezer))
-        .then(prices.s_freezer_pti_electricity)
-        .when(pl.col("set_point").eq(SetPoint.magnum))
-        .then(prices.magnum_pti_electricity)
-        .when(pl.col("set_point").eq(SetPoint.standard))
-        .then(prices.standard_pti_electricity)
-        .otherwise(None)  # unknown set point -> null, see emr_issues()
+        pl.when(pl.col("invoice_to") == "IOT")
+        .then(
+            pl.lit(IOT_ELECTRICITY_DAILY_RATE)
+        )
+        .otherwise(
+            standard_rate * pl.col("above_8_hours")
+        )
     )
 
 
 @lru_cache(maxsize=1)
 def pti_staging() -> pl.LazyFrame:
-    """PTI sessions with per-session charges and a chronological,
-    1-indexed sequence number per container."""
+    """PTI sessions with billing quantities and per-session charges."""
     prices = emr_prices()
+
     return (
-        scan_google_sheet(sheet_id=EMR_SHEET_ID, sheet_name=PTI_SHEET_NAME)
-        .filter(pl.col("datetime_start").dt.year().eq(CURRENT_YEAR))
+        scan_google_sheet(
+            sheet_id=EMR_SHEET_ID,
+            sheet_name=PTI_SHEET_NAME,
+        )
+        .filter(
+            pl.col("datetime_start").dt.year() == CURRENT_YEAR
+        )
         .select(
             "datetime_start",
             pl.col("container_number").cast(containers_enum),
-            pl.col("set_point").cast(pl.Utf8).cast(SetPoint.enum_dtype()),
+            pl.col("set_point")
+            .cast(pl.Utf8)
+            .cast(SetPoint.enum_dtype()),
             "unit_manufacturer",
             "datetime_end",
             pl.col("status").cast(pl.Enum(PTI_STATUS)),
@@ -189,52 +221,108 @@ def pti_staging() -> pl.LazyFrame:
             pl.col("plugged_on").alias("generator"),
         )
         .with_columns(
-            hours=_hours_between("datetime_start", "datetime_end"),
+            hours=_hours_between(
+                "datetime_start",
+                "datetime_end",
+            ),
+            days=_iot_days_between(
+                "datetime_start",
+                "datetime_end",
+            ),
             plugin_price=pl.lit(prices.plugin),
         )
         .with_columns(
-            above_8_hours=pl.when(pl.col("hours") > LONG_SESSION_HOURS).then(2).otherwise(1)
+            above_8_hours=(
+                pl.when(
+                    (pl.col("invoice_to") != "IOT")
+                    & (pl.col("hours") > LONG_SESSION_HOURS)
+                )
+                .then(2)
+                .otherwise(1)
+            ),
+            billing_quantity=(
+                pl.when(pl.col("invoice_to") == "IOT")
+                .then(pl.col("days").cast(pl.Float64))
+                .otherwise(pl.col("hours"))
+            ),
+            billing_unit=(
+                pl.when(pl.col("invoice_to") == "IOT")
+                .then(pl.lit("Days"))
+                .otherwise(pl.lit("Hours"))
+            ),
         )
-        .with_columns(electricity_price=_electricity_price(prices) * pl.col("above_8_hours"))
-        # Chronological order BEFORE numbering, so "previous session"
-        # means previous in time, not previous in the sheet.
+        .with_columns(
+            electricity_price=_electricity_price(prices)
+        )
         .sort("datetime_start")
-        .with_columns(cum_count=pl.col("container_number").cum_count().over("container_number"))
+        .with_columns(
+            cum_count=(
+                pl.col("container_number")
+                .cum_count()
+                .over("container_number")
+            )
+        )
     )
 
 
-def pti(staging: pl.LazyFrame | None = None) -> pl.LazyFrame:
-    """Main PTI billing frame: each session joined to the container's
-    previous session to decide the shifting fee.
+def pti(
+    staging: pl.LazyFrame | None = None,
+) -> pl.LazyFrame:
+    """Main PTI billing frame.
 
-    Shifting fee applies when there is no previous session, or the gap
-    since the previous session exceeds 24 h on the same generator.
-    (Column is named ``no_shifting`` for schema compatibility — the
-    name reads inverted relative to what it charges.)
+    Shifting applies when there is no previous session, or when the gap
+    since the previous session exceeds 24 hours on the same generator.
     """
     lf = staging if staging is not None else pti_staging()
 
     return (
-        lf.with_columns(previous=pl.col("cum_count") - 1)
+        lf.with_columns(
+            previous=pl.col("cum_count") - 1
+        )
         .join(
             lf,
-            left_on=["container_number", "previous"],
-            right_on=["container_number", "cum_count"],
+            left_on=[
+                "container_number",
+                "previous",
+            ],
+            right_on=[
+                "container_number",
+                "cum_count",
+            ],
             how="left",
         )
         .with_columns(
             no_shifting=(
-                ((pl.col("datetime_start") - pl.col("datetime_end_right")) > SHIFTING_GAP)
-                & (pl.col("generator_right") == pl.col("generator"))
-            ).fill_null(True)  # first session for the container
+                (
+                    pl.col("datetime_start")
+                    - pl.col("datetime_end_right")
+                )
+                > SHIFTING_GAP
+            )
+            & (
+                pl.col("generator_right")
+                == pl.col("generator")
+            )
         )
         .with_columns(
-            shifting_price=pl.when(pl.col("no_shifting")).then(emr_prices().shifting).otherwise(0)
+            no_shifting=pl.col("no_shifting").fill_null(True)
         )
         .with_columns(
-            total_price=pl.col("plugin_price")
-            + pl.col("electricity_price")
-            + pl.col("shifting_price")
+            shifting_price=(
+                pl.when(pl.col("no_shifting"))
+                .then(pl.lit(emr_prices().shifting))
+                .otherwise(pl.lit(0.0))
+            )
+        )
+        .with_columns(
+            total_price=pl.when(pl.col("invoice_to").eq("IOT")).then( pl.col("plugin_price")
+        + (pl.col("days") *pl.col("electricity_price"))
+        + pl.col("shifting_price"))
+                .otherwise(
+                    pl.col("plugin_price")
+                + pl.col("electricity_price")
+                + pl.col("shifting_price")
+            ).round(2)
         )
         .select(
             "datetime_start",
@@ -243,17 +331,21 @@ def pti(staging: pl.LazyFrame | None = None) -> pl.LazyFrame:
             "invoice_to",
             "datetime_end",
             "hours",
+            "days",
+            "billing_quantity",
+            "billing_unit",
             "status",
             "plugin_price",
             "electricity_price",
-            pl.when(pl.col("no_shifting")).then(1).otherwise(0).alias("no_shifting"),
+            pl.when(pl.col("no_shifting"))
+            .then(1)
+            .otherwise(0)
+            .alias("no_shifting"),
             "generator",
             "shifting_price",
             "total_price",
         )
     )
-
-
 # ---------------------------------------------------------------------------
 # Washing
 # ---------------------------------------------------------------------------

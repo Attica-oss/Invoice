@@ -2,16 +2,14 @@
 
 from .cccs_stuffing import CCCS_STUFFING_DATASET, cccs_stuffing
 from .container_ops_activity import (
-    ELECTRICITY_DATASET,
-    LINER_DATASET,
-    PALLET_DATASET,
+    load_pallet_dataset,
     coa,
     stuffing_issues,
 )
 from .customers import (
     bycatch_companies,
     cargo,
-    enum_customer,
+    # enum_customer,
     purseiner,
     ship_owner,
     shipper,
@@ -48,17 +46,18 @@ __all__ = [
     "cargo",
     "cccs_adjusted_records",
     "coa",
-    "ELECTRICITY_DATASET",
-    "PALLET_DATASET",
-    "LINER_DATASET",
+    # "ELECTRICITY_DATASET",
+    # "PALLET_DATASET",
+    # "LINER_DATASET",
     "iot_coa",
     "stuffing_type",
     "net_list",
     "shipper",
-    "enum_customer",
+    #"enum_customer",
     "unit_price",
     "shipping_line",
     "stuffing_issues",
     "cccs_stuffing",
     "CCCS_STUFFING_DATASET",
+    "load_pallet_dataset"
 ]

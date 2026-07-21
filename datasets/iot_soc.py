@@ -18,10 +18,9 @@ from datetime import date
 
 import polars as pl
 
-from utils import apply_overtime_rate,iot_soc,CURRENT_YEAR
-from datasets import iot_cargo_price, stuffing_price,net_list_raw,iot_coa
-
-
+from datasets import iot_cargo_price, iot_coa, net_list_raw, stuffing_price
+from utils import CURRENT_YEAR, apply_overtime_rate, iot_soc
+from utils.validations import OvertimePerc
 
 # Asian Marine Reefer shipments from this date are billed to IOT.
 # NOTE: deliberately *not* filtered to CURRENT_YEAR — the qualifying
@@ -119,5 +118,26 @@ def iot_stuffing() -> pl.LazyFrame:
             left_on=["date", "vessel", "container_number"],
             right_on=["date_plugged", "vessel_client", "container_number"],
             how="inner",
+        )
+        .select(
+            pl.col("vessel"),
+            pl.col("day_name"),
+            pl.col("date"),
+            pl.col("start_time"),
+            pl.col("container_number"),
+            pl.col("end_time"),
+            pl.col("overtime"),
+            pl.col("total_tonnage"),
+            pl.col("storage"),
+            (
+                pl.when(pl.col("overtime").eq("normal hours"))
+                .then(pl.col("unit_price") * OvertimePerc.normal_hour)
+                .when(pl.col("overtime").eq("overtime 150%"))
+                .then(pl.col("unit_price") * OvertimePerc.overtime_150)
+                .when(pl.col("overtime").eq("overtime 200%"))
+                .then(pl.col("unit_price") * OvertimePerc.overtime_200)
+                .otherwise(0)
+            ).alias("unit_price"),
+            pl.col("total_price"),
         )
     )

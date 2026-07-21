@@ -36,7 +36,8 @@ from functools import lru_cache
 import polars as pl
 from scan_google_sheet import scan_google_sheet
 
-from datasets import enum_customer, shipper, shipping_line, unit_price
+from datasets.customers import enum_customer, shipper, shipping_line
+from datasets.price import unit_price
 from utils import CURRENT_YEAR, PLUGGED_STATUS, containers_enum
 from utils.config import (
     LINER_PALLET_SHEET_NAME,
@@ -278,5 +279,3 @@ def stuffing_issues() -> pl.LazyFrame:
     )
 
     return pl.concat([plug_issues, liner_issues], how="vertical").sort("date_plugged")
-
-

@@ -16,49 +16,46 @@ with app.setup:
 
     with ThreadPoolExecutor(max_workers=5) as _pool:
         _f_stuffing = _pool.submit(lambda: cccs_stuffing().collect())
-        _f_elec     = _pool.submit(lambda: coa().collect())
-        _f_transfer = _pool.submit(lambda: transfer().collect())
-        _f_crane    = _pool.submit(lambda: shore_crane().collect())
-        _f_price    = _pool.submit(lambda: bc_items_lf.collect())
+        _f_elec = _pool.submit(lambda: coa().collect())
+        _f_transfer = _pool.submit(lambda: transfer.transfer().collect())
+        _f_crane = _pool.submit(lambda: shore_crane.shore_crane().collect())
+        _f_price = _pool.submit(lambda: bc_items_lf.collect())
 
     def _fix_time(df: pl.DataFrame) -> pl.DataFrame:
         # DuckDB Arrow filter pushdown doesn't support TIME_NS; cast to strings.
         # SQL callers can still do col::TIME for comparisons.
         time_cols = [c for c, d in zip(df.columns, df.dtypes) if d == pl.Time]
-        return df.with_columns(pl.col(c).cast(pl.Utf8) for c in time_cols) if time_cols else df
-
-    CCCS_STUFFING_DATASET = _f_stuffing.result()
-    ELECTRICITY_DATASET   = _fix_time(_f_elec.result())
-    TRANSFER_DATASET      = _fix_time(_f_transfer.result())
-    SHORE_CRANE_DATASET   = _fix_time(_f_crane.result())
-    price_df              = _f_price.result()
-
-    def _build_container_origin(df: pl.DataFrame) -> pl.DataFrame:
-        """Map every (container, date_plugged) to its chain's original vessel.
-
-        A chain start is a plug record with no predecessor — no other record
-        for the same container whose date_out equals this record's date_plugged.
-        Each subsequent record in the chain inherits that original vessel via
-        a backward join_asof, replacing the expensive recursive SQL CTE.
-        """
-        records = df.select("container_number", "date_plugged", "time_plugged", "vessel_client")
-
-        predecessors = (
-            df.select("container_number", pl.col("date_out").alias("date_plugged"))
-            .drop_nulls()
+        return (
+            df.with_columns(pl.col(c).cast(pl.Utf8) for c in time_cols)
+            if time_cols
+            else df
         )
 
+    CCCS_STUFFING_DATASET = _f_stuffing.result()
+    ELECTRICITY_DATASET = _fix_time(_f_elec.result())
+    TRANSFER_DATASET = _fix_time(_f_transfer.result())
+    SHORE_CRANE_DATASET = _fix_time(_f_crane.result())
+    price_df = _f_price.result()
+
+    def _build_container_origin(df: pl.DataFrame) -> pl.DataFrame:
+        records = df.select(
+            "container_number", "date_plugged", "time_plugged", "vessel_client"
+        )
+        predecessors = (
+            df.filter(pl.col("date_out") != pl.col("date_plugged"))
+            .select("container_number", pl.col("date_out").alias("date_plugged"))
+            .drop_nulls()
+            .unique()
+        )
         chain_starts = (
-            records
-            .join(predecessors, on=["container_number", "date_plugged"], how="anti")
+            records.join(predecessors, on=["container_number", "date_plugged"], how="anti")
+            .sort("container_number", "date_plugged")
             .select(
                 "container_number",
                 "date_plugged",
                 pl.col("vessel_client").alias("original_vessel"),
             )
-            .sort("container_number", "date_plugged")
         )
-
         return (
             records.sort("container_number", "date_plugged")
             .join_asof(
@@ -67,7 +64,9 @@ with app.setup:
                 on="date_plugged",
                 strategy="backward",
             )
-            .select("container_number", "date_plugged", "time_plugged", "original_vessel")
+            .select(
+                "container_number", "date_plugged", "time_plugged", "original_vessel"
+            )
         )
 
     CONTAINER_ORIGIN = _build_container_origin(ELECTRICITY_DATASET)
@@ -78,6 +77,16 @@ def eomonth(dt: str) -> date:
     converted_date = date.fromisoformat(dt)
     last_day = monthrange(converted_date.year, converted_date.month)[1]
     return converted_date.replace(day=last_day)
+
+
+@app.cell(hide_code=True)
+def _(electricity_dataset):
+    _df = mo.sql(
+        f"""
+        FROM ELECTRICITY_DATASET
+        """
+    )
+    return
 
 
 @app.cell
@@ -100,7 +109,7 @@ def _():
     )
 
     _today = date.today()
-    _years = sorted({_today.year - 1, _today.year, _today.year + 1})
+    _years = sorted({_today.year, _today.year + 1})
     month_options = {
         date(_y, _m, 1).strftime("%b %Y"): f"{_y}-{_m:02d}-01"
         for _y in _years
@@ -333,7 +342,13 @@ def _(
     shore_crane_df,
     stuffing_df,
 ):
-    _has_data = len(electricity_df) + len(stuffing_df) + len(shore_crane_df) + len(haulage_df) > 0
+    _has_data = (
+        len(electricity_df)
+        + len(stuffing_df)
+        + len(shore_crane_df)
+        + len(haulage_df)
+        > 0
+    )
     mo.callout(
         mo.md(
             f"**No records found** for **{select_report.value}** "
@@ -384,7 +399,7 @@ def _(cccs_stuffing_dataset, month_selector, select_report):
               AND customer = '{select_report.value}'
               AND date BETWEEN '{month_selector.value}' AND LAST_DAY(DATE '{month_selector.value}')
             """,
-            output=False,
+            output=True,
         )
     return (stuffing_df,)
 
@@ -395,9 +410,8 @@ def _(stuffing_df):
         f"""
         FROM stuffing_df
         SELECT COALESCE(SUM(total_tonnage), 0.0) AS tonnage,
-               COUNT(DISTINCT container_number) AS number_stuffed
-        """,
-        output=False
+               COUNT(DISTINCT container_number) AS number_stuffed,
+        """
     )
     return (stuffing_summary_df,)
 
@@ -408,8 +422,7 @@ def _(electricity_df):
         f"""
         FROM electricity_df
         SELECT SUM(number_of_days_on_plug) AS days_plugged,COUNT (DISTINCT container_number) AS number_stuffed
-        """,
-        output=False
+        """
     )
     return (electricity_summary_df,)
 
@@ -464,18 +477,16 @@ def _(haulage_df):
 
 @app.cell(hide_code=True)
 def _(month_selector, select_report, shore_crane_dataset):
-    with mo.status.spinner("Loading shore crane data…"):
-        shore_crane_df = mo.sql(
-            f"""
-            FROM SHORE_CRANE_DATASET
-            SELECT * EXCLUDE (invoiced_to, operation_type)
-            WHERE invoiced_to = 'MAERSKLINE'
-              AND customer = '{select_report.value}'
-              AND operation_type = 'CCCS Container Stuffing'
-              AND date BETWEEN '{month_selector.value}' AND LAST_DAY(DATE '{month_selector.value}')
-            """,
-            output=False,
-        )
+    shore_crane_df = mo.sql(
+        f"""
+        FROM SHORE_CRANE_DATASET
+                SELECT * EXCLUDE (invoiced_to, operation_type)
+                WHERE invoiced_to = 'MAERSKLINE'
+                  AND customer LIKE '%{select_report.value}%'
+                  AND operation_type = 'CCCS Container Stuffing'
+                  AND date BETWEEN '{month_selector.value}' AND LAST_DAY(DATE '{month_selector.value}')
+        """
+    )
     return (shore_crane_df,)
 
 
@@ -503,7 +514,7 @@ def _(electricity_dataset, month_selector, select_report):
                     vessel_client, date_plugged, time_plugged, container_number, plugged_status,
                     CASE WHEN (date_out > LAST_DAY(DATE '{month_selector.value}') OR date_out IS NULL)
                          THEN NULL ELSE date_out END AS date_out,
-                    CASE WHEN plugged_status = 'Partial' AND "location" = 'For Completion'
+                    CASE WHEN operation_type LIKE '%Direct%' THEN 0 WHEN plugged_status = 'Partial' AND "location" = 'For Completion'
                          THEN DATEDIFF('days', date_start, date_stop)
                          ELSE DATEDIFF('days', date_start, date_stop) + 1
                     END AS number_of_days_on_plug,
@@ -523,7 +534,7 @@ def _(electricity_dataset, month_selector, select_report):
                 plugin_price, monitoring_price, storage_price,
                 storage_price + monitoring_price + plugin_price AS total_price
             """,
-            output=False,
+            output=True,
         )
     return (electricity_df,)
 
@@ -536,39 +547,37 @@ def _(
     select_report,
     transfer_dataset,
 ):
-    with mo.status.spinner("Loading transfer data…"):
-        haulage_df = mo.sql(
-            f"""
-            WITH valid_containers AS (
-                SELECT DISTINCT e.container_number
-                FROM electricity_df e
-                INNER JOIN CONTAINER_ORIGIN co
-                    ON trim(e.container_number) = trim(co.container_number)
-                    AND e.date_plugged  = co.date_plugged
-                    AND e.time_plugged  = co.time_plugged
-                WHERE co.original_vessel = '{select_report.value}'
-            )
-            FROM TRANSFER_DATASET t
-            SEMI JOIN valid_containers v ON trim(t.container_number) = trim(v.container_number)
-            SELECT
-                t.day_name,
-                t.container_number,
-                t.date,
-                t.movement_type,
-                t.destination,
-                t.status,
-                t.time_out,
-                CASE WHEN t.driver LIKE '%IPHS%' THEN 'IPHS' ELSE t.driver END AS driver,
-                t.type,
-                t.size,
-                '{select_report.value}' AS customer,
-                t.haulage_price
-            WHERE t.status = 'Full'
-              AND t.movement_type = 'Delivery'
-              AND t.date BETWEEN '{month_selector.value}' AND LAST_DAY(DATE '{month_selector.value}')
-            """,
-            output=False,
-        )
+    haulage_df = mo.sql(
+        f"""
+        WITH valid_containers AS (
+                    SELECT DISTINCT e.container_number
+                    FROM electricity_df e
+                    INNER JOIN CONTAINER_ORIGIN co
+                        ON trim(e.container_number) = trim(co.container_number)
+                        AND e.date_plugged  = co.date_plugged
+                        AND e.time_plugged  = co.time_plugged
+                    WHERE co.original_vessel LIKE '%{select_report.value}%'
+                )
+                FROM TRANSFER_DATASET t
+                SEMI JOIN valid_containers v ON trim(t.container_number) = trim(v.container_number)
+                SELECT
+                    t.day_name,
+                    t.container_number,
+                    t.date,
+                    t.movement_type,
+                    t.destination,
+                    t.status,
+                    t.time_out,
+                    CASE WHEN t.driver LIKE '%IPHS%' THEN 'IPHS' ELSE t.driver END AS driver,
+                    t.type,
+                    t.size,
+                    '{select_report.value}' AS customer,
+                    t.haulage_price
+                WHERE t.status = 'Full'
+                  AND t.movement_type = 'Delivery'
+                  AND t.date BETWEEN '{month_selector.value}' AND LAST_DAY(DATE '{month_selector.value}')
+        """
+    )
     return (haulage_df,)
 
 
@@ -934,6 +943,18 @@ def _(pricing_df):
 
 @app.cell(hide_code=True)
 def _(pricing_df):
+    _df = mo.sql(
+        f"""
+        FROM pricing_df
+            SELECT *, "Unit Price" * QTY
+        WHERE QTY > 0
+        """
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(pricing_df):
     service_breakdown_df = mo.sql(
         f"""
         WITH mapped AS (
@@ -1138,7 +1159,8 @@ def _(
 @app.cell
 def _(month_selector, reports, save_button, select_report):
     mo.stop(
-        not save_button.value, mo.md("*Click the button to generate the file.*")
+        not save_button.value,
+        mo.md("*Click the button to generate the file.*"),
     )
 
     output_file = export_dataframes(
