@@ -315,7 +315,7 @@ def pti(
             )
         )
         .with_columns(
-            total_price=pl.when(pl.col("invoice_to").eq("IOT")).then( pl.col("plugin_price")
+            total_price=pl.when(pl.col("invoice_to").eq("IOT")) .then( pl.col("plugin_price")
         + (pl.col("days") *pl.col("electricity_price"))
         + pl.col("shifting_price"))
                 .otherwise(
