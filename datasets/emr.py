@@ -292,20 +292,20 @@ def pti(
             how="left",
         )
         .with_columns(
-            no_shifting=(
+            shifting_required=(
                 (
                     pl.col("datetime_start")
                     - pl.col("datetime_end_right")
                 )
                 > SHIFTING_GAP
             )
-            & (
+            | (
                 pl.col("generator_right")
-                == pl.col("generator")
+                != pl.col("generator")
             )
         )
         .with_columns(
-            no_shifting=pl.col("no_shifting").fill_null(True)
+            no_shifting=pl.col("shifting_required").fill_null(True)
         )
         .with_columns(
             shifting_price=(

@@ -18,11 +18,17 @@ from .stuffing import coa, pallet
 from .transport import forklift, scow_transfer, shore_crane, transfer
 from .washing import washing
 
+from .operations import berth,extramen,additional, hatch_to_hatch
+
 forklift_for_salt = forklift_salt()
 
 washing_lf = washing()
 
 __all__ = [
+    "additional",
+    "berth",
+    "extramen",
+    "hatch_to_hatch",
     "full_scows",
     "empty_scows",
     "washing",

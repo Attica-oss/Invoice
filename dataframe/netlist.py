@@ -348,7 +348,8 @@ netList = (
     )
     .drop("vessel_client")
     .with_columns(
-        invoice_value=(pl.col("unit_price") * pl.col("total_tonnage")).round(3)
+        invoice_value=( pl.col("unit_price").round(3)
+           * pl.col("total_tonnage").round(3))
     )
     .select(
         pl.col("day_name"),

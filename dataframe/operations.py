@@ -41,7 +41,7 @@ BERTH_DUES_PATH = ExcelFiles.BERTH_DUES_2026.value
 
 
 berth: pl.LazyFrame = pl.read_excel(
-    BERTH_DUES_PATH[0], sheet_name=BERTH_DUES_PATH[1], engine="calamine"
+    BERTH_DUES_PATH[0], sheet_name=BERTH_DUES_PATH[1], engine="calamine",schema_overrides={"TIME IN":pl.Time,"TIME OUT":pl.Time}
 ).lazy()
 
 # Operations Activity Unloading Lazyframe

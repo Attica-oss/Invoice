@@ -64,7 +64,13 @@ def get_price(services: list[str] | None = None) -> pl.DataFrame:
 
 def bc_items() -> pl.LazyFrame:
     """Load + clean the BC items sheet once (small table → keep in memory)."""
-    lf: pl.LazyFrame = scan_google_sheet(sheet_id=MASTER_ID, sheet_name=BC_ITEMS_SHEET_NAME)
+    lf: pl.LazyFrame = scan_google_sheet(sheet_id=MASTER_ID, sheet_name=BC_ITEMS_SHEET_NAME).select(
+        pl.col("Type"),
+        pl.col("No."),
+        pl.col("Description"),
+        pl.col("Variant"),
+        pl.col("Unit Price").cast(pl.Float64).round(3),
+    )
     return lf
 
 

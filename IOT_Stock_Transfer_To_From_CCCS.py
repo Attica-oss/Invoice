@@ -35,6 +35,74 @@ with app.setup:
     price_df = _f_price.result()
 
 
+@app.cell
+def _():
+    from datasets import miscellaneous_lf,forklift_scow_handling,scow_transfer
+
+    return forklift_scow_handling, miscellaneous_lf, scow_transfer
+
+
+@app.cell
+def _(forklift_scow_handling, miscellaneous_lf, scow_transfer):
+    misc_df = miscellaneous_lf()
+    fl_df = forklift_scow_handling.forklift_scow_handling_lf()
+    scow_df = scow_transfer()
+    return fl_df, misc_df, scow_df
+
+
+@app.cell
+def _(scow_df):
+    scow_df.filter(pl.col("status").eq("Full")).with_columns(
+        time_selection=pl.when(pl.col("movement_type").eq("Collection"))
+        .then(pl.col("time_in"))
+        .otherwise(pl.col("time_out"))
+    ).with_columns(
+        overtime=pl.when(
+            pl.col("day_name")
+            .is_in(["Sun", "PH"])
+            .and_(pl.col("time_selection").gt(pl.time(16, 0)))
+        )
+        .then(pl.lit("overtime 200%"))
+        .when(
+            (
+                pl.col("day_name")
+                .is_in(["Sun", "PH"])
+                .and_(pl.col("time_selection").le(pl.time(16, 0)))
+            ).or_(
+                pl.col("day_name")
+                .is_in(["Sun", "PH"])
+                .not_()
+                .and_(pl.col("time_selection").gt(pl.time(17, 0)))
+            )
+        )
+        .then(pl.lit("overtime 150%"))
+        .otherwise(pl.lit("normal hours"))
+    ).collect()
+    return
+
+
+@app.cell(hide_code=True)
+def _(fl_df):
+    _df = mo.sql(
+        f"""
+        FROM fl_df
+        """
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(misc_df, month_selector):
+    _df = mo.sql(
+        f"""
+        FROM misc_df
+        WHERE operation_type LIKE '%Bin Dispatch%'  AND 
+            date BETWEEN '{month_selector.value}' AND LAST_DAY(DATE '{month_selector.value}')
+        """
+    )
+    return
+
+
 @app.function
 def eomonth(dt: str) -> date:
     converted_date = date.fromisoformat(dt)
@@ -332,7 +400,7 @@ def _():
     return pti_log_df, washing_log_df
 
 
-@app.cell(hide_code=True)
+@app.cell
 def _(pti_df, washing_df):
     summary_df = mo.sql(
         f"""
