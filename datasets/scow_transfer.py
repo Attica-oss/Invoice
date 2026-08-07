@@ -25,7 +25,7 @@ def scow_transfer() -> pl.LazyFrame:
         )
         .filter(pl.col("date").dt.year().eq(CURRENT_YEAR))
         .select(
-            pl.col("date").days.add_day_name(),
+            pl.col("date").days.add_day_name(), #
             pl.col("date"),
             pl.col("container_number"),
             pl.col("customer"),
