@@ -21,7 +21,6 @@ from type_casting.customers import cargo
 from type_casting.dates import (
     CURRENT_YEAR,
     SPECIAL_DAYS,
-    Days,
     public_holiday,
 )
 from type_casting.validations import (
@@ -89,6 +88,7 @@ stuffing_type = (
                 "customer",
                 "date_plugged",
                 "container_number",
+                "time_plugged",
                 "operation_type",
             ]
         )
@@ -99,6 +99,7 @@ stuffing_type = (
     .filter(
         (~pl.col("operation_type").str.contains("CCCS"))
         & (pl.col("operation_type").str.contains_any(["Full", "Basic", "Stuffing"]))
+        & (~pl.col("operation_type").str.contains("Cross"))
     )
     .with_columns(
         stuffing=pl.when(pl.col("operation_type").str.contains("Full"))
@@ -107,8 +108,19 @@ stuffing_type = (
         .then(pl.lit("Basic OSS"))  # Changed to Basic OSS
         .otherwise(pl.lit("Container Stuffing"))
     )
+    .group_by(
+        [
+            "vessel_client",
+            "customer",
+            "date_plugged",
+            "container_number",
+            "stuffing",
+        ]
+    )
+    .agg(pl.col("time_plugged").max())
+    .drop("time_plugged")
     .select(pl.all().exclude("operation_type"))
-    .unique()
+    .unique(subset=["vessel_client", "container_number", "date_plugged"], keep="last")
     .sort(by="date_plugged")
 )
 
@@ -157,7 +169,7 @@ cccs_adjusted_records = (
             .and_(pl.col("Date").dt.year().eq(CURRENT_YEAR))
         )
         .select(
-            pl.col("Date").days.add_day_name(), # type: ignore[attr-defined]
+            pl.col("Date").days.add_day_name(),  # type: ignore[attr-defined]
             pl.col("Date").alias("date"),
             pl.col("Time"),
             pl.col("overtime"),
@@ -241,7 +253,7 @@ netList = (
             .filter(pl.col("Date").dt.year().eq(CURRENT_YEAR))
             .filter(~pl.col("Container (Destination)").str.contains("CCCS"))
             .select(
-                pl.col("Date").days.add_day_name(), # type: ignore[attr-defined]
+                pl.col("Date").days.add_day_name(),  # type: ignore[attr-defined]
                 pl.col("Date").alias("date"),
                 pl.col("Vessel").str.to_uppercase().alias("vessel"),
                 pl.col("startTime").alias("start_time"),
@@ -263,7 +275,7 @@ netList = (
         by_left=["destination", "vessel"],
         by_right=["container_number", "vessel_client"],
         strategy="forward",
-        # tolerance="1d",
+        tolerance="2d",
     )
     .join(
         other=stuffing_type,
@@ -271,13 +283,18 @@ netList = (
         right_on=["container_number", "date_plugged"],
         how="left",
         suffix="_ox",
+        coalesce=False,
     )
-    # .fill_null(strategy="max")
+    .drop(["customer_ox", "date_plugged_ox"])
     .with_columns(
         service=pl.when(
             pl.col("stuffing_ox")
             .eq(pl.lit("Basic OSS"))
-            .and_(pl.col("vessel_client").is_in(["OCEAN BASKET", "AMIRANTE"]))
+            .and_(
+                pl.col("vessel_client").is_in(
+                    ["OCEAN BASKET", "AMIRANTE", "ISLAND CATCH"]
+                )
+            )
         )
         .then(pl.col("stuffing_ox"))
         .when(
@@ -320,19 +337,21 @@ netList = (
                 # "operation_type_ox",
                 "stuffing_ox",
                 "date_plugged",
+                "date_plugged_ox",
+                "container_number",
             ]
         )
     )
-    .with_columns(Service=pl.col("service") + " - " + pl.col("storage_type"))
+    .with_columns(service=pl.col("service") + " - " + pl.col("storage_type"))
     .sort(by="date")
     .join_asof(
         UNLOADING_PRICE.lazy(),
-        by_left="Service",
+        by_left="service",
         by_right="service",
         on="date",
         strategy="backward",
     )
-    .select(pl.all().exclude(["Service", "service_type"]))
+    .drop("service_type")
     .with_columns(
         unit_price=pl.when(pl.col("overtime") == Overtime.overtime_200_text)
         .then(pl.col("unit_price") * OvertimePerc.overtime_200)
@@ -341,15 +360,19 @@ netList = (
         .otherwise(pl.col("unit_price"))
     )
     .with_columns(
-        pl.when(pl.col("vessel_client").ne(pl.col("vessel")))
+        pl.when(
+            pl.col("vessel_client").is_in(by_catch_companies)
+            # & pl.col("vessel_client").ne(pl.col("vessel"))
+        )
         .then(pl.col("vessel_client"))
         .otherwise(pl.lit(None))
         .alias("remarks")
     )
     .drop("vessel_client")
     .with_columns(
-        invoice_value=( pl.col("unit_price").round(3)
-           * pl.col("total_tonnage").round(3))
+        invoice_value=(
+            pl.col("unit_price").round(3) * pl.col("total_tonnage").round(3)
+        ).cast(pl.Decimal(scale=2))
     )
     .select(
         pl.col("day_name"),

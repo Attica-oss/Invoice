@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.23.1"
+__generated_with = "0.23.14"
 app = marimo.App(width="columns")
 
 with app.setup:
@@ -135,8 +135,14 @@ def _(month_selector, select_report):
     return (forklift_services_df,)
 
 
+@app.cell
+def _():
+    121/60
+    return
+
+
 @app.cell(hide_code=True)
-def _(forklift_services_df, totals, unpiv):
+def _(forklift_services_df, unpiv):
     forklift_summary_df = mo.sql(
         f"""
         WITH totals AS (

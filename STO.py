@@ -4,9 +4,8 @@ __generated_with = "0.23.14"
 app = marimo.App(width="columns")
 
 with app.setup:
-
     from concurrent.futures import ThreadPoolExecutor
-    from datetime import date
+    from datetime import date, timedelta
     from calendar import monthrange
     import polars as pl
     import marimo as mo
@@ -25,15 +24,12 @@ with app.setup:
         transfer,
     )
     from scan_google_sheet import scan_google_sheet
-    from dataframe import  forklift, hatch_to_hatch
+    from dataframe import forklift, hatch_to_hatch
 
-    ACTIVITY_XLSX = (
-            r"P:\Verification & Invoicing\Validation Report"
-            r"\2026 IPHS operation activity.xlsx"
-        )
+    ACTIVITY_XLSX = r"C:\Users\gmounac\Dropbox\! OPERATION SUPPORTING DOCUMENTATION\2026\2026 IPHS operation activity.xlsx"
     VALIDATION_XLSX = (
-            r"P:\Verification & Invoicing\Validation Report\Validation Report.xlsx"
-        )
+        r"P:\Verification & Invoicing\Validation Report\Validation Report.xlsx"
+    )
 
     with ThreadPoolExecutor(max_workers=10) as _pool:
         _f_tare = _pool.submit(lambda: genesis_raw().collect())
@@ -92,6 +88,15 @@ def get_first_value(
     if df.is_empty() or column not in df.columns:
         return default
     return df.get_column(column).item(0)
+
+
+@app.cell
+def _():
+    well_inv_df = scan_google_sheet(
+        url="https://docs.google.com/spreadsheets/d/1PvTkl6DYZdhtaiNshz0qwtSPxC8S1OOeu905NmhFKNs/edit?gid=1301483182#gid=1301483182",
+        sheet_name="WelltoWell",
+    )
+    return (well_inv_df,)
 
 
 @app.cell(hide_code=True)
@@ -241,16 +246,6 @@ def _():
             "JO WEN",
             "KERSAINT",
             "LAYLA",
-            "MAN AN",
-            "MARTA REEFER",
-            "MERCURY",
-            "NF DAFA No. 8",
-            "NF EASTERN STAR",
-            "NF INDIAN TUNA No. 9",
-            "NF SEA GLORY No. 16",
-            "NF TUNA PEAK",
-            "NF TUNA PEAK No. 1",
-            "NO. 121 DONGWON",
             "NOUR",
             "ORANGE SEA",
             "ORANGE SPIRIT",
@@ -324,29 +319,26 @@ def _(berth_df, select_report):
         .to_list()
     )
 
-
-
-
     start_date = mo.ui.dropdown(
-            options=_options,
-            value=_options[0] if _options else None,
-            label="Start Date",
-        )
+        options=_options,
+        value=_options[0] if _options else None,
+        label="Start Date",
+    )
     return (start_date,)
 
 
 @app.cell
 def _(berth_df, select_report, start_date):
     mo.stop(
-            start_date.value is None,
-            mo.callout(
-                mo.md(
-                    f"**No berth record found for {select_report.value}.** "
-                    "Select a different vessel."
-                ),
-                kind="warn",
+        start_date.value is None,
+        mo.callout(
+            mo.md(
+                f"**No berth record found for {select_report.value}.** "
+                "Select a different vessel."
             ),
-        )
+            kind="warn",
+        ),
+    )
 
     end_date = (
         berth_df.filter(
@@ -394,10 +386,8 @@ def _(
 
     filter_bar = mo.hstack(
         [
-
             select_report,
-             start_date,
-
+            start_date,
         ],
         justify="start",
         gap=2,
@@ -406,11 +396,11 @@ def _(
     meta = mo.hstack(
         [
             mo.stat(
-                    label="Invoice Value",
-                    value=f"{metrics_df.item():,.2f}",
-                    caption="Total price (USD)",
-                ),
-            ],
+                label="Invoice Value",
+                value=f"{metrics_df.item():,.2f}",
+                caption="Total price (USD)",
+            ),
+        ],
         justify="start",
         gap=1,
     )
@@ -439,25 +429,20 @@ def _(
 
 
 @app.cell
+def _(bc_df, copy_button):
+    mo.stop(not copy_button.value)
+    bc_df.write_clipboard()  # tab-separated, pastes cleanly into BC / Excel
+    mo.md("✅ Copied to clipboard")
+    return
+
+
+@app.cell
 def _():
     report_status_df = scan_google_sheet(
         url="https://docs.google.com/spreadsheets/d/1xNh4SiP_xw8Ck1baLhFazBsmMLIbOHjF4tg_M89efvI/edit?gid=1899664910#gid=1899664910",
         sheet_name="report_status",
     )
     return (report_status_df,)
-
-
-@app.cell(hide_code=True)
-def _(report_status_df):
-    _df = mo.sql(
-        f"""
-        FROM report_status_df
-        SELECT COUNT(*) AS number_of_report,
-        report_type
-        GROUP BY ALL
-        """
-    )
-    return
 
 
 @app.cell(hide_code=True)
@@ -516,11 +501,11 @@ def _(berth_ldf, report_status_df, select_report, start_date):
 
 @app.cell
 def _(report_data_df):
-
-
     document_date = mo.ui.text(
         label="Document Date:",
-        value=str(get_first_value(report_data_df, "document_date", default="")),
+        value=str(
+            get_first_value(report_data_df, "document_date", default="")
+        ),
     )
 
     posting_date = mo.ui.text(
@@ -529,27 +514,28 @@ def _(report_data_df):
             report_data_df,
             "posting_date",
             default="",
-        )
+        ),
     )
 
     period_start = mo.ui.text(
         label="Period Start:",
         value=str(get_first_value(report_data_df, "period_start", default="")),
-
     )
 
     period_end = mo.ui.text(
         label="Period End:",
-        value=str(get_first_value(report_data_df, "period_end", default="")))
+        value=str(get_first_value(report_data_df, "period_end", default="")),
+    )
 
     sto_number = mo.ui.text(
         label="StopOver No.",
-        value=str(get_first_value(report_data_df, "sto_number", default=""))
+        value=str(get_first_value(report_data_df, "sto_number", default="")),
     )
 
     customer = mo.ui.text(
         label="Customer Name",
-        value=str(get_first_value(report_data_df, "customer", default="")),)
+        value=str(get_first_value(report_data_df, "customer", default="")),
+    )
     return (
         customer,
         document_date,
@@ -568,7 +554,13 @@ def _():
 
 
 @app.cell(hide_code=True)
-def _(days_on_electricity, no_of_plugin):
+def _(
+    forklift_hours,
+    no_of_plugin,
+    number_of_containers,
+    salt_operations,
+    total_tonnage,
+):
     summary_table = mo.Html(
         f"""
         <table style="
@@ -590,33 +582,78 @@ def _(days_on_electricity, no_of_plugin):
             </tr>
             <tr>
                 <td style="text-align:right; padding-right:28px; font-style:italic;">
-                    Electricity
+                    Tonnage
                 </td>
                 <td style="text-align:right; font-weight:bold;">
-                    {days_on_electricity}
+                    {total_tonnage}
                 </td>
                 <td style="padding-left:12px; font-style:italic;">
-                    Days
+                    Tons
+                </td>
+            </tr>
+             <tr>
+                <td style="text-align:right; padding-right:28px; font-style:italic;">
+                    Total Container Stuffed
+                </td>
+                <td style="text-align:right; font-weight:bold;">
+                    {number_of_containers}
+                </td>
+                <td style="padding-left:12px; font-style:italic;">
+                    Containers
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:right; padding-right:28px; font-style:italic;">
+                    Forklift Services:
+                </td>
+                <td style="text-align:right; font-weight:bold;">
+                    {forklift_hours}
+                </td>
+                <td style="padding-left:12px; font-style:italic;">
+                    Hours
+                </td>
+                </tr>
+            <tr>
+                <td style="text-align:right; padding-right:28px; font-style:italic;">
+                    Salt Operations:
+                </td>
+                <td style="text-align:right; font-weight:bold;">
+                    {salt_operations}
+                </td>
+                <td style="padding-left:12px; font-style:italic;">
+                    Hours
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:right; padding-right:28px; font-style:italic;">
+                    Forklift Services:
+                </td>
+                <td style="text-align:right; font-weight:bold;">
+                    {forklift_hours}
+                </td>
+                <td style="padding-left:12px; font-style:italic;">
+                    Hours
                 </td>
             </tr>
             <tr>
                 <td colspan="3" style="height:18px;"></td>
             </tr>
         </table>
-        """)
+        """
+    )
     return (summary_table,)
 
 
 @app.cell
 def _(final_berth_df, select_report, start_date):
     mo.callout(
-            mo.md(
-                f"**No berth record found** for **{select_report.value}** "
-                f"starting **{start_date.value}**. "
-                "Check the vessel name or select a different start date."
-            ),
-            kind="warn",
-        ) if final_berth_df.is_empty() else None
+        mo.md(
+            f"**No berth record found** for **{select_report.value}** "
+            f"starting **{start_date.value}**. "
+            "Check the vessel name or select a different start date."
+        ),
+        kind="warn",
+    ) if final_berth_df.is_empty() else None
     return
 
 
@@ -648,6 +685,17 @@ def _(berth_df, select_report, start_date):
         """
     )
     return (final_berth_df,)
+
+
+@app.cell
+def _(final_berth_df):
+    discount_berthing_figure: int = final_berth_df.select(
+        pl.col("discount").sum()
+    ).item()
+    value_berthing_figure: int = final_berth_df.select(
+        pl.col("value").sum()
+    ).item()
+    return discount_berthing_figure, value_berthing_figure
 
 
 @app.cell(hide_code=True)
@@ -758,6 +806,7 @@ def _(end_date, select_report, start_date, tare_dataset, unpivoted):
 def _():
     mo.md(r"""
     ### Stuffing ::lucide:container::
+    ----
     """)
     return
 
@@ -771,17 +820,17 @@ def _(end_date, select_report, start_date, stuffing_dataset):
         SELECT
             vessel_client AS vessel,
             date_plugged::DATE + time_plugged::TIME AS datetime_plugged_in,
-            container_number shipping_line,
+            container_number,shipping_line,
             plugged_status,
             tonnage,
             set_point,
             date_out,
             CASE
-                WHEN operation_type LIKE '%OSS%' THEN 0
+                WHEN operation_type LIKE '%OSS%' OR shipping_line = 'IOT' THEN 0
                 ELSE days_on_plug
             END AS days_on_plug,
             CASE
-                WHEN operation_type LIKE '%OSS%' THEN 0
+                WHEN operation_type LIKE '%OSS%' OR shipping_line = 'IOT' THEN 0
                 ELSE total
             END AS total_price,
             CASE
@@ -798,6 +847,14 @@ def _(end_date, select_report, start_date, stuffing_dataset):
     return (stuffing_df,)
 
 
+@app.cell(hide_code=True)
+def _():
+    mo.md(r"""
+    * Stuffing Metrics for summary
+    """)
+    return
+
+
 @app.cell
 def _(stuffing_df):
     # STO summary figures shown in the UI and on the Summary sheet.
@@ -808,7 +865,10 @@ def _(stuffing_df):
         .sum()
         or 0
     )
-    return days_on_electricity, no_of_plugin
+    number_of_containers = stuffing_df.select(
+        pl.col("container_number").unique_counts().sum()
+    ).item()
+    return days_on_electricity, no_of_plugin, number_of_containers
 
 
 @app.cell(hide_code=True)
@@ -873,14 +933,46 @@ def _(salt_df, unpivoted):
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
+    * Salt metrics for summary
+    """)
+    return
+
+
+@app.cell
+def _(salt_summary_df):
+    salt_operations = salt_summary_df.select(pl.col("quantity").sum()).item()
+    return (salt_operations,)
+
+
+@app.cell(hide_code=True)
+def _():
+    mo.md(r"""
     ### Forklift ::lucide:forklift::
     """)
     return
 
 
 @app.cell
-def _():
-    pl.read_excel(source=r"C:\Users\gmounac\Dropbox\Container and Transport\Transport Section\Forklift Usage\Forklift Record.xlsx",schema_overrides={"Time Out":pl.Time,"Time In":pl.Time})
+def _(end_date, select_report, start_date):
+    pl.read_excel(
+        source=r"C:\Users\gmounac\Dropbox\Container and Transport\Transport Section\Forklift Usage\Forklift Record.xlsx",
+        schema_overrides={
+            "Time Out": pl.Time,
+            "Time In": pl.Time,
+            "Duration": pl.Time,
+        },
+    ).filter(
+        pl.col("Invoiced in:").is_in(["ECHEBASTAR", "HARTSWATER"]).not_()
+    ).filter(
+        pl.col("Vessel/Client")
+        .eq(select_report.value)
+        .and_(
+            pl.col("Date of Service").is_between(
+                date.fromisoformat(start_date.value),
+                end_date + timedelta(days=5),
+            )
+        )
+    ).sort(["Date of Service", "Time Out"])
     return
 
 
@@ -900,10 +992,43 @@ def _(end_date, forklift_dataset, select_report, start_date):
     forklift_df = mo.sql(
         f"""
         FROM FORKLIFT_DATASET
-        WHERE invoiced_in NOT IN ('HARTSWATER LIMITED','ECHEBASTAR') AND customer = '{select_report.value}'  AND date BETWEEN '{start_date.value}' AND '{end_date}'::DATE+ INTERVAL 5 DAY
+        WHERE invoiced_in NOT IN ('HARTSWATER LIMITED','ECHEBASTAR','SAPMER') AND customer = '{select_report.value}'  AND date BETWEEN '{start_date.value}' AND '{end_date}'::DATE+ INTERVAL 5 DAY
         """
     )
     return (forklift_df,)
+
+
+@app.cell(hide_code=True)
+def _(forklift_df, unpivoted):
+    forklift_summary_df = mo.sql(
+        f"""
+        WITH
+            summaries AS (FROM forklift_df
+        SELECT 
+        CEIL(SUM(normal_hours) / 60 ) AS "Normal Hours",
+        CEIL(SUM(overtime_150) / 60 ) AS "Overtime 150%",
+        CEIL(SUM(overtime_200) / 60 ) AS "Overtime 200%"),
+
+         unpivoted AS (
+                UNPIVOT summaries ON "Normal Hours",
+                "Overtime 150%",
+                "Overtime 200%" INTO NAME service VALUE quantity
+            )
+
+
+
+        FROM
+            unpivoted
+        SELECT
+            *,
+            CASE
+                WHEN service = 'Normal Hours' THEN 30 * 1.0 * quantity
+                WHEN service = 'Overtime 150%' THEN 30* 1.5 * quantity
+                WHEN service = 'Overtime 200%' THEN 30* 2.0 * quantity
+            END AS total_price
+        """
+    )
+    return (forklift_summary_df,)
 
 
 @app.cell(hide_code=True)
@@ -943,36 +1068,21 @@ def _(f_salt_df, unpivoted):
 
 
 @app.cell(hide_code=True)
-def _(forklift_df, unpivoted):
-    forklift_summary_df = mo.sql(
-        f"""
-        WITH
-            summaries AS (FROM forklift_df
-        SELECT 
-        CEIL(SUM(normal_hours) / 60 ) AS "Normal Hours",
-        CEIL(SUM(overtime_150) / 60 ) AS "Overtime 150%",
-        CEIL(SUM(overtime_200) / 60 ) AS "Overtime 200%"),
-
-         unpivoted AS (
-                UNPIVOT summaries ON "Normal Hours",
-                "Overtime 150%",
-                "Overtime 200%" INTO NAME service VALUE quantity
-            )
+def _():
+    mo.md(r"""
+    * Forklift metrics for summary
+    """)
+    return
 
 
-
-        FROM
-            unpivoted
-        SELECT
-            *,
-            CASE
-                WHEN service = 'Normal Hours' THEN 30 * 1.0 * quantity
-                WHEN service = 'Overtime 150%' THEN 30* 1.5 * quantity
-                WHEN service = 'Overtime 200%' THEN 30* 2.0 * quantity
-            END AS total_price
-        """
+@app.cell
+def _(forklift_salt_summary_df, forklift_summary_df):
+    forklift_hours = int(
+        pl.concat([forklift_summary_df, forklift_salt_summary_df])
+        .select(pl.col("quantity").sum())
+        .item()
     )
-    return (forklift_summary_df,)
+    return (forklift_hours,)
 
 
 @app.cell(hide_code=True)
@@ -1087,14 +1197,22 @@ def _():
     return
 
 
-@app.cell
-def _(end_date, select_report, start_date, well_to_well_new):
+@app.cell(hide_code=True)
+def _(end_date, select_report, start_date, well_inv_df):
     well_to_well_df = mo.sql(
         f"""
-        FROM WELL_TO_WELL_NEW
+        WITH main AS (FROM well_inv_df
+            SELECT "Day" AS day_name,
+            "Date" AS date,
+            "Vessel" AS vessel,
+            "Tonnage" AS tonnage,
+            CASE WHEN "Day" IN ('Sun','PH') THEN 17*1.5 ELSE 17 END AS unit_price
         WHERE
             vessel = '{select_report.value}'
-            AND date BETWEEN '{start_date.value}' AND '{end_date}'
+            AND date BETWEEN '{start_date.value}' AND '{end_date}')
+
+        FROM main
+        SELECT *, tonnage * unit_price AS total_price
         """
     )
     return (well_to_well_df,)
@@ -1125,36 +1243,6 @@ def _(well_to_well_df):
         """
     )
     return (summary_well_to_well_df,)
-
-
-@app.cell
-def _():
-    well_inv_df = scan_google_sheet(
-        url="https://docs.google.com/spreadsheets/d/1PvTkl6DYZdhtaiNshz0qwtSPxC8S1OOeu905NmhFKNs/edit?gid=1301483182#gid=1301483182",
-        sheet_name="WelltoWell",
-    )
-    return (well_inv_df,)
-
-
-@app.cell(hide_code=True)
-def _(end_date, select_report, start_date, well_inv_df):
-    WELL_TO_WELL_NEW = mo.sql(
-        f"""
-        WITH main AS (FROM well_inv_df
-            SELECT "Day" AS day_name,
-            "Date" AS date,
-            "Vessel" AS vessel,
-            "Tonnage" AS tonnage,
-            CASE WHEN "Day" IN ('Sun','PH') THEN 17*1.5 ELSE 17 END AS unit_price
-        WHERE
-            vessel = '{select_report.value}'
-            AND date BETWEEN '{start_date.value}' AND '{end_date}')
-
-        FROM main
-        SELECT *, tonnage * unit_price AS total_price
-        """
-    )
-    return
 
 
 @app.cell(hide_code=True)
@@ -1189,6 +1277,22 @@ def _(net_list_df):
         """
     )
     return (summary_net_list_df,)
+
+
+@app.cell(hide_code=True)
+def _():
+    mo.md(r"""
+    * Net list metrics for summary
+    """)
+    return
+
+
+@app.cell
+def _(summary_net_list_df):
+    total_tonnage = summary_net_list_df.select(
+        pl.col("total_tonnage").sum()
+    ).item()
+    return (total_tonnage,)
 
 
 @app.cell(hide_code=True)
@@ -1582,7 +1686,7 @@ def _(stuffing_df):
                     'PLUGIN' AS Description,
                     'STD' AS Variant
                 WHERE
-                    remarks IS NULL
+                    remarks= ''
             ),
             monitoring AS (
                 FROM
@@ -1592,7 +1696,7 @@ def _(stuffing_df):
                     'MONITORING' AS Description,
                     'STD' AS Variant
                 WHERE
-                    remarks IS NULL
+                    remarks= ''
                     AND plugged_status <> 'Partial'
             ),
             standard AS (
@@ -1604,7 +1708,7 @@ def _(stuffing_df):
                     'STD' AS Variant
                 WHERE
                     set_point = -25
-                    AND remarks IS NULL
+                    AND remarks = ''
             ),
             magnum AS (
                 FROM
@@ -1615,7 +1719,7 @@ def _(stuffing_df):
                     'STD' AS Variant
                 WHERE
                     set_point = -35
-                    AND remarks IS NULL
+                    AND remarks = ''
             ),
             s_freezer AS (
                 FROM
@@ -1626,7 +1730,7 @@ def _(stuffing_df):
                     'STD' AS Variant
                 WHERE
                     set_point = -60
-                    AND remarks IS NULL
+                    AND remarks= ''
             )
         FROM
             plugin
@@ -1777,7 +1881,8 @@ def _(summary_extra_men_df):
         FROM normal 
         UNION ALL
         FROM overtime
-        """
+        """,
+        output=False
     )
     return (extra_men_bc,)
 
@@ -1973,116 +2078,177 @@ def _(
     well_to_well_bc,
 ):
     combined_services_bc = pl.concat(
-            [
-                _df.select(
-                    pl.col("QTY").cast(pl.Decimal(scale=3)),
-                    pl.col("Description").cast(pl.Utf8),
-                    pl.col("Variant").cast(pl.Utf8),
-                )
-                for _df in [
-                    berth_bc,
-                    tare_bc,
-                    stuffing_bc,
-                    salt_bc,
-                    forklift_bc,
-                    extra_men_bc,
-                    additional_overtime_bc,
-                    well_to_well_bc,
-                    net_list_bc,
-                    shore_crane_bc,
-                    transfer_bc,
-                ]
+        [
+            _df.select(
+                pl.col("QTY").cast(pl.Decimal(scale=3)),
+                pl.col("Description").cast(pl.Utf8),
+                pl.col("Variant").cast(pl.Utf8),
+            )
+            for _df in [
+                berth_bc,
+                tare_bc,
+                stuffing_bc,
+                salt_bc,
+                forklift_bc,
+                extra_men_bc,
+                additional_overtime_bc,
+                well_to_well_bc,
+                net_list_bc,
+                shore_crane_bc,
+                transfer_bc,
             ]
-        )
+        ]
+    )
     combined_services_bc
     return (combined_services_bc,)
 
 
 @app.cell(hide_code=True)
-def _(combined_services_bc):
+def _(combined_services_bc, customer):
     pricing_df = mo.sql(
         f"""
-        WITH bc AS (FROM
-            price_df
-            SELECT 
-            "Type",
-            "No.",
-            "Description",
-            "Variant",
-           "Unit Price"
-        WHERE
-            Description IN (
-            'TARE- RENTAL',
-            'CALIBRATION',
-            'EXTRA MEN',
-            'ADDITIONAL OVERTIME',
-            'WELL TO WELL',
-            'TRANSFER FEU',
-            'SALT LOADING',
-            'FORKLIFT RENTAL',
-            'SHORE CRANE RENTAL',
-            'UNLOAD TO COLD STORE - DRY',
-            'UNLOAD TO COLD STORE - BRINE',
-            'TRANSHIPMENT - DRY',
-            'TRANSHIPMENT - BRINE',
-            'STO -BASIC OSS - DRY',
-            'STO -BASIC OSS - BRINE',
-            'UNLOAD TO QUAY - DRY',
-            'UNLOAD TO QUAY - BRINE',
-            'CONTAINER STUFFING - DRY',
-            'CONTAINER STUFFING - BRINE',
-            'PLUGIN',
-            'MONITORING',
-            'ELECTRICITY - 25°',
-        	'ELECTRICITY - 35°',
-        	'ELECTRICITY - 60°',
-        	'BERTH DUES (FISHING VESSELS)',
-        	'BERTH DUES (LONGLINER)',
-        	'BERTH DUES (CARGO)',
-        	'BERTH DUES (SUPPLY VESSELS)',
-        	'BERTH DUES (MILITARY)'
+        WITH
+            bc AS (
+                SELECT
+                    "Type",
+                    "No.",
+                    "Description",
+                    "Variant",
+                    "Unit Price",
+                    list_position(
+                        [
+                            'BERTH DUES (FISHING VESSELS)',
+                            'BERTH DUES (LONGLINER)',
+                            'BERTH DUES (CARGO)',
+                            'BERTH DUES (SUPPLY VESSELS)',
+                            'BERTH DUES (MILITARY)',
+                            'TARE- RENTAL',
+                            'CALIBRATION',
+                            'PLUGIN',
+                            'MONITORING',
+                            'ELECTRICITY - 25°',
+                            'ELECTRICITY - 35°',
+                            'ELECTRICITY - 60°',
+                            'SALT LOADING',
+                            'FORKLIFT RENTAL',
+                            'EXTRA MEN',
+                            'ADDITIONAL OVERTIME',
+                            'WELL TO WELL',
+                            'UNLOAD TO COLD STORE - DRY',
+                            'UNLOAD TO COLD STORE - BRINE',
+                            'TRANSHIPMENT - DRY',
+                            'TRANSHIPMENT - BRINE',
+                            'STO -BASIC OSS - DRY',
+                            'STO -BASIC OSS - BRINE',
+                            'UNLOAD TO QUAY - DRY',
+                            'UNLOAD TO QUAY - BRINE',
+                            'CONTAINER STUFFING - DRY',
+                            'CONTAINER STUFFING - BRINE',
+                            'SHORE CRANE RENTAL',
+                            'TRANSFER FEU'
+                        ],
+                        "Description"
+                    ) AS sort_order
+                FROM
+                    price_df
+                WHERE
+                    "Description" IN (
+                        'BERTH DUES (FISHING VESSELS)',
+                        'BERTH DUES (LONGLINER)',
+                        'BERTH DUES (CARGO)',
+                        'BERTH DUES (SUPPLY VESSELS)',
+                        'BERTH DUES (MILITARY)',
+                        'TARE- RENTAL',
+                        'CALIBRATION',
+                        'PLUGIN',
+                        'MONITORING',
+                        'ELECTRICITY - 25°',
+                        'ELECTRICITY - 35°',
+                        'ELECTRICITY - 60°',
+                        'SALT LOADING',
+                        'FORKLIFT RENTAL',
+                        'EXTRA MEN',
+                        'ADDITIONAL OVERTIME',
+                        'WELL TO WELL',
+                        'UNLOAD TO COLD STORE - DRY',
+                        'UNLOAD TO COLD STORE - BRINE',
+                        'TRANSHIPMENT - DRY',
+                        'TRANSHIPMENT - BRINE',
+                        'STO -BASIC OSS - DRY',
+                        'STO -BASIC OSS - BRINE',
+                        'UNLOAD TO QUAY - DRY',
+                        'UNLOAD TO QUAY - BRINE',
+                        'CONTAINER STUFFING - DRY',
+                        'CONTAINER STUFFING - BRINE',
+                        'SHORE CRANE RENTAL',
+                        'TRANSFER FEU'
+                    )
+            ),
 
+            summaries AS (
+                FROM
+                    combined_services_bc
+                SELECT
+                    *
+                WHERE
+                    QTY <> 0
+            )
 
-
-            ) ),summaries AS (FROM combined_services_bc WHERE QTY <>0)
-
-
-        SELECT 
-            b.Type,
+        SELECT
+            b."Type",
             b."No.",
-            b.Description,
-            b.Variant,
+            b."Description",
+            b."Variant",
             s.QTY::DECIMAL AS QTY,
-            CASE WHEN b.Description = 'BERTH DUES (FISHING VESSELS)' THEN 1000 ELSE b."Unit Price"::DECIMAL END AS "Unit Price"
-        FROM bc b LEFT JOIN summaries s ON s.Description = b.Description AND s.Variant = b.Variant
-        WHERE s.QTY IS NOT NULL
+            CASE
+                WHEN b."Description" = 'BERTH DUES (FISHING VESSELS)'
+                    AND '{customer.value}' IN (
+                        'ECHEBASTAR',
+                        'HARTSWATER LIMITED'
+                    )
+                THEN 1250
+                ELSE b."Unit Price"::DECIMAL
+            END AS "Unit Price"
+        FROM
+            bc AS b
+        LEFT JOIN summaries AS s
+            ON s."Description" = b."Description"
+            AND s."Variant" = b."Variant"
+        WHERE
+            s.QTY IS NOT NULL
+        ORDER BY
+            b.sort_order,
+            b."Variant";
         """
     )
     return (pricing_df,)
 
 
 @app.cell(hide_code=True)
-def _(pricing_df):
+def _(service_breakdown_df):
     metrics_df = mo.sql(
         f"""
-        WITH a AS (FROM pricing_df
-                SELECT Description, Variant, "Unit Price", QTY,
-                    ROUND("Unit Price" * QTY, 2) AS total_price
-                WHERE QTY > 0)
-
-                FROM a
-                SELECT COALESCE(ROUND(SUM(total_price)::FLOAT8, 2), 0) AS total_price
-        """,
-        output=False
+        WITH
+            a AS (
+                FROM
+                    service_breakdown_df
+                SELECT
+                    Description,
+                    Variant,
+                    "unit_price",
+                    quantity AS QTY,
+                    total AS total_price
+            )
+        FROM
+            a
+        SELECT SUM(total_price) AS total_price
+        """
     )
     return (metrics_df,)
 
 
 @app.cell
-def _(bc_df, copy_button):
-    mo.stop(not copy_button.value)
-    bc_df.write_clipboard()  # tab-separated, pastes cleanly into BC / Excel
-    mo.md("✅ Copied to clipboard")
+def _():
     return
 
 
@@ -2092,27 +2258,28 @@ def _(pricing_df):
         f"""
         FROM pricing_df
             SELECT * EXCLUDE("Unit Price")
-        WHERE QTY > 0
         """
     )
     return (bc_df,)
 
 
 @app.cell(hide_code=True)
-def _(pricing_df):
+def _(discount_berthing_figure: int, pricing_df, value_berthing_figure: int):
     service_breakdown_df = mo.sql(
         f"""
         FROM pricing_df
                 SELECT
                     'STO Services' AS section,
+            Description,
+            Variant,
                     Description ||
                         CASE WHEN Variant <> 'STD' THEN ' (' || Variant || ')' ELSE '' END
                         AS service,
                     ROW_NUMBER() OVER (ORDER BY Description, Variant) AS sort_order,
                     "Unit Price" AS unit_price,
                     QTY AS quantity,
-                    ROUND(QTY * "Unit Price", 2) AS total
-                WHERE QTY > 0
+                    CASE WHEN service LIKE '%BERTH%' AND QTY > 0 THEN '{value_berthing_figure}' WHEN service LIKE '%BERTH%' AND QTY < 0 THEN '{discount_berthing_figure}' ELSE ROUND(QTY * "Unit Price", 2) END AS total
+
                 ORDER BY sort_order
         """
     )

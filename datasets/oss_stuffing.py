@@ -23,7 +23,7 @@ def oss() -> pl.LazyFrame:
         .with_columns(
             # Bill the client named in remarks when it differs from the
             # operating vessel.
-            vessel=pl.when(pl.col("remarks").is_null())
+            vessel=pl.when(pl.col("remarks").is_null().or_(pl.col("service") == pl.lit("Full OSS")))
             .then(pl.col("vessel"))
             .otherwise(pl.col("remarks")),
             service=pl.when(pl.col("service") == pl.lit("Full OSS"))
@@ -37,9 +37,9 @@ def oss() -> pl.LazyFrame:
             on="date",
             strategy="backward",
         )
-        .drop("service", "remarks")
+        .drop("service_type", "remarks")
         .with_columns(unit_price=apply_overtime_rate())
         .with_columns(
             invoice_value=(pl.col("unit_price") * pl.col("total_tonnage")).round(3)
-        )
+        ).unique()
     )
