@@ -18,7 +18,9 @@ from datetime import date
 
 import polars as pl
 
-from datasets import iot_cargo_price, iot_coa, net_list_raw, stuffing_price
+from datasets.price import iot_cargo_price, stuffing_price
+from datasets.stuffing import iot_coa
+from datasets.genesis import net_list_raw
 from utils import CURRENT_YEAR, apply_overtime_rate, iot_soc
 from utils.validations import OvertimePerc
 

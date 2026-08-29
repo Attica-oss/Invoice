@@ -1,6 +1,12 @@
-"""Stuffing Lazyframes"""
+"""Stuffing Lazyframes.
+
+``coa`` and ``pallet`` are ``@lru_cache`` builders exposed under their old
+names via :pep:`562` ``__getattr__``; importing this module does no I/O.
+"""
 
 from datetime import timedelta
+from functools import lru_cache
+from typing import Any
 
 import polars as pl
 
@@ -21,31 +27,25 @@ from type_casting import (
     shipping_line,
 )
 
+
 # Price
-LINER_PRICE = (
-    get_price(["Plastic Liner Installation"])
-    .select(pl.col("unit_price"))
-    .to_series()[0]
-)
-MAGNUM_ELECTRICITY = (
-    get_price(["Electricity Price Magnum"]).select(pl.col("unit_price")).to_series()[0]
-)
-MONITORING_PRICE = get_price(["Monitoring"]).select(pl.col("unit_price")).to_series()[0]
-PALLET_IOT_PRICE = (
-    get_price(["Pallets(+ Wedges) Usage"]).select(pl.col("unit_price")).to_series()[0]
-)
-PALLET_PRICE = get_price(["Pallets"]).select(pl.col("unit_price")).to_series()[0]
-PLUGIN_PRICE = get_price(["Plugin"]).select(pl.col("unit_price")).to_series()[0]
-S_FREEZER_ELECTRICITY = (
-    get_price(["Electricity Price S Freezer"])
-    .select(pl.col("unit_price"))
-    .to_series()[0]
-)
-STANDARD_ELECTRICITY = (
-    get_price(["Electricity Price Standard"])
-    .select(pl.col("unit_price"))
-    .to_series()[0]
-)
+@lru_cache(maxsize=1)
+def _prices() -> dict[str, float]:
+    """Stuffing unit prices from one cached read of the price table."""
+
+    def _p(service: str) -> float:
+        return get_price([service]).select(pl.col("unit_price")).to_series()[0]
+
+    return {
+        "liner": _p("Plastic Liner Installation"),
+        "magnum_electricity": _p("Electricity Price Magnum"),
+        "monitoring": _p("Monitoring"),
+        "pallet_iot": _p("Pallets(+ Wedges) Usage"),
+        "pallet": _p("Pallets"),
+        "plugin": _p("Plugin"),
+        "s_freezer_electricity": _p("Electricity Price S Freezer"),
+        "standard_electricity": _p("Electricity Price Standard"),
+    }
 
 
 # Yard Metrics
@@ -82,78 +82,118 @@ def load_pallet_dataset() -> pl.LazyFrame:
 
 
 # Pallet and Liner Dataframe
-pallet: pl.LazyFrame = load_pallet_dataset().with_columns(
-    pallet_price=pl.when(
-        (
-            pl.col("remarks").cast(pl.Utf8).str.contains(pl.lit("Pallet"), strict=True)
-        ).and_(pl.col("shipping_line").eq(pl.lit("IOT")))
-    )
-    .then(PALLET_IOT_PRICE)
-    .when(pl.col("remarks").cast(pl.Utf8).str.contains(pl.lit("Pallet"), strict=True))
-    .then(PALLET_PRICE)
-    .otherwise(0),
-    liner_price=pl.when(
-        (
-            pl.col("remarks").cast(pl.Utf8).str.contains(pl.lit("Liner"), strict=True)
-        ).and_(pl.col("shipping_line").eq(pl.lit("CMA CGM")))
-    )
-    .then(LINER_PRICE)
-    .otherwise(0),
-)
-
-coa: pl.LazyFrame = (
-    load_gsheet_data(sheet_id=STUFFING_SHEET_ID, sheet_name=PLUGIN_SHEET_NAME)
-    .filter(
-        pl.col("date_out").dt.year().eq(CURRENT_YEAR).or_(pl.col("date_out").is_null())
-    )
-    .select(
-        pl.col("vessel_client").str.to_uppercase().cast(dtype=enum_customer()),
-        pl.col("customer").cast(dtype=pl.Enum(shipper)),
-        pl.col("date_plugged"),
-        pl.col("time_plugged"),
-        pl.col("container_number").cast(dtype=containers_enum),
-        pl.col("operation_type"),
-        pl.col("shipping_line").cast(dtype=pl.Enum(shipping_line)),
-        pl.col("plugged_status").cast(dtype=pl.Enum(PLUGGED_STATUS)),
-        pl.col("tonnage"),
-        pl.col("set_point"),
-        pl.col("date_out"),
-        pl.col("location"),
-    )
-    .with_columns(
-        pl.col("date_plugged").cast(pl.Date, strict=False),
-        pl.col("date_out").cast(pl.Date, strict=False),
-    )
-    .with_columns(
-        days_on_plug=pl.when(transfer_direct | on_plug | plugged_only)
-        .then(timedelta(days=0))
-        .when(partially_stuffed)
-        .then(duration)
-        .otherwise(duration + 1),
-        plugin_price=pl.when(transfer_direct | exchange_hands)
-        .then(0)
-        .otherwise(PLUGIN_PRICE),
-        monitoring_price=pl.when(
-            transfer_direct | on_plug_or_partially_stuffed | plugged_only
+@lru_cache(maxsize=1)
+def _pallet() -> pl.LazyFrame:
+    prices = _prices()
+    PALLET_IOT_PRICE = prices["pallet_iot"]
+    PALLET_PRICE = prices["pallet"]
+    LINER_PRICE = prices["liner"]
+    return load_pallet_dataset().with_columns(
+        pallet_price=pl.when(
+            (
+                pl.col("remarks")
+                .cast(pl.Utf8)
+                .str.contains(pl.lit("Pallet"), strict=True)
+            ).and_(pl.col("shipping_line").eq(pl.lit("IOT")))
         )
-        .then(0)
-        .otherwise(MONITORING_PRICE),
+        .then(PALLET_IOT_PRICE)
+        .when(
+            pl.col("remarks").cast(pl.Utf8).str.contains(pl.lit("Pallet"), strict=True)
+        )
+        .then(PALLET_PRICE)
+        .otherwise(0),
+        liner_price=pl.when(
+            (
+                pl.col("remarks")
+                .cast(pl.Utf8)
+                .str.contains(pl.lit("Liner"), strict=True)
+            ).and_(pl.col("shipping_line").eq(pl.lit("CMA CGM")))
+        )
+        .then(LINER_PRICE)
+        .otherwise(0),
     )
-    .with_columns(
-        electricity_unit_price=pl.when(plugged_only)
-        .then(pl.lit(0))
-        .when(pl.col("set_point").eq(-60))
-        .then(S_FREEZER_ELECTRICITY)
-        .when(pl.col("set_point").eq(-35))
-        .then(MAGNUM_ELECTRICITY)
-        .otherwise(STANDARD_ELECTRICITY)
+
+
+@lru_cache(maxsize=1)
+def _coa() -> pl.LazyFrame:
+    prices = _prices()
+    PLUGIN_PRICE = prices["plugin"]
+    MONITORING_PRICE = prices["monitoring"]
+    S_FREEZER_ELECTRICITY = prices["s_freezer_electricity"]
+    MAGNUM_ELECTRICITY = prices["magnum_electricity"]
+    STANDARD_ELECTRICITY = prices["standard_electricity"]
+    return (
+        load_gsheet_data(sheet_id=STUFFING_SHEET_ID, sheet_name=PLUGIN_SHEET_NAME)
+        .filter(
+            pl.col("date_out")
+            .dt.year()
+            .eq(CURRENT_YEAR)
+            .or_(pl.col("date_out").is_null())
+        )
+        .select(
+            pl.col("vessel_client").str.to_uppercase().cast(dtype=enum_customer()),
+            pl.col("customer").cast(dtype=pl.Enum(shipper)),
+            pl.col("date_plugged"),
+            pl.col("time_plugged"),
+            pl.col("container_number").cast(dtype=containers_enum),
+            pl.col("operation_type"),
+            pl.col("shipping_line").cast(dtype=pl.Enum(shipping_line)),
+            pl.col("plugged_status").cast(dtype=pl.Enum(PLUGGED_STATUS)),
+            pl.col("tonnage"),
+            pl.col("set_point"),
+            pl.col("date_out"),
+            pl.col("location"),
+        )
+        .with_columns(
+            pl.col("date_plugged").cast(pl.Date, strict=False),
+            pl.col("date_out").cast(pl.Date, strict=False),
+        )
+        .with_columns(
+            days_on_plug=pl.when(transfer_direct | on_plug | plugged_only)
+            .then(timedelta(days=0))
+            .when(partially_stuffed)
+            .then(duration)
+            .otherwise(duration + 1),
+            plugin_price=pl.when(transfer_direct | exchange_hands)
+            .then(0)
+            .otherwise(PLUGIN_PRICE),
+            monitoring_price=pl.when(
+                transfer_direct | on_plug_or_partially_stuffed | plugged_only
+            )
+            .then(0)
+            .otherwise(MONITORING_PRICE),
+        )
+        .with_columns(
+            electricity_unit_price=pl.when(plugged_only)
+            .then(pl.lit(0))
+            .when(pl.col("set_point").eq(-60))
+            .then(S_FREEZER_ELECTRICITY)
+            .when(pl.col("set_point").eq(-35))
+            .then(MAGNUM_ELECTRICITY)
+            .otherwise(STANDARD_ELECTRICITY)
+        )
+        .with_columns(
+            total_electricity=pl.col("electricity_unit_price") * pl.col("days_on_plug")
+        )
+        .with_columns(
+            total=pl.col("plugin_price")
+            + pl.col("monitoring_price")
+            + pl.col("total_electricity")
+        )
     )
-    .with_columns(
-        total_electricity=pl.col("electricity_unit_price") * pl.col("days_on_plug")
-    )
-    .with_columns(
-        total=pl.col("plugin_price")
-        + pl.col("monitoring_price")
-        + pl.col("total_electricity")
-    )
-)
+
+
+_EXPORTS = {
+    "coa": _coa,
+    "pallet": _pallet,
+}
+
+
+def __getattr__(name: str) -> Any:
+    builder = _EXPORTS.get(name)
+    if builder is not None:
+        return builder()
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
+__all__ = [*_EXPORTS, "load_pallet_dataset"]

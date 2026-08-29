@@ -5,9 +5,8 @@ from __future__ import annotations
 from functools import lru_cache
 
 import polars as pl
+from data_source.make_dataset import load_sheet as scan_google_sheet
 
-
-from scan_google_sheet import scan_google_sheet
 from utils.config import (
     NET_LIST_SHEET_NAME,
     OPS_SHEET_ID,

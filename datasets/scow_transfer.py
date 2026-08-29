@@ -5,7 +5,7 @@ from __future__ import annotations
 import polars as pl
 from functools import lru_cache
 
-from scan_google_sheet import scan_google_sheet
+from data_source.make_dataset import load_sheet as scan_google_sheet
 from utils.config import TRANSPORT_SHEET_ID,SCOW_TRANSFER_SHEET
 from utils import CURRENT_YEAR
 # from datasets import unit_price

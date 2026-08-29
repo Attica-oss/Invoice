@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import polars as pl
 
-from datasets import load_salt
+from datasets.salt import load_salt
 from utils import duration_to_hhmm
 
 

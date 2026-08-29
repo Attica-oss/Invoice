@@ -84,7 +84,8 @@ def _(electricity_dataset):
     _df = mo.sql(
         f"""
         FROM ELECTRICITY_DATASET
-        """
+        """,
+        output=False
     )
     return
 
@@ -109,7 +110,7 @@ def _():
     )
 
     _today = date.today()
-    _years = sorted({_today.year, _today.year + 1})
+    _years = sorted({_today.year})
     month_options = {
         date(_y, _m, 1).strftime("%b %Y"): f"{_y}-{_m:02d}-01"
         for _y in _years
@@ -388,20 +389,67 @@ def _(pricing_df):
 
 @app.cell(hide_code=True)
 def _(cccs_stuffing_dataset, month_selector, select_report):
-    with mo.status.spinner("Loading stuffing data…"):
-        stuffing_df = mo.sql(
-            f"""
-            FROM CCCS_STUFFING_DATASET
-            SELECT day_name, date, container_number, customer, service,
-                   total_tonnage, overtime_tonnage, unit_price,
-                   total_price::DECIMAL AS total_price
-            WHERE invoiced = 'MAERSKLINE'
-              AND customer = '{select_report.value}'
-              AND date BETWEEN '{month_selector.value}' AND LAST_DAY(DATE '{month_selector.value}')
-            """,
-            output=True,
-        )
+    stuffing_df = mo.sql(
+        f"""
+        FROM
+            CCCS_STUFFING_DATASET
+        SELECT
+            day_name,
+            date,
+            container_number,
+            customer,
+            service,
+            total_tonnage::DECIMAL AS total_tonnage,
+            overtime_tonnage::DECIMAL AS overtime_tonnage,
+            unit_price,
+            total_price::DECIMAL AS total_price
+        WHERE
+            invoiced = 'MAERSKLINE'
+            AND customer = '{select_report.value}'
+            AND date BETWEEN '{month_selector.value}' AND LAST_DAY(DATE '{month_selector.value}')
+        """
+    )
     return (stuffing_df,)
+
+
+@app.cell(hide_code=True)
+def _(stuffing_df):
+    _df = mo.sql(
+        f"""
+        WITH
+            main AS (
+                FROM
+                    stuffing_df
+                SELECT
+                    day_name,
+                    service,
+                    total_tonnage,
+                    (total_tonnage - overtime_tonnage) AS normal_tonnage,
+                    overtime_tonnage,
+                    unit_price,
+                    total_price,
+                    CASE
+                        WHEN day_name IN ('Sun', 'PH') THEN 'overtime'
+                        ELSE 'normal'
+                    END AS overtime
+            ),
+            normal_hours AS (
+        FROM
+            main
+        SELECT
+            service,
+            SUM(normal_tonnage) AS normal_tonnage,
+            unit_price,
+            overtime || ' ' || 'hours' AS overtime
+        WHERE
+            overtime = 'normal'
+        GROUP BY ALL)
+
+
+        FROM main
+        """
+    )
+    return
 
 
 @app.cell(hide_code=True)

@@ -10,7 +10,7 @@ from __future__ import annotations
 from functools import lru_cache
 
 import polars as pl
-from scan_google_sheet import scan_google_sheet
+from data_source.make_dataset import load_sheet as scan_google_sheet
 
 # from data_source.sheet_ids import MASTER_ID, PRICE_SHEET_NAME
 from utils import PolarsEnum
@@ -52,7 +52,13 @@ def price_table() -> pl.LazyFrame:
         sheet_id=MASTER_ID, sheet_name=PRICE_SHEET_NAME, parse_dates=True
     )
 
-    return lf.filter(pl.col("EndingDate").eq("")).select(
+    # Blank EndingDate = currently-active price. Cast to Utf8 first: the
+    # 0.3.0 parser may type this column as Date (blank -> null) where the
+    # old one left it Utf8 (blank -> "").
+    ending_blank = (
+        pl.col("EndingDate").cast(pl.Utf8, strict=False).replace("", None).is_null()
+    )
+    return lf.filter(ending_blank).select(
         pl.col("Service").alias("service"),
         pl.col("Class").alias("service_type"),
         pl.col("StartingDate").alias("date"),

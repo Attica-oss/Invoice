@@ -1,57 +1,72 @@
-"""Re export for dataframe."""
+"""Lazy re-exports for the dataframe package.
 
-from .bin_dispatch import empty_scows, full_scows
-from .emr import pti, shifting, washing
-from .miscellaneous import (
-    by_catch,
-    cccs_stuffing,
-    cross_stuffing,
-    dispatch_to_cargo,
-    from_cccs_to_vessel,
-    truck_to_cccs_via_skiff,
-)
-from .netlist import iot_cargo, iot_stuffing, netList, oss
+Nothing is imported or built at package import time. Each name below is
+resolved on first access (including ``from dataframe import <name>``) by
+:pep:`562` ``__getattr__``, which pulls it from the owning submodule --
+whose frames are themselves ``@lru_cache`` builders. Result: importing
+``dataframe`` costs nothing; the first use of a frame triggers exactly the
+sheet reads it needs, cached for the process.
+"""
 
-# from .operations import tare
-from .shore_handling import forklift_salt, salt
-from .stuffing import coa, pallet
-from .transport import forklift, scow_transfer, shore_crane, transfer
-from .washing import washing
+from importlib import import_module
+from typing import Any
 
-from .operations import berth,extramen,additional, hatch_to_hatch
+# name -> (submodule, attribute, call_result?)
+#   call_result=True  -> the submodule attribute is a builder function and the
+#                        re-export should be the *frame* it returns.
+_SPEC: dict[str, tuple[str, str, bool]] = {
+    # bin_dispatch
+    "full_scows": ("bin_dispatch", "full_scows", False),
+    "empty_scows": ("bin_dispatch", "empty_scows", False),
+    # emr
+    "pti": ("emr", "pti", False),
+    "shifting": ("emr", "shifting", False),
+    # washing / pti helpers (functions kept as functions, like before)
+    "washing": ("washing", "washing", False),
+    "washing_lf": ("washing", "washing", True),
+    # miscellaneous
+    "by_catch": ("miscellaneous", "by_catch", False),
+    "cccs_stuffing": ("miscellaneous", "cccs_stuffing", False),
+    "cross_stuffing": ("miscellaneous", "cross_stuffing", False),
+    "dispatch_to_cargo": ("miscellaneous", "dispatch_to_cargo", False),
+    "from_cccs_to_vessel": ("miscellaneous", "from_cccs_to_vessel", False),
+    "truck_to_cccs_via_skiff": ("miscellaneous", "truck_to_cccs_via_skiff", False),
+    # netlist
+    "netList": ("netlist", "netList", False),
+    "oss": ("netlist", "oss", False),
+    "iot_cargo": ("netlist", "iot_cargo", False),
+    "iot_stuffing": ("netlist", "iot_stuffing", False),
+    # shore_handling
+    "salt": ("shore_handling", "salt", False),
+    "forklift_salt": ("shore_handling", "forklift_salt", False),
+    "forklift_for_salt": ("shore_handling", "forklift_salt", True),
+    # stuffing
+    "coa": ("stuffing", "coa", False),
+    "pallet": ("stuffing", "pallet", False),
+    # transport
+    "forklift": ("transport", "forklift", False),
+    "scow_transfer": ("transport", "scow_transfer", False),
+    "shore_crane": ("transport", "shore_crane", False),
+    "transfer": ("transport", "transfer", False),
+    # operations
+    "berth": ("operations", "berth", False),
+    "extramen": ("operations", "extramen", False),
+    "additional": ("operations", "additional", False),
+    "hatch_to_hatch": ("operations", "hatch_to_hatch", False),
+}
 
-forklift_for_salt = forklift_salt()
 
-washing_lf = washing()
+def __getattr__(name: str) -> Any:
+    spec = _SPEC.get(name)
+    if spec is None:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    submodule, attribute, call_result = spec
+    value = getattr(import_module(f"{__name__}.{submodule}"), attribute)
+    return value() if call_result else value
 
-__all__ = [
-    "additional",
-    "berth",
-    "extramen",
-    "hatch_to_hatch",
-    "full_scows",
-    "empty_scows",
-    "washing",
-    "pti",
-    "shifting",
-    "truck_to_cccs_via_skiff",
-    "forklift",
-    "shore_crane",
-    "transfer",
-    # "tare",
-    "dispatch_to_cargo",
-    "from_cccs_to_vessel",
-    "cross_stuffing",
-    "by_catch",
-    "cccs_stuffing",
-    "netList",
-    "oss",
-    "iot_cargo",
-    "iot_stuffing",
-    "salt",
-    "forklift_for_salt",
-    "coa",
-    "scow_transfer",
-    "pallet",
-    "washing_lf",
-]
+
+def __dir__() -> list[str]:
+    return sorted(_SPEC)
+
+
+__all__ = list(_SPEC)

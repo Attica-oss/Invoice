@@ -5,7 +5,7 @@ from __future__ import annotations
 from functools import lru_cache
 
 import polars as pl
-from scan_google_sheet import scan_google_sheet
+from data_source.make_dataset import load_sheet as scan_google_sheet
 
 from data_source.sheet_ids import BC_ITEMS_SHEET_NAME, MASTER_ID, PRICE_SHEET_NAME
 from type_casting import PolarsEnum
@@ -41,7 +41,14 @@ def price_table() -> pl.LazyFrame:
         sheet_id=MASTER_ID, sheet_name=PRICE_SHEET_NAME, parse_dates=True
     )
 
-    return lf.filter(pl.col("EndingDate").eq("")).select(
+    # A blank EndingDate marks the currently-active price. The 0.3.0 Rust
+    # parser types an all-blank/date-like column as Date (blanks -> null),
+    # where the old pure-Python parser left it Utf8 (blanks -> ""). Cast to
+    # Utf8 first so the "is it blank" test works whichever way it inferred.
+    ending_blank = (
+        pl.col("EndingDate").cast(pl.Utf8, strict=False).replace("", None).is_null()
+    )
+    return lf.filter(ending_blank).select(
         pl.col("Service").alias("service"),
         pl.col("Class").alias("service_type"),
         pl.col("StartingDate").alias("date"),

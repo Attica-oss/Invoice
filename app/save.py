@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -47,6 +49,12 @@ class SaveResult:
     error: Exception | None = None
 
 
+# CSV writes are I/O-bound (Google Sheet fetch + parse in scan-google-sheet
+# release the GIL, so does the Polars collect), so a thread pool gives a
+# near-linear speed-up over saving one frame at a time.
+_MAX_WORKERS = min(8, (os.cpu_count() or 4) * 2)
+
+
 def save_to_csv(
     name: str, lf: pl.LazyFrame, output_dir: Path = OUTPUT_DIR
 ) -> SaveResult:
@@ -64,27 +72,37 @@ def save_to_csv(
         logger.info("Wrote %s -> %s", name, path)
         return SaveResult(name=name, path=path)
 
-    except (PermissionError, OSError, FileExistsError, FileNotFoundError) as e:
+    except Exception as e:  # noqa: BLE001 - one bad frame must not abort the batch
         logger.exception("Failed writing %s -> %s", name, path)
         return SaveResult(name=name, path=path, error=e)
+
+
+def _save_many(
+    frames: dict[str, pl.LazyFrame],
+) -> tuple[list[str], list[tuple[str, Exception]]]:
+    """Write every frame concurrently; collect successes and failures."""
+    successes: list[str] = []
+    failures: list[tuple[str, Exception]] = []
+
+    with ThreadPoolExecutor(max_workers=_MAX_WORKERS) as pool:
+        futures = {
+            pool.submit(save_to_csv, name, lf): name for name, lf in frames.items()
+        }
+        for future in as_completed(futures):
+            result = future.result()
+            if result.error:
+                failures.append((result.name, result.error))
+            else:
+                successes.append(result.name)
+
+    return successes, failures
 
 
 def _save_category(
     category_name: str, category_dfs: dict[str, pl.LazyFrame]
 ) -> tuple[list[str], list[tuple[str, Exception]]]:
     logger.info("Processing category: %s", category_name)
-
-    successes: list[str] = []
-    failures: list[tuple[str, Exception]] = []
-
-    for name, lf in category_dfs.items():
-        result = save_to_csv(name, lf)
-        if result.error:
-            failures.append((result.name, result.error))
-        else:
-            successes.append(result.name)
-
-    return successes, failures
+    return _save_many(category_dfs)
 
 
 def save_df_to_csv(category: str | None) -> None:
@@ -92,13 +110,12 @@ def save_df_to_csv(category: str | None) -> None:
     Save dataframes by category name or 'all'.
     """
     if category == "all":
-        all_successes: list[str] = []
-        all_failures: list[tuple[str, Exception]] = []
-
-        for cat_name, cat_dfs in df_dict.items():
-            s, f = _save_category(cat_name, cat_dfs)
-            all_successes.extend(s)
-            all_failures.extend(f)
+        # One pool across every category so all sheet fetches overlap
+        # instead of running category by category.
+        every_frame = {
+            name: lf for cat_dfs in df_dict.values() for name, lf in cat_dfs.items()
+        }
+        all_successes, all_failures = _save_many(every_frame)
 
         logger.info(
             "Save completed. Success: %d, Failed: %d",
