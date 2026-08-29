@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import polars as pl
 
-from datasets import miscellaneous_lf
+from datasets.miscellaneous import miscellaneous_lf
 
 
 def forklift_scow_handling_lf() -> pl.LazyFrame:

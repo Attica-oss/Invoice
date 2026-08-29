@@ -1,7 +1,7 @@
 """Customer Validations"""
 
 import polars as pl
-from scan_google_sheet import scan_google_sheet
+from data_source.make_dataset import load_sheet as scan_google_sheet
 
 from utils.config import CLIENT_SHEET_NAME, MASTER_ID
 

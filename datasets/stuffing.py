@@ -6,7 +6,7 @@ from functools import lru_cache
 
 import polars as pl
 
-from datasets import coa
+from datasets.container_ops_activity import coa
 
 
 @lru_cache(maxsize=1)

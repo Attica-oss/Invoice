@@ -7,7 +7,8 @@ from functools import lru_cache
 
 import polars as pl
 
-from datasets import net_list_raw, cargo
+from datasets.genesis import net_list_raw
+from datasets.customers import cargo
 from datasets.stuffing import stuffing_type
 from datasets.truck_to_cold_store import cccs_adjusted_records
 from datasets.price import unloading_price

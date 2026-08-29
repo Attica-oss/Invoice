@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import polars as pl
 
-from scan_google_sheet import scan_google_sheet
+from data_source.make_dataset import load_sheet as scan_google_sheet
 from utils.config import TRANSFER_SHEET_NAME, TRANSPORT_SHEET_ID
 from utils.validations import MovementType
 

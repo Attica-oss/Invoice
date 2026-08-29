@@ -1,4 +1,12 @@
-"""Shore handling Lazyframe"""
+"""Shore handling Lazyframe.
+
+``salt`` is an ``@lru_cache`` builder exposed under its old name via
+:pep:`562` ``__getattr__``; ``forklift_salt`` stays a function. Importing
+this module does no I/O.
+"""
+
+from functools import lru_cache
+from typing import Any
 
 import polars as pl
 
@@ -16,21 +24,26 @@ from type_casting.dates import (
     SPECIAL_DAYS,
     UPPER_BOUND,
     UPPER_BOUND_SPECIAL_DAY,
-    Days,
     duration_to_hhmm,
     public_holiday,
 )
 from type_casting.validations import OvertimePerc
 
-BIN_TIPPING_PRICE = (
-    get_price(["CCCS Movement in/out"]).select(pl.col("unit_price")).to_series()[0]
-)
 
-SALT_PRICE: float = (
-    get_price(["Loading (Quay to Ship)", "Loading @ Zone 14"])
-    .select(pl.col("unit_price"))
-    .to_series()[0]
-)
+@lru_cache(maxsize=1)
+def _bin_tipping_price() -> float:
+    return (
+        get_price(["CCCS Movement in/out"]).select(pl.col("unit_price")).to_series()[0]
+    )
+
+
+@lru_cache(maxsize=1)
+def _salt_price() -> float:
+    return (
+        get_price(["Loading (Quay to Ship)", "Loading @ Zone 14"])
+        .select(pl.col("unit_price"))
+        .to_series()[0]
+    )
 
 
 # Public Holiday Dates
@@ -157,131 +170,139 @@ durations = pl.col("date").dt.combine(pl.col("end_time")) - pl.col("date").dt.co
 )
 
 
-salt: pl.LazyFrame = (
-    load_gsheet_data(sheet_id=SHORE_HANDLING_ID, sheet_name=SALT_OPERATION_SHEET_NAME)
-    .filter(
-        pl.col("date")
-        .dt.year()
-        .eq(CURRENT_YEAR)
-        .and_(pl.col("start_time").is_not_null())
-        .and_(pl.col("end_time").is_not_null())
-    )
-    .select(
-        pl.col("date").days.add_day_name(),
-        pl.col("date"),
-        pl.col("vessel").cast(dtype=pl.Enum(purseiner)),
-        pl.col("customer").str.strip_chars().cast(dtype=pl.Enum(ship_owner())),
-        pl.col("start_time"),
-        pl.col("end_time"),
-        pl.col("duration"),
-        pl.col("operation_type"),
-        pl.col("tonnage").cast(pl.Float64, strict=False),
-    )
-    .with_columns(
-        # Normal rate calculation
-        normal=pl.when(after_midnight & is_not_special_day)
-        .then(before_upper_bound_portion)
-        .when(is_not_special_day & end_time_after_cut_off & ~after_midnight)
-        .then(normal_duration)
-        .when(is_not_special_day & before_cut_off_normal_day & ~after_midnight)
-        .then(durations)
-        .otherwise(pl.duration()),
-        # 150% rate calculation - only until midnight for normal days
-        normal_150=pl.when(after_midnight & is_not_special_day)
-        .then(after_upper_bound_until_midnight)  # Only until midnight
-        .when(is_not_special_day & start_after_cut_off_normal_day & ~after_midnight)
-        .then(durations)
-        .when(is_not_special_day & stop_after_cut_off_normal_day & ~after_midnight)
-        .then(hours_after_cut_off_normal_day)
-        .otherwise(pl.duration()),
-        # Special days at 150%
-        sun_150=pl.when(
-            is_special_day & stop_after_cut_off_special_day & ~after_midnight
+@lru_cache(maxsize=1)
+def _salt() -> pl.LazyFrame:
+    SALT_PRICE = _salt_price()
+    return (
+        load_gsheet_data(
+            sheet_id=SHORE_HANDLING_ID, sheet_name=SALT_OPERATION_SHEET_NAME
         )
-        .then(normal_duration_special_day)
-        .when(is_special_day & stop_before_cut_off_special_day & ~after_midnight)
-        .then(durations)
-        .when(
-            is_special_day
-            & after_midnight
-            & (pl.col("start_time") < UPPER_BOUND_SPECIAL_DAY)
+        .filter(
+            pl.col("date")
+            .dt.year()
+            .eq(CURRENT_YEAR)
+            .and_(pl.col("start_time").is_not_null())
+            .and_(pl.col("end_time").is_not_null())
         )
-        .then(
-            pl.col("date").dt.combine(UPPER_BOUND_SPECIAL_DAY)
-            - pl.col("date").dt.combine(pl.col("start_time"))
+        .select(
+            pl.col("date").days.add_day_name(),
+            pl.col("date"),
+            pl.col("vessel").cast(dtype=pl.Enum(purseiner)),
+            pl.col("customer").str.strip_chars().cast(dtype=pl.Enum(ship_owner())),
+            pl.col("start_time"),
+            pl.col("end_time"),
+            pl.col("duration"),
+            pl.col("operation_type"),
+            pl.col("tonnage").cast(pl.Float64, strict=False),
         )
-        .otherwise(pl.duration()),
-        # 200% overtime - including after midnight for normal days
-        overtime_200=pl.when(
-            is_special_day & start_after_cut_off_special_day & ~after_midnight
-        )
-        .then(durations)
-        .when(is_special_day & stop_after_cut_off_special_day & ~after_midnight)
-        .then(hours_after_cut_off_special_day)
-        .when(is_special_day & after_midnight)
-        .then(
-            pl.when(pl.col("start_time") >= UPPER_BOUND_SPECIAL_DAY)
-            .then(duration_after_midnight)
-            .otherwise(
-                (pl.col("date") + pl.duration(days=1)).dt.combine(pl.col("end_time"))
-                - pl.col("date").dt.combine(UPPER_BOUND_SPECIAL_DAY)
+        .with_columns(
+            # Normal rate calculation
+            normal=pl.when(after_midnight & is_not_special_day)
+            .then(before_upper_bound_portion)
+            .when(is_not_special_day & end_time_after_cut_off & ~after_midnight)
+            .then(normal_duration)
+            .when(is_not_special_day & before_cut_off_normal_day & ~after_midnight)
+            .then(durations)
+            .otherwise(pl.duration()),
+            # 150% rate calculation - only until midnight for normal days
+            normal_150=pl.when(after_midnight & is_not_special_day)
+            .then(after_upper_bound_until_midnight)  # Only until midnight
+            .when(is_not_special_day & start_after_cut_off_normal_day & ~after_midnight)
+            .then(durations)
+            .when(is_not_special_day & stop_after_cut_off_normal_day & ~after_midnight)
+            .then(hours_after_cut_off_normal_day)
+            .otherwise(pl.duration()),
+            # Special days at 150%
+            sun_150=pl.when(
+                is_special_day & stop_after_cut_off_special_day & ~after_midnight
             )
+            .then(normal_duration_special_day)
+            .when(is_special_day & stop_before_cut_off_special_day & ~after_midnight)
+            .then(durations)
+            .when(
+                is_special_day
+                & after_midnight
+                & (pl.col("start_time") < UPPER_BOUND_SPECIAL_DAY)
+            )
+            .then(
+                pl.col("date").dt.combine(UPPER_BOUND_SPECIAL_DAY)
+                - pl.col("date").dt.combine(pl.col("start_time"))
+            )
+            .otherwise(pl.duration()),
+            # 200% overtime - including after midnight for normal days
+            overtime_200=pl.when(
+                is_special_day & start_after_cut_off_special_day & ~after_midnight
+            )
+            .then(durations)
+            .when(is_special_day & stop_after_cut_off_special_day & ~after_midnight)
+            .then(hours_after_cut_off_special_day)
+            .when(is_special_day & after_midnight)
+            .then(
+                pl.when(pl.col("start_time") >= UPPER_BOUND_SPECIAL_DAY)
+                .then(duration_after_midnight)
+                .otherwise(
+                    (pl.col("date") + pl.duration(days=1)).dt.combine(
+                        pl.col("end_time")
+                    )
+                    - pl.col("date").dt.combine(UPPER_BOUND_SPECIAL_DAY)
+                )
+            )
+            .when(
+                is_not_special_day & after_midnight
+            )  # Add this crucial condition for normal days
+            .then(
+                portion_after_midnight
+            )  # After midnight portion goes to 200% for normal days
+            .otherwise(pl.duration()),
+            # Add durations column for after midnight case
+            total_duration=pl.when(after_midnight)
+            .then(duration_after_midnight)
+            .otherwise(durations),
         )
-        .when(
-            is_not_special_day & after_midnight
-        )  # Add this crucial condition for normal days
-        .then(
-            portion_after_midnight
-        )  # After midnight portion goes to 200% for normal days
-        .otherwise(pl.duration()),
-        # Add durations column for after midnight case
-        total_duration=pl.when(after_midnight)
-        .then(duration_after_midnight)
-        .otherwise(durations),
+        .with_columns(
+            # Calculate weighted values by tonnage, using total_duration for after midnight cases
+            normal=(
+                pl.col("normal")
+                / pl.when(after_midnight)
+                .then(pl.col("total_duration"))
+                .otherwise(durations)
+            )
+            * pl.col("tonnage"),
+            overtime_150=(
+                pl.col("normal_150")
+                / pl.when(after_midnight)
+                .then(pl.col("total_duration"))
+                .otherwise(durations)
+            )
+            * pl.col("tonnage")
+            + (
+                pl.col("sun_150")
+                / pl.when(after_midnight)
+                .then(pl.col("total_duration"))
+                .otherwise(durations)
+            )
+            * pl.col("tonnage"),
+            overtime_200=(
+                pl.col("overtime_200")
+                / pl.when(after_midnight)
+                .then(pl.col("total_duration"))
+                .otherwise(durations)
+            )
+            * pl.col("tonnage"),
+        )
+        .with_columns(
+            price=(pl.col("normal") * SALT_PRICE * OvertimePerc.normal_hour)
+            + (pl.col("overtime_150") * SALT_PRICE * OvertimePerc.overtime_150)
+            + (pl.col("overtime_200") * SALT_PRICE * OvertimePerc.overtime_200)
+        )
+        .select(pl.all().exclude(["normal_150", "sun_150", "total_duration"]))
     )
-    .with_columns(
-        # Calculate weighted values by tonnage, using total_duration for after midnight cases
-        normal=(
-            pl.col("normal")
-            / pl.when(after_midnight)
-            .then(pl.col("total_duration"))
-            .otherwise(durations)
-        )
-        * pl.col("tonnage"),
-        overtime_150=(
-            pl.col("normal_150")
-            / pl.when(after_midnight)
-            .then(pl.col("total_duration"))
-            .otherwise(durations)
-        )
-        * pl.col("tonnage")
-        + (
-            pl.col("sun_150")
-            / pl.when(after_midnight)
-            .then(pl.col("total_duration"))
-            .otherwise(durations)
-        )
-        * pl.col("tonnage"),
-        overtime_200=(
-            pl.col("overtime_200")
-            / pl.when(after_midnight)
-            .then(pl.col("total_duration"))
-            .otherwise(durations)
-        )
-        * pl.col("tonnage"),
-    )
-    .with_columns(
-        price=(pl.col("normal") * SALT_PRICE * OvertimePerc.normal_hour)
-        + (pl.col("overtime_150") * SALT_PRICE * OvertimePerc.overtime_150)
-        + (pl.col("overtime_200") * SALT_PRICE * OvertimePerc.overtime_200)
-    )
-    .select(pl.all().exclude(["normal_150", "sun_150", "total_duration"]))
-)
 
 
+@lru_cache(maxsize=1)
 def forklift_salt() -> pl.LazyFrame:
     """Forklift for salt operation"""
-    df = salt
+    df = _salt()
     result = (
         df.filter(
             pl.col("operation_type").ne(pl.lit("Loading @ Zone 14", dtype=pl.Utf8))
@@ -471,3 +492,19 @@ add_day_name_col: pl.Expr = (
     .then(pl.lit("PH"))
     .otherwise(pl.col("Date").dt.to_string(format="%a"))
 )
+
+
+_EXPORTS = {
+    "salt": _salt,
+    "bin_tipping_price": _bin_tipping_price,
+}
+
+
+def __getattr__(name: str) -> Any:
+    builder = _EXPORTS.get(name)
+    if builder is not None:
+        return builder()
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
+__all__ = [*_EXPORTS, "forklift_salt", "add_day_name_col"]

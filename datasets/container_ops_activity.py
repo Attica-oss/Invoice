@@ -34,7 +34,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 
 import polars as pl
-from scan_google_sheet import scan_google_sheet
+from data_source.make_dataset import load_sheet as scan_google_sheet
 
 from datasets.customers import enum_customer, shipper, shipping_line
 from datasets.price import unit_price

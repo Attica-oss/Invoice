@@ -11,7 +11,8 @@ from __future__ import annotations
 
 import polars as pl
 
-from datasets import net_list, oss_stuffing_price
+from datasets.net_list import net_list
+from datasets.price import oss_stuffing_price
 from utils import apply_overtime_rate
 
 

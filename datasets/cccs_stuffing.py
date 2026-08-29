@@ -5,7 +5,7 @@ from __future__ import annotations
 from functools import lru_cache
 
 import polars as pl
-from scan_google_sheet import scan_google_sheet
+from data_source.make_dataset import load_sheet as scan_google_sheet
 
 from datasets.price import get_price
 from utils import CURRENT_YEAR, SPECIAL_DAYS, Days, OvertimePerc, containers_enum
