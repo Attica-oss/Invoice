@@ -17,7 +17,7 @@ def _():
     xstuff_df = mo.sql(
         f"""
         FROM cross_stuffing
-        WHERE MONTH(date)  = 4 AND invoiced = 'MAERSKLINE'
+        WHERE MONTH(date)  = 5 AND invoiced = 'IOT IMPORT'
         """
     )
     return (xstuff_df,)
@@ -68,7 +68,7 @@ def _(washing_ldf):
     _df = mo.sql(
         f"""
         fROM washing_ldf 
-        WHERE "Invoice To" = 'MAERSKLINE' AND MONTH(date) = 4 AND MONTH(Timestamp) <> 4
+        --WHERE "Invoice To" = 'MAERSKLINE' AND MONTH(date) = 4 AND MONTH(Timestamp) <> 4
         """
     )
     return
@@ -107,7 +107,7 @@ def _():
     _df = mo.sql(
         f"""
         FROM transfer
-        WHERE container_number IN ('MNBU0511468','MNBU0249532')
+        WHERE container_number IN ('MNBU0157170','MNBU3076430','MNBU4642682')
         """
     )
     return

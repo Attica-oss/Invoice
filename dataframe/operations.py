@@ -41,7 +41,10 @@ BERTH_DUES_PATH = ExcelFiles.BERTH_DUES_2026.value
 
 
 berth: pl.LazyFrame = pl.read_excel(
-    BERTH_DUES_PATH[0], sheet_name=BERTH_DUES_PATH[1], engine="calamine",schema_overrides={"TIME IN":pl.Time,"TIME OUT":pl.Time}
+    BERTH_DUES_PATH[0],
+    sheet_name=BERTH_DUES_PATH[1],
+    engine="calamine",
+    schema_overrides={"TIME IN": pl.Time, "TIME OUT": pl.Time},
 ).lazy()
 
 # Operations Activity Unloading Lazyframe
@@ -72,7 +75,7 @@ def add_day_name_column(date_col: pl.Expr) -> pl.Expr:
     """adds the day name based on the date column name this includes public holiday (PH)"""
 
     return (
-        pl.when(date_col.is_in(public_holiday()))
+        pl.when(date_col.is_in(public_holiday().implode()))
         .then(pl.lit("PH"))
         .otherwise(date_col.dt.to_string(format="%a"))
     ).cast(dtype=pl.Enum(DayName.list_all()))
@@ -189,16 +192,16 @@ hatch_to_hatch: pl.LazyFrame = (
     .join_asof(WELL_TO_WELL.lazy(), by="service", on="date", strategy="backward")
     .with_columns(
         total_price=pl.when(pl.col("day_name").is_in(SPECIAL_DAYS))
-        .then(
-            OvertimePerc.overtime_150
-            * pl.col("unit_price")
-            * pl.col("Well-to-Well Transfer")
-        )
-        .otherwise(
-            OvertimePerc.normal_hour
-            * pl.col("unit_price")
-            * pl.col("Well-to-Well Transfer")
-        )
+            .then(
+                OvertimePerc.overtime_150
+                * pl.col("unit_price")
+                * pl.col("Well-to-Well Transfer")
+            )
+            .otherwise(
+                OvertimePerc.normal_hour
+                * pl.col("unit_price")
+                * pl.col("Well-to-Well Transfer")
+            )
     )
     .with_columns(
         price=pl.when(pl.col("day_name").is_in(SPECIAL_DAYS))

@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.23.14"
+__generated_with = "0.24.0"
 app = marimo.App(width="columns")
 
 with app.setup:
@@ -579,6 +579,26 @@ def _(
         """
     )
     return (haulage_df,)
+
+
+@app.cell(hide_code=True)
+def _(container_origin, electricity_df, select_report, transfer_dataset):
+    _df = mo.sql(
+        f"""
+         WITH valid_containers AS (SELECT DISTINCT e.container_number
+                    FROM electricity_df e
+                    INNER JOIN CONTAINER_ORIGIN co
+                        ON trim(e.container_number) = trim(co.container_number)
+                        AND e.date_plugged  = co.date_plugged
+                        AND e.time_plugged  = co.time_plugged
+                    WHERE co.original_vessel LIKE '%{select_report.value}%')
+
+        FROM TRANSFER_DATASET t
+                SEMI JOIN valid_containers v ON trim(t.container_number) = trim(v.container_number)
+        WHERE movement_type = 'Delivery' --AND date BETWEEN '2026-07-01' AND '2026-07-31'
+        """
+    )
+    return
 
 
 @app.cell(hide_code=True)

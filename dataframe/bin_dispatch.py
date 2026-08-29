@@ -96,7 +96,7 @@ full_scows: pl.LazyFrame = (
         .otherwise(pl.lit(MovementType.in_))
         .cast(dtype=MovementType.enum_dtype()),
         storage_type=pl.lit("Dry", dtype=pl.Utf8),
-        day_name=pl.when(pl.col("date").is_in(ph_list))
+        day_name=pl.when(pl.col("date").is_in(ph_list.implode()))
         .then(pl.lit("PH"))
         .otherwise(pl.col("date").dt.to_string(format="%a")),
     )
@@ -232,7 +232,7 @@ empty_scows: pl.LazyFrame = (
         .then(pl.lit(MovementType.out))
         .otherwise(pl.lit(MovementType.in_))
         .cast(dtype=MovementType.enum_dtype()),
-        day_name=pl.when(pl.col("date").is_in(ph_list))
+        day_name=pl.when(pl.col("date").is_in(ph_list.implode()))
         .then(pl.lit("PH"))
         .otherwise(pl.col("date").dt.to_string(format="%a")),
     )

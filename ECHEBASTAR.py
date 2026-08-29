@@ -135,12 +135,6 @@ def _(month_selector, select_report):
     return (forklift_services_df,)
 
 
-@app.cell
-def _():
-    121/60
-    return
-
-
 @app.cell(hide_code=True)
 def _(forklift_services_df, unpiv):
     forklift_summary_df = mo.sql(

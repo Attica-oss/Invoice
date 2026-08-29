@@ -149,6 +149,10 @@ class DayName(PolarsEnum):
     def special_days(cls) -> list[DayName]:
         return [cls.SUN, cls.PH]
 
+    @classmethod
+    def implode(cls) -> list[str]:
+        return [day.value for day in cls.special_days()]
+
 
 # List of special days
 SPECIAL_DAYS: list[DayName] = DayName.special_days()

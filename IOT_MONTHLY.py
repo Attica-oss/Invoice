@@ -133,12 +133,11 @@ def _(container_plugin, month_selector):
         FROM
             container_plugin
         WHERE
-            customer = 'IOT'  AND date_plugged <= LAST_DAY(DATE '{month_selector.value}')
+            customer = 'IOT' AND shipping_line = 'IOT' AND date_plugged <= LAST_DAY(DATE '{month_selector.value}')
             AND (
                 date_out IS NULL
                 OR date_out >= DATE '{month_selector.value}'
             )
-  
         """
     )
     return

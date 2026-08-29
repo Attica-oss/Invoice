@@ -7,6 +7,7 @@ from .customers import enum_customer, shipper, shipping_line
 from .dates import CURRENT_YEAR, DayName, Days
 from .polars_enum import PolarsEnum
 from .validations import PLUGGED_STATUS, MovementType, PalletType, SetPoint
+from .cast_to_numbers import Numbers, CastToNumbers
 
 __all__ = [
     "PolarsEnum",
@@ -21,4 +22,6 @@ __all__ = [
     "PalletType",
     "PLUGGED_STATUS",
     "SetPoint",
+    "Numbers",
+    "CastToNumbers",
 ]

@@ -469,7 +469,7 @@ def _(
             pl.col("unit_price"),
             pl.col("invoice_value"),
             pl.col("remarks"),
-        )
+        ).unique()
     )
     return
 

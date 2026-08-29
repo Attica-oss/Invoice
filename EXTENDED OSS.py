@@ -1,7 +1,7 @@
 import marimo
 
 __generated_with = "0.23.14"
-app = marimo.App(width="full")
+app = marimo.App(width="columns")
 
 with app.setup:
     from concurrent.futures import ThreadPoolExecutor
@@ -472,7 +472,7 @@ def _(berth_ldf, report_status_df, select_report, start_date):
                     start_date,
                     end_date
                 WHERE
-                    report_type = 'STO'
+                    report_type = 'OSS'
                     AND "vessel/client" = '{select_report.value}'
                     AND start_date = '{start_date.value}'
             )
@@ -698,16 +698,6 @@ def _(final_berth_df):
     return discount_berthing_figure, value_berthing_figure
 
 
-@app.cell
-def _(discount_berthing_figure: int, value_berthing_figure: int):
-    berth_discount = mo.stat(value=discount_berthing_figure,label="Discount ($)",bordered=True)
-    berth_value = mo.stat(value=value_berthing_figure,label="Berthing ($)",bordered=True)
-    berth_total_value = mo.stat(value=(value_berthing_figure + discount_berthing_figure),label="Total Berthing ($)",bordered=True)
-
-    mo.vstack([mo.md("## Berthing"),berth_value,berth_discount,berth_total_value],justify="center")
-    return
-
-
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
@@ -836,15 +826,14 @@ def _(end_date, select_report, start_date, stuffing_dataset):
             set_point,
             date_out,
             CASE
-                WHEN operation_type LIKE '%OSS%' OR shipping_line = 'IOT' THEN 0
+                WHEN shipping_line = 'IOT' THEN 0
                 ELSE days_on_plug
             END AS days_on_plug,
             CASE
-                WHEN operation_type LIKE '%OSS%' OR shipping_line = 'IOT' THEN 0
+                WHEN shipping_line = 'IOT' THEN 0
                 ELSE total
             END AS total_price,
             CASE
-                WHEN customer = 'MAERSKLINE' THEN 'On the account of Maersk'
                 WHEN customer = 'IOT' THEN 'On the account of IOT'
                 ELSE ''
             END AS remarks
@@ -1158,39 +1147,20 @@ def _(end_date, extra_men_dataset_new, select_report, start_date):
 def _(extra_men_df):
     summary_extra_men_df = mo.sql(
         f"""
-        WITH
-            normal AS (
-                FROM
-                    extra_men_df
-                SELECT
-                    'Normal Hour' AS description,
-                    COALESCE(SUM(total_tonnage * extra_men::INT)::DECIMAL,0) AS value,
-                    COALESCE(MIN(price),0.8::DECIMAL) AS unit_price
-                WHERE
-                    price = 0.8
-            ),
-            overtime AS (
-                FROM
-                    extra_men_df
-                SELECT
-                    'Overtime Hour' AS description,
-                    COALESCE(SUM(total_tonnage * extra_men::INT)::DECIMAL,0) AS value,
-                    COALESCE(MIN(price),1.2::DECIMAL) AS unit_price
-                WHERE
-                    price = 1.2
-            ),
-            grouped AS (
-                FROM
-                    normal
-                UNION ALL
-                FROM
-                    overtime
-            )
-        FROM
-            grouped
-        SELECT
-            *,
-            (value * unit_price)::DECIMAL AS total_price
+        WITH normal AS (FROM extra_men_df
+            SELECT 'Normal Hour' AS description,SUM(total_tonnage * extra_men::INT)::DECIMAL AS value,MIN(price) AS unit_price
+        WHERE price = 0.8),overtime AS (FROM extra_men_df
+            SELECT 'Overtime Hour' AS description,SUM(total_tonnage * extra_men::INT)::DECIMAL AS value,MIN(price) AS unit_price
+        WHERE price = 1.2)
+
+
+        ,grouped AS (FROM normal
+        UNION ALL
+        FROM overtime)
+
+
+            FROM grouped
+        SELECT *,(value * unit_price)::DECIMAL AS total_price
         """
     )
     return (summary_extra_men_df,)
@@ -1286,10 +1256,33 @@ def _():
 def _(end_date, net_list_dataset, select_report, start_date):
     net_list_df = mo.sql(
         f"""
-        FROM NET_LIST_DATASET
-        WHERE
-            vessel = '{select_report.value}'
-            AND date BETWEEN '{start_date.value}' AND '{end_date}'
+        WITH adjusted AS (
+            SELECT
+                * EXCLUDE(unit_price, remarks),
+
+                CASE
+                    WHEN service = 'Full OSS' AND overtime = 'normal hours'
+                        THEN 38.75::DECIMAL
+                    WHEN service = 'Full OSS' AND overtime = 'overtime 150%'
+                        THEN 58.125::DECIMAL
+                    WHEN service = 'Full OSS' AND overtime = 'overtime 200%'
+                        THEN 77.5::DECIMAL
+                    ELSE unit_price
+                END AS unit_price,
+
+                remarks
+
+            FROM NET_LIST_DATASET
+
+            WHERE
+                vessel = '{select_report.value}'
+                AND date BETWEEN '{start_date.value}' AND '{end_date}'
+        )
+
+        SELECT
+            * EXCLUDE(invoice_value),
+            total_tonnage::DECIMAL * unit_price::DECIMAL AS invoice_value
+        FROM adjusted
         """
     )
     return (net_list_df,)
@@ -1338,7 +1331,7 @@ def _(end_date, select_report, shore_crane_dataset, start_date):
         f"""
         FROM SHORE_CRANE_DATASET
         WHERE
-            customer = '{select_report.value}' AND invoiced_to <> 'MAERSKLINE'
+            customer = '{select_report.value}' AND invoiced_to = 'MAERSKLINE'
             AND date BETWEEN '{start_date.value}' AND '{end_date}'
         """
     )
@@ -1537,7 +1530,7 @@ def _(to_filter_transfer_df, transfer_dataset):
             AND f.container_number = t.container_number
         WHERE
             f.exit_date IS NOT NULL
-           AND t.remarks NOT IN ('IOT', 'MAERSKLINE')
+           AND t.remarks NOT IN ('IOT')
         """
     )
     return (transfer_df,)
@@ -1994,7 +1987,9 @@ def _(summary_net_list_df):
                                 ('Basic OSS', 'Brine', 'STO -BASIC OSS - BRINE'),
                                 ('Basic OSS', 'Dry', 'STO -BASIC OSS - DRY'),
                                 ('Container Stuffing', 'Brine', 'CONTAINER STUFFING - BRINE'),
-                                ('Container Stuffing', 'Dry', 'CONTAINER STUFFING - DRY')
+                                ('Container Stuffing', 'Dry', 'CONTAINER STUFFING - DRY'),
+                                ('Full OSS', 'Brine', 'CONTAINER STUFFING - BRINE'),
+                                ('Full OSS', 'Dry', 'CONTAINER STUFFING - DRY')
                         ) AS t (service, storage_type, Description)
                     ),
                     variant_map AS (

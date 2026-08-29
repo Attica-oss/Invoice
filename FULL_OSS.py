@@ -1,7 +1,7 @@
 import marimo
 
-__generated_with = "0.23.14"
-app = marimo.App(width="columns")
+__generated_with = "0.24.0"
+app = marimo.App(width="full")
 
 with app.setup:
     from concurrent.futures import ThreadPoolExecutor
@@ -367,7 +367,7 @@ def _(report_data_df):
 
     period_start = mo.ui.text(
         label="Period Start:",
-        value=str(get_first_value(report_data_df, "start_date", default="")),
+        value=str(get_first_value(report_data_df, "start_date", default=""))
     )
 
     period_end = mo.ui.text(

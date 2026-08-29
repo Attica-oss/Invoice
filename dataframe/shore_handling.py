@@ -467,7 +467,7 @@ def forklift_salt() -> pl.LazyFrame:
 
 
 add_day_name_col: pl.Expr = (
-    pl.when(pl.col("Date").is_in(ph_list))
+    pl.when(pl.col("Date").is_in(ph_list.implode()))
     .then(pl.lit("PH"))
     .otherwise(pl.col("Date").dt.to_string(format="%a"))
 )

@@ -372,7 +372,7 @@ netList = (
     .with_columns(
         invoice_value=(
             pl.col("unit_price").round(3) * pl.col("total_tonnage").round(3)
-        ).cast(pl.Decimal(scale=2))
+        ).cast(pl.Decimal(scale=3))
     )
     .select(
         pl.col("day_name"),
@@ -388,7 +388,7 @@ netList = (
         pl.col("unit_price"),
         pl.col("invoice_value"),
         pl.col("remarks"),
-    )
+    ).unique()
 )
 
 
@@ -471,7 +471,7 @@ iot_cargo = (
         .filter(get_iot_cargo)
     )
     .with_columns(
-        day_name=pl.when(pl.col("date").is_in(ph_list))
+        day_name=pl.when(pl.col("date").is_in(ph_list.implode()))
         .then(pl.lit("PH"))
         .otherwise(pl.col("date").dt.to_string(format="%a")),
         service=pl.lit("Loading to Cargo") + " - " + pl.col("storage"),
