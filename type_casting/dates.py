@@ -42,6 +42,9 @@ UPPER_BOUND: time = time(17, 0, 0)
 MIDNIGHT: time = time(0, 0, 0)
 LOWER_BOUND: time = time(7, 59, 59)
 NULL_DURATION: pl.Expr = pl.duration(days=0, hours=0, minutes=0, seconds=0)
+# Preferred name. NULL_DURATION is kept as a backwards-compatible alias --
+# both are a zero-length duration.
+ZERO_DURATION: pl.Expr = NULL_DURATION
 
 
 class Year(int):
@@ -363,54 +366,52 @@ class Days:
 # ---------------------------------------------------------------------------#
 
 
+type FrameT = pl.DataFrame | pl.LazyFrame
+
+
 def duration_to_hhmm(
-    df: pl.LazyFrame,
-    duration_columns: str | list[str],
-) -> pl.LazyFrame:
-    """
-    Convert duration columns to HH:MM string format.
+    df: FrameT,
+    duration_columns: str | list[str] | None = None,
+) -> FrameT:
+    """Convert Duration columns to "HH:MM" strings.
+
+    Hours are *total* hours, so values of 24 h and above render correctly
+    (e.g. ``26:45``) -- the previous ``str.to_time`` cast broke on any
+    total >= 24 h. Nulls stay null. Negative durations render with a
+    leading minus (e.g. ``-01:30``); if you see one, upstream interval
+    logic is wrong.
 
     Args:
-        df: The DataFrame or LazyFrame to process.
-        duration_columns: Duration column name or names. If None, auto-detects
-            duration columns from the schema.
+        df: DataFrame or LazyFrame.
+        duration_columns: Column name(s) to convert. If None, converts
+            every Duration column in the schema.
 
     Returns:
-        The same type as input, with the selected duration columns converted
-        to HH:MM strings.
+        Same frame type, with the selected columns as Utf8 strings.
     """
-    # Determine if we're working with a DataFrame or LazyFrame
-    is_lazy = isinstance(df, pl.LazyFrame)
-    schema = df.collect_schema() if is_lazy else df.lazy().collect_schema()
+    schema = df.collect_schema()
 
-    # If no duration columns specified, detect them automatically
     if duration_columns is None:
         duration_columns = [
-            col_name
-            for col_name, dtype in schema.items()
-            if str(dtype).startswith("Duration") or str(dtype).startswith("duration")
+            name for name, dtype in schema.items() if isinstance(dtype, pl.Duration)
         ]
     elif isinstance(duration_columns, str):
         duration_columns = [duration_columns]
 
-    # No duration columns to convert
+    missing = [c for c in duration_columns if c not in schema]
+    if missing:
+        raise ValueError(f"duration_to_hhmm: columns not in frame: {missing}")
+
     if not duration_columns:
         return df
 
-    # Define a function to format durations as HH:MM
     def hhmm_expr(col: str) -> pl.Expr:
-        total_minutes = pl.col(col).dt.total_seconds().floordiv(60)
+        total_minutes = pl.col(col).dt.total_minutes()
+        sign = pl.when(total_minutes < 0).then(pl.lit("-")).otherwise(pl.lit(""))
+        magnitude = total_minutes.abs()
+        hours = magnitude.floordiv(60).cast(pl.Utf8).str.zfill(2)
+        minutes = magnitude.mod(60).cast(pl.Utf8).str.zfill(2)
+        # when/then propagates null for null inputs automatically.
+        return (sign + hours + pl.lit(":") + minutes).alias(col)
 
-        hours = total_minutes.floordiv(60).cast(pl.Int64).cast(pl.Utf8).str.zfill(2)
-        minutes = total_minutes.mod(60).cast(pl.Int64).cast(pl.Utf8).str.zfill(2)
-
-        return (
-            pl.when(pl.col(col).is_null())
-            .then(pl.lit(None, dtype=pl.Utf8))
-            .otherwise(hours + pl.lit(":") + minutes)
-            .alias(col)
-        )
-
-    return df.with_columns(
-        [hhmm_expr(col).str.to_time(format="%H:%M") for col in duration_columns]
-    )
+    return df.with_columns([hhmm_expr(col) for col in duration_columns])

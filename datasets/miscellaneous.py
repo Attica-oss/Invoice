@@ -5,8 +5,8 @@ from functools import lru_cache
 import polars as pl
 
 from data_source.make_dataset import load_sheet as scan_google_sheet
-from utils import CURRENT_YEAR, DayName
-from utils.config import ALL_CCCS_DATA_SHEET_NAME, MISC_SHEET_ID
+from data_source.sheet_ids import ALL_CCCS_DATA_SHEET_NAME, MISC_SHEET_ID
+from type_casting import CURRENT_YEAR, DayName
 
 
 def _to_f64(column: str) -> pl.Expr:

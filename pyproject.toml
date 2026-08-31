@@ -29,9 +29,37 @@ invoice = "main:main"
 
 [dependency-groups]
 dev = [
+    "pytest>=9.1.1",
     "ruff>=0.15.2",
     "ty>=0.0.10",
 ]
+
+[tool.ruff]
+# Generated marimo notebooks are not hand-maintained; linting them is noise
+# (useless-expression, unused-locals, naive datetime, ...).
+extend-exclude = ["notebooks", "**/__marimo__/**"]
+
+[tool.ruff.lint.per-file-ignores]
+# Pre-existing findings unrelated to the change that introduced this config.
+# Listed so `ruff check` can gate CI from a green baseline; drop each as it
+# is fixed.
+"dataframe/pre_trip_inspection.py" = ["F821"]  # `cleaning_price` undefined; module not wired into dataframe/__init__ yet
+"dataframe/shore_handling.py" = ["PLE0604"]    # __all__ = [*_EXPORTS, ...]; dict-unpack is str-only, ruff can't prove it
+"dataframe/stuffing.py" = ["PLE0604"]          # same __all__ = [*_EXPORTS, ...] pattern
+"datasets/__init__.py" = ["RUF022"]            # __all__ not alphabetically sorted
+
+[tool.ty.src]
+# Notebooks are marimo-generated; tests carry deliberate negative cases
+# (e.g. passing None to a str param) and rely on union-typed frame helpers.
+exclude = ["tests", "notebooks", "**/__marimo__/**"]
+
+[tool.pytest.ini_options]
+# Run from the repo root so `import type_casting` / `import save` resolve
+# without an installed package. `testpaths` keeps collection off the
+# marimo notebooks in notebooks/.
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-ra"
 
 [tool.marimo.runtime]
 # Notebooks live in notebooks/, one level below the repo root where the
