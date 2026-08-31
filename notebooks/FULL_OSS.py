@@ -5,26 +5,25 @@ app = marimo.App(width="full")
 
 with app.setup:
     from concurrent.futures import ThreadPoolExecutor
-    from datetime import date, timedelta
-    from calendar import monthrange
-    import polars as pl
-    import marimo as mo
-
+    from datetime import date
     from typing import Any
 
+    import marimo as mo
+    import polars as pl
+    from scan_google_sheet import scan_google_sheet
+
     from data import bc_items_lf
-    from save import export_dataframes
     from datasets import (
         # genesis_raw,
         coa,
+        net_list,
         # load_salt,
         # forklift_salt,
-    oss_stuffing,
-        net_list,
+        oss_stuffing,
         shore_crane,
         transfer,
     )
-    from scan_google_sheet import scan_google_sheet
+    from save import export_dataframes
     # from dataframe import forklift, hatch_to_hatch
 
     ACTIVITY_XLSX = (
@@ -238,7 +237,6 @@ def _():
     mo.md(r"""
  
     """)
-    return
 
 
 @app.cell
@@ -256,7 +254,7 @@ def _(
     sto_number,
     summary_table,
 ):
-    title = mo.md(f"# ::lucide:blocks:: OSS Report")
+    title = mo.md("# ::lucide:blocks:: OSS Report")
 
     filter_bar = mo.hstack(
         [
@@ -299,7 +297,6 @@ def _(
             actions,
         ]
     )
-    return
 
 
 @app.cell
@@ -447,7 +444,6 @@ def _():
     mo.md(r"""
     ## Datasets
     """)
-    return
 
 
 @app.cell(hide_code=True)
@@ -455,7 +451,6 @@ def _():
     mo.md(r"""
     ### Stuffing ::lucide:container::
     """)
-    return
 
 
 @app.cell(hide_code=True)
@@ -473,13 +468,12 @@ def _(end_date, full_oss_dataset, select_report, start_date):
 @app.cell(hide_code=True)
 def _(stuffing_old_df):
     _df = mo.sql(
-        f"""
+        """
         FROM stuffing_old_df
         SELECT storage_type,overtime,SUM(total_tonnage)::DECIMAL AS tonnage,SUM(invoice_value)::DECIMAL AS invoice_value
         GROUP BY ALL
         """
     )
-    return
 
 
 @app.cell(hide_code=True)
@@ -487,7 +481,6 @@ def _():
     mo.md(r"""
     ### Electricity ::lucide:plug-zap::
     """)
-    return
 
 
 @app.cell(hide_code=True)
@@ -523,7 +516,6 @@ def _(end_date, select_report, start_date, stuffing_dataset):
         """,
         output=False
     )
-    return
 
 
 @app.cell(hide_code=True)
@@ -570,7 +562,7 @@ def _(stuffing_df):
 @app.cell(hide_code=True)
 def _(stuffing_df):
     plugin_summary_df = mo.sql(
-        f"""
+        """
         WITH
             plugin AS (
                 FROM
@@ -642,7 +634,6 @@ def _():
     mo.md(r"""
     ### Net List
     """)
-    return
 
 
 @app.cell(hide_code=True)
@@ -661,7 +652,7 @@ def _(end_date, full_oss_dataset, select_report, start_date):
 @app.cell(hide_code=True)
 def _(net_list_df):
     summary_net_list_df = mo.sql(
-        f"""
+        """
         FROM net_list_df
         SELECT service,storage_type,overtime,SUM(total_tonnage)::DECIMAL AS total_tonnage,SUM(invoice_value)::DECIMAL AS total_price
         GROUP BY ALL
@@ -676,7 +667,6 @@ def _():
     mo.md(r"""
     ### Shore Crane ::lucide:git-pull-request-create::
     """)
-    return
 
 
 @app.cell(hide_code=True)
@@ -695,7 +685,7 @@ def _(end_date, select_report, shore_crane_dataset, start_date):
 @app.cell(hide_code=True)
 def _(shore_crane_df):
     summary_shore_crane_df = mo.sql(
-        f"""
+        """
         WITH
             ot_2 AS (
                 FROM
@@ -798,7 +788,6 @@ def _():
     mo.md(r"""
     ### Transfer
     """)
-    return
 
 
 @app.cell
@@ -838,7 +827,6 @@ def _():
     mo.md(r"""
     #### Container still on plug
     """)
-    return
 
 
 @app.cell
@@ -847,13 +835,12 @@ def _(to_filter_transfer_df):
         pl.col("exit_date").is_null()
     )
     container_on_plug
-    return
 
 
 @app.cell(hide_code=True)
 def _(to_filter_transfer_df, transfer_dataset):
     transfer_df = mo.sql(
-        f"""
+        """
         WITH
             t AS (
                 FROM
@@ -893,7 +880,7 @@ def _(to_filter_transfer_df, transfer_dataset):
 @app.cell(hide_code=True)
 def _(transfer_df):
     summary_transfer_df = mo.sql(
-        f"""
+        """
         WITH
             main AS (
                 FROM
@@ -956,7 +943,6 @@ def _():
     mo.md(r"""
     ## Summaries Df (Business Central line items)
     """)
-    return
 
 
 @app.cell(hide_code=True)
@@ -964,13 +950,12 @@ def _():
     mo.md(r"""
     -- Stuffing
     """)
-    return
 
 
 @app.cell(hide_code=True)
 def _(plugin_summary_df):
     stuffing_bc = mo.sql(
-        f"""
+        """
         WITH
             plugin AS (
                 FROM
@@ -1044,13 +1029,12 @@ def _():
     mo.md(r"""
     --- Net List
     """)
-    return
 
 
 @app.cell(hide_code=True)
 def _(summary_net_list_df):
     net_list_bc = mo.sql(
-        f"""
+        """
         WITH
             service_map AS (
                 SELECT
@@ -1094,13 +1078,12 @@ def _():
     mo.md(r"""
     --- Shore Crane
     """)
-    return
 
 
 @app.cell(hide_code=True)
 def _(summary_shore_crane_df):
     shore_crane_bc = mo.sql(
-        f"""
+        """
         WITH variant_map AS (
                     SELECT * FROM (
                         VALUES
@@ -1126,13 +1109,12 @@ def _():
     mo.md(r"""
     --- Transfer
     """)
-    return
 
 
 @app.cell(hide_code=True)
 def _(summary_transfer_df):
     transfer_bc = mo.sql(
-        f"""
+        """
         WITH variant_map AS (
                     SELECT * FROM (
                         VALUES
@@ -1158,7 +1140,6 @@ def _():
     mo.md(r"""
     ## Combined Summaries
     """)
-    return
 
 
 @app.cell
@@ -1189,7 +1170,7 @@ def _(net_list_bc, shore_crane_bc, stuffing_bc, transfer_bc):
 @app.cell(hide_code=True)
 def _(combined_services_bc):
     pricing_df = mo.sql(
-        f"""
+        """
         WITH bc AS (FROM
             price_df
             SELECT 
@@ -1237,7 +1218,7 @@ def _(combined_services_bc):
 @app.cell(hide_code=True)
 def _(pricing_df):
     metrics_df = mo.sql(
-        f"""
+        """
         WITH a AS (FROM pricing_df
                 SELECT Description, Variant, "Unit Price", QTY,
                     ROUND("Unit Price" * QTY, 2) AS total_price
@@ -1255,13 +1236,12 @@ def _(bc_df, copy_button):
     mo.stop(not copy_button.value)
     bc_df.write_clipboard()  # tab-separated, pastes cleanly into BC / Excel
     mo.md("✅ Copied to clipboard")
-    return
 
 
 @app.cell(hide_code=True)
 def _(pricing_df):
     bc_df = mo.sql(
-        f"""
+        """
         FROM pricing_df
             SELECT * EXCLUDE("Unit Price")
         WHERE QTY > 0
@@ -1273,7 +1253,7 @@ def _(pricing_df):
 @app.cell(hide_code=True)
 def _(pricing_df):
     service_breakdown_df = mo.sql(
-        f"""
+        """
         FROM pricing_df
                 SELECT
                     'STO Services' AS section,
@@ -1375,7 +1355,6 @@ def _(month_selector, reports, save_button, select_report):
         output_path=f"output/{select_report.value} STO - {format_datestr_to_month_year(month_selector.value)}.xlsx",
     )
     mo.md(f"✅ Saved to `{output_file}`")
-    return
 
 
 if __name__ == "__main__":

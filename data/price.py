@@ -5,8 +5,8 @@ from __future__ import annotations
 from functools import lru_cache
 
 import polars as pl
-from data_source.make_dataset import load_sheet as scan_google_sheet
 
+from data_source.make_dataset import load_sheet as scan_google_sheet
 from data_source.sheet_ids import BC_ITEMS_SHEET_NAME, MASTER_ID, PRICE_SHEET_NAME
 from type_casting import PolarsEnum
 

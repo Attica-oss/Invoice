@@ -4,12 +4,9 @@ __generated_with = "0.24.0"
 app = marimo.App(width="columns")
 
 with app.setup:
-    import polars as pl
-    import marimo as mo
 
     from dataframe import bin_dispatch
-
-    from type_casting import CastToNumbers,Numbers
+    from type_casting import CastToNumbers, Numbers
 
 
 @app.cell
@@ -20,7 +17,6 @@ def _():
         CastToNumbers(column_name="unit_price").to_currency(scale=2),
         CastToNumbers(column_name="total_price").to_currency(scale=3)
     ).collect()
-    return
 
 
 @app.cell

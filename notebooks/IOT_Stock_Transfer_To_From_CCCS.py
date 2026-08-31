@@ -4,19 +4,21 @@ __generated_with = "0.23.14"
 app = marimo.App(width="columns")
 
 with app.setup:
+    from calendar import monthrange
     from concurrent.futures import ThreadPoolExecutor
     from datetime import date
-    from calendar import monthrange
-    import polars as pl
+
     import marimo as mo
+    import polars as pl
+    from scan_google_sheet import scan_google_sheet
 
     from data import bc_items_lf
+    from datasets import emr
     from save import export_dataframes
-    from datasets import cccs_stuffing, iot_soc
 
     with ThreadPoolExecutor(max_workers=5) as _pool:
-        # _f_cccs_stuffing = _pool.submit(lambda: cccs_stuffing().collect())
-        _f_stuffing = _pool.submit(lambda: iot_soc.iot_stuffing().collect())
+        _f_pti = _pool.submit(lambda: emr.pti().collect())
+        _f_washing = _pool.submit(lambda: emr.washing().collect())
         _f_price = _pool.submit(lambda: bc_items_lf.collect())
 
     def _fix_time(df: pl.DataFrame) -> pl.DataFrame:
@@ -29,43 +31,74 @@ with app.setup:
             else df
         )
 
-    # CCCS_STUFFING_DATASET = _f_cccs_stuffing.result()
-    STUFFING_DATASET = _fix_time(_f_stuffing.result())
+    PTI_DATASET = _f_pti.result()
+    WASHING_DATASET = _fix_time(_f_washing.result())
     price_df = _f_price.result()
 
-    # def _build_container_origin(df: pl.DataFrame) -> pl.DataFrame:
-    #     records = df.select(
-    #         "container_number", "date_plugged", "time_plugged", "vessel_client"
-    #     )
-    #     predecessors = (
-    #         df.filter(pl.col("date_out") != pl.col("date_plugged"))
-    #         .select("container_number", pl.col("date_out").alias("date_plugged"))
-    #         .drop_nulls()
-    #         .unique()
-    #     )
-    #     chain_starts = (
-    #         records.join(predecessors, on=["container_number", "date_plugged"], how="anti")
-    #         .sort("container_number", "date_plugged")
-    #         .select(
-    #             "container_number",
-    #             "date_plugged",
-    #             pl.col("vessel_client").alias("original_vessel"),
-    #         )
-    #     )
-    #     return (
-    #         records.sort("container_number", "date_plugged")
-    #         .join_asof(
-    #             chain_starts,
-    #             by="container_number",
-    #             on="date_plugged",
-    #             strategy="backward",
-    #         )
-    #         .select(
-    #             "container_number", "date_plugged", "time_plugged", "original_vessel"
-    #         )
-    #     )
 
-    # CONTAINER_ORIGIN = _build_container_origin(ELECTRICITY_DATASET)
+@app.cell
+def _():
+    from datasets import forklift_scow_handling, miscellaneous_lf, scow_transfer
+
+    return forklift_scow_handling, miscellaneous_lf, scow_transfer
+
+
+@app.cell
+def _(forklift_scow_handling, miscellaneous_lf, scow_transfer):
+    misc_df = miscellaneous_lf()
+    fl_df = forklift_scow_handling.forklift_scow_handling_lf()
+    scow_df = scow_transfer()
+    return fl_df, misc_df, scow_df
+
+
+@app.cell
+def _(scow_df):
+    scow_df.filter(pl.col("status").eq("Full")).with_columns(
+        time_selection=pl.when(pl.col("movement_type").eq("Collection"))
+        .then(pl.col("time_in"))
+        .otherwise(pl.col("time_out"))
+    ).with_columns(
+        overtime=pl.when(
+            pl.col("day_name")
+            .is_in(["Sun", "PH"])
+            .and_(pl.col("time_selection").gt(pl.time(16, 0)))
+        )
+        .then(pl.lit("overtime 200%"))
+        .when(
+            (
+                pl.col("day_name")
+                .is_in(["Sun", "PH"])
+                .and_(pl.col("time_selection").le(pl.time(16, 0)))
+            ).or_(
+                pl.col("day_name")
+                .is_in(["Sun", "PH"])
+                .not_()
+                .and_(pl.col("time_selection").gt(pl.time(17, 0)))
+            )
+        )
+        .then(pl.lit("overtime 150%"))
+        .otherwise(pl.lit("normal hours"))
+    ).collect()
+
+
+@app.cell(hide_code=True)
+def _(fl_df):
+    _df = mo.sql(
+        """
+        FROM fl_df
+        """
+    )
+
+
+@app.cell(hide_code=True)
+def _(misc_df, month_selector):
+    _df = mo.sql(
+        f"""
+        FROM misc_df
+        WHERE operation_type LIKE '%Bin Dispatch%'  AND 
+            date BETWEEN '{month_selector.value}' AND LAST_DAY(DATE '{month_selector.value}')
+        """
+    )
 
 
 @app.function
@@ -102,23 +135,17 @@ def _():
 
 
 @app.cell
-def _(stuffing_summary_df):
-    stuffing_summary_df
-    return
+def _(pti_df, washing_df):
+    no_of_washing = washing_df.select(pl.len()).item()
 
+    no_of_shifting = pti_df.select(pl.col("shifting_price").len()).item()
 
-@app.cell
-def _(stuffing_summary_df):
-    normal_tonnage = stuffing_summary_df.filter(pl.col("overtime").eq("normal hours")).select(pl.col("tonnage")).sum().item()
-    overtime_150_tonnage = stuffing_summary_df.filter(pl.col("overtime").eq("overtime 150%")).select(pl.col("tonnage")).sum().item()
-    overtime_200_tonnage = stuffing_summary_df.filter(pl.col("overtime").eq("overtime 200%")).select(pl.col("tonnage")).sum().item()
-    total_tonnage = stuffing_summary_df.select(pl.col("tonnage")).sum().item()
-    return (
-        normal_tonnage,
-        overtime_150_tonnage,
-        overtime_200_tonnage,
-        total_tonnage,
-    )
+    no_of_plugin = pti_df.select(pl.col("plugin_price").len()).item()
+
+    days_on_electricity = pti_df.select(
+        pl.col("days_on_electricity").sum()
+    ).item()
+    return days_on_electricity, no_of_plugin, no_of_shifting, no_of_washing
 
 
 @app.cell
@@ -127,12 +154,7 @@ def _():
 
 
 @app.cell
-def _(
-    normal_tonnage,
-    overtime_150_tonnage,
-    overtime_200_tonnage,
-    total_tonnage,
-):
+def _(days_on_electricity, no_of_plugin, no_of_shifting, no_of_washing):
     summary_table = mo.Html(
         f"""
         <table style="
@@ -141,51 +163,51 @@ def _(
             font-size: 16px;
             line-height: 1.45;
         ">
-       
+
 
 
             <tr>
                 <td style="text-align:right; padding-right:28px; font-style:italic;">
-                    Normal Hours
+                   Container Cleaning
                 </td>
                 <td style="text-align:right; font-weight:bold;">
-                    {normal_tonnage}
+                    {no_of_washing}
                 </td>
                 <td style="padding-left:12px; font-style:italic;">
-                    Tons
+                    Containers
                 </td>
             </tr>
 
             <tr>
                 <td style="text-align:right; padding-right:28px; font-style:italic;">
-                    Overtime 150%
+                    Shifting
                 </td>
                 <td style="text-align:right; font-weight:bold;">
-                    {overtime_150_tonnage}
+                    {no_of_shifting}
                 </td>
                 <td style="padding-left:12px; font-style:italic;">
-                    Tons
+                    Shifts
                 </td>
             </tr>
 
                     <tr>
                 <td style="text-align:right; padding-right:28px; font-style:italic;">
-                    Overtime 200%
+                   Plugin
                 </td>
                 <td style="text-align:right; font-weight:bold;">
-                    {overtime_200_tonnage}
+                    {no_of_plugin}
                 </td>
                 <td style="padding-left:12px; font-style:italic;">
-                    Tons
+                    Plugins
                 </td>
             </tr>
 
             <tr>
                 <td style="text-align:right; padding-right:28px; font-style:italic;">
-                    Total Tonnage
+                    Electricity
                 </td>
                 <td style="text-align:right; font-weight:bold;">
-                    {total_tonnage}
+                    {days_on_electricity}
                 </td>
                 <td style="padding-left:12px; font-style:italic;">
                     Days
@@ -196,7 +218,7 @@ def _(
                 <td colspan="3" style="height:18px;"></td>
             </tr>
 
-    
+
         </table>
         """
     )
@@ -212,7 +234,7 @@ def _(
     select_report,
     summary_table,
 ):
-    title = mo.md(f"# 🐟 IOT Stuffing Report")
+    title = mo.md("# ⚙️🌊 IOT M&R Report")
 
     filter_bar = mo.hstack(
         [month_selector, select_report],
@@ -251,17 +273,11 @@ def _(
             actions,
         ]
     )
-    return
 
 
 @app.cell(hide_code=True)
-def _(month_selector, select_report, stuffing_df):
-    _has_data = (
-   
-        + len(stuffing_df)
-   
-        > 0
-    )
+def _(month_selector, pti_df, select_report, washing_df):
+    _has_data = len(washing_df)+len(pti_df) > 0
     mo.callout(
         mo.md(
             f"**No records found** for **{select_report.value}** "
@@ -270,7 +286,6 @@ def _(month_selector, select_report, stuffing_df):
         ),
         kind="warn",
     ) if not _has_data else None
-    return
 
 
 @app.function
@@ -285,7 +300,7 @@ def format_datestr_to_month_year(date_str: str) -> str:
 @app.cell(hide_code=True)
 def _(pricing_df):
     metrics_df = mo.sql(
-        f"""
+        """
         With a AS (FROM pricing_df
 
         SELECT Description,Variant,"Unit Price",QTY,ROUND("Unit Price" * QTY,2) AS total_price
@@ -299,101 +314,130 @@ def _(pricing_df):
 
 
 @app.cell(hide_code=True)
-def _(stuffing_df):
-    stuffing_summary_df = mo.sql(
+def _(month_selector, pti_dataset, select_report):
+    pti_df = mo.sql(
         f"""
-        WITH
-            main AS (
-                FROM
-                    stuffing_df
-                SELECT
-                    overtime,
-                    COALESCE(SUM(total_tonnage), 0.0)::DECIMAL AS tonnage,
-                GROUP BY ALL
-            ),
-            sort_order AS (
-                FROM
-                    stuffing_df
-                SELECT DISTINCT
-                    overtime,
-                    CASE
-                        WHEN overtime = 'normal hours' THEN 1
-                        WHEN overtime = 'overtime 150%' THEN 2
-                        WHEN overtime = 'overtime 200%' THEN 3
-                    END AS sort
-            )
-        SELECT
-            m.overtime,
-            tonnage
-        FROM
-            sort_order s
-            LEFT JOIN main m ON m.overtime = s.overtime
-        ORDER BY
-            sort
-        """
-    )
-    return (stuffing_summary_df,)
-
-
-@app.cell(hide_code=True)
-def _(month_selector, stuffing_dataset):
-    stuffing_df = mo.sql(
-        f"""
-        FROM
-            STUFFING_DATASET
-        SELECT 
-            *
+        FROM PTI_DATASET
+            SELECT 
+            datetime_start,
+            container_number,
+            set_point,
+            invoice_to,
+            datetime_end,
+            status,
+            "days" AS days_on_electricity,
+            electricity_price,
+            shifting_price,
+            plugin_price,
+            total_price
 
         WHERE
-            date BETWEEN '{month_selector.value}' AND LAST_DAY(DATE '{month_selector.value}')
+            invoice_to = '{select_report.value}'
+           AND 
+            datetime_start BETWEEN '{month_selector.value}' AND LAST_DAY(DATE '{month_selector.value}')
         """
     )
-    return (stuffing_df,)
+    return (pti_df,)
 
 
 @app.cell(hide_code=True)
-def _(stuffing_df):
-    summary_df = mo.sql(
+def _(month_selector, select_report, washing_dataset):
+    washing_df = mo.sql(
         f"""
+        FROM WASHING_DATASET
+            SELECT date AS cleaning_date,
+            container_number,
+            invoice_to AS client,
+            price,
+            CASE WHEN service_remarks = 'Clean' THEN '' ELSE service_remarks END AS service_remarks
+
+        WHERE
+            invoice_to = '{select_report.value}'
+           AND 
+            date BETWEEN '{month_selector.value}' AND LAST_DAY(DATE '{month_selector.value}')
+        ORDER BY date
+        """
+    )
+    return (washing_df,)
+
+
+@app.cell(hide_code=True)
+def _(month_selector, select_report, washing_log_df):
+    _df = mo.sql(
+        f"""
+        FROM washing_log_df WHERE "Invoice To" = '{select_report.value}'
+         AND 
+            date BETWEEN '{month_selector.value}' AND LAST_DAY(DATE '{month_selector.value}')
+        ORDER BY date
+        """
+    )
+
+
+@app.cell(hide_code=True)
+def _(month_selector, pti_log_df, select_report):
+    _df = mo.sql(
+        f"""
+        FROM pti_log_df WHERE "Shipping Line" = '{select_report.value}'
+         AND 
+            "Date Plugin" BETWEEN '{month_selector.value}' AND LAST_DAY(DATE '{month_selector.value}')
+        ORDER BY "Date Plugin"
+        """
+    )
+
+
+@app.cell
+def _():
+    washing_log_df = scan_google_sheet(url="https://docs.google.com/spreadsheets/d/1L9qkq9WlIa2j5DcvoLvxkqYogRg76S-e8OxAIyLruAE/edit?gid=656582295#gid=656582295",sheet_name="ContainerCleaning")
+
+
+    pti_log_df = scan_google_sheet(url="https://docs.google.com/spreadsheets/d/1L9qkq9WlIa2j5DcvoLvxkqYogRg76S-e8OxAIyLruAE/edit?gid=656582295#gid=656582295",sheet_name="ContainerPTI")
+    return pti_log_df, washing_log_df
+
+
+@app.cell
+def _(pti_df, washing_df):
+    summary_df = mo.sql(
+        """
         WITH
-   
-            normal_stuffing AS (
+
+            pti_main AS (
                 FROM
-                    stuffing_df
+                    pti_df
                 SELECT
-                    COALESCE(SUM(total_tonnage), 0) AS QTY,
-                    'STUFFING - FISHLOADER' AS Description,
+                    COALESCE(SUM(days_on_electricity), 0) AS QTY,
+                    'PTI IOT SOC' AS Description,
                     'STD' AS Variant
-                WHERE
-                    overtime = 'normal hours'
-            ), ot_1_stuffing AS (
+            ), pti_plugin AS (
                 FROM
-                    stuffing_df
+                    pti_df
                 SELECT
-                    COALESCE(SUM(total_tonnage), 0) AS QTY,
-                    'STUFFING - FISHLOADER' AS Description,
-                    '150%' AS Variant
-                WHERE
-                    overtime = 'overtime 150%'
-            ), ot_2_stuffing AS (
+                    COUNT(plugin_price) AS QTY,
+                    'PLUGIN' AS Description,
+                    'STD' AS Variant
+            ), pti_shifting AS (
                 FROM
-                    stuffing_df
+                    pti_df
                 SELECT
-                    COALESCE(SUM(total_tonnage), 0) AS QTY,
-                    'STUFFING - FISHLOADER' AS Description,
-                    '200%' AS Variant
-                WHERE
-                    overtime = 'overtime 200%'
-            )
+                    COUNT(shifting_price) AS QTY,
+                    'SHIFTING' AS Description,
+                    'STD' AS Variant
+               ),wash AS (
+            FROM washing_df
+            SELECT COUNT(*) AS QTY,
+            'WASHING' AS Description,
+            'STD' AS Variant
+               )
 
 
-    
 
-        FROM normal_stuffing
+
+        FROM pti_main
         UNION ALL
-        FROM ot_1_stuffing
+        FROM pti_plugin
         UNION ALL
-        FROM ot_2_stuffing
+        FROM pti_shifting
+        UNION ALL
+        FROM wash
         """,
         output=False
     )
@@ -403,13 +447,17 @@ def _(stuffing_df):
 @app.cell(hide_code=True)
 def _(summary_df):
     pricing_df = mo.sql(
-        f"""
+        """
         WITH bc AS (FROM
             price_df
         WHERE
             Description IN (
-            'STUFFING - FISHLOADER',
-            )),summaries AS (FROM summary_df)
+            'WASHING',
+            'PLUGIN',
+            'SHIFTING',
+            'PTI IOT SOC'
+
+            ) AND Variant = 'STD'),summaries AS (FROM summary_df)
 
 
         SELECT 
@@ -437,13 +485,12 @@ def _(bc_df, copy_button):
     mo.stop(not copy_button.value)
     bc_df.write_clipboard()  # tab-separated, pastes cleanly into BC / Excel
     mo.md("✅ Copied to clipboard")
-    return
 
 
 @app.cell(hide_code=True)
 def _(pricing_df):
     bc_df = mo.sql(
-        f"""
+        """
         FROM pricing_df
             SELECT * EXCLUDE("Unit Price")
         WHERE QTY > 0
@@ -455,19 +502,18 @@ def _(pricing_df):
 @app.cell(hide_code=True)
 def _(pricing_df):
     _df = mo.sql(
-        f"""
+        """
         FROM pricing_df
             SELECT *, ("Unit Price" * QTY)::DECIMAL AS total_price
         WHERE QTY > 0
         """
     )
-    return
 
 
 @app.cell(hide_code=True)
 def _(pricing_df):
     service_breakdown_df = mo.sql(
-        f"""
+        """
         WITH
             mapped AS (
                 FROM
@@ -522,50 +568,53 @@ def _(pricing_df):
 
 @app.cell
 def _(
+    days_on_electricity,
     month_selector,
-    normal_tonnage,
-    overtime_150_tonnage,
-    overtime_200_tonnage,
+    no_of_plugin,
+    no_of_shifting,
+    no_of_washing,
+    pti_df,
     select_report,
     service_breakdown_df,
-    stuffing_df,
-    total_tonnage,
+    washing_df,
 ):
     reports = {
         "Summary": {
             "type": "summary",
-            "date_range": f"{format_datestr_to_month_year(month_selector.value)}",
+            "month": f"{format_datestr_to_month_year(month_selector.value)}",
             "client": f"{select_report.value}",
             "summary_rows": [
-           
                 None,  # blank row
                 {
-                    "label": "Normal Hours",
-                    "value": normal_tonnage,
-                    "unit": "Tons",
+                    "label": "Container Cleaning:",
+                    "value": no_of_washing,
+                    "unit": "Containers",
                     "italic": True,
                 },
-                 {
-                    "label": "Overtime 150%",
-                    "value": overtime_150_tonnage,
-                    "unit": "Tons",
+                {
+                    "label": "PTI:",
+                    "value": None,
+                    "unit": None,
                     "italic": True,
                 },
-                        {
-                    "label": "Overtime 200%",
-                    "value": overtime_200_tonnage,
-                    "unit": "Tons",
+                {
+                    "label": "Shifting:",
+                    "value": no_of_shifting,
+                    "unit": "Shifts",
                     "italic": True,
                 },
-            
+                {
+                    "label": "Plugin",
+                    "value": no_of_plugin,
+                    "unit": "Plugins",
+                    "italic": True,
+                },
                 None,
                 {
-                    "label": "Total Tonnage",
-                    "value": (
-                        total_tonnage
-                    ),
-                    "unit": "Tons",
-                    "number_format": "#,##0.000",
+                    "label": "Electricity",
+                    "value": (days_on_electricity),
+                    "unit": "Days",
+                    # "number_format": "#,##0.000",
                 },
             ],
             # Expected columns:
@@ -575,11 +624,13 @@ def _(
             "pages_wide": 1,
             "pages_tall": 1,
         },
-        "Stuffing": {
-            "df": stuffing_df,
+        "Container Cleaning": {
+            "df": washing_df,
+            "header_color": "#f35f97",
+        },"PTI Operation": {
+            "df": pti_df,
             "header_color": "#f35f97",
         }
-    
     }
     return (reports,)
 
@@ -596,7 +647,6 @@ def _(month_selector, reports, save_button, select_report):
         output_path=f"output/{select_report.value} CCCS - {format_datestr_to_month_year(month_selector.value)}.xlsx",
     )
     mo.md(f"✅ Saved to `{output_file}`")
-    return
 
 
 if __name__ == "__main__":

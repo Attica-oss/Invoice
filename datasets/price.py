@@ -7,9 +7,10 @@ The old module relied on ``get_price`` happening to return sorted data.
 
 from __future__ import annotations
 
-from functools import lru_cache
+from functools import cache, lru_cache
 
 import polars as pl
+
 from data_source.make_dataset import load_sheet as scan_google_sheet
 
 # from data_source.sheet_ids import MASTER_ID, PRICE_SHEET_NAME
@@ -136,7 +137,7 @@ OSS_STUFFING_SERVICES: list[str] = [
 ]
 
 
-@lru_cache(maxsize=None)
+@cache
 def _sorted_price(services: tuple[str, ...]) -> pl.LazyFrame:
     return get_price(list(services)).sort("service", "date").lazy()
 

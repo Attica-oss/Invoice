@@ -4,14 +4,13 @@ __generated_with = "0.20.4"
 app = marimo.App(width="medium")
 
 with app.setup:
-    import polars as pl
+
     import marimo as mo
-    from datetime import date
-    from dataframe.bin_dispatch import full_scows, empty_scows
-    from dataframe.shore_handling import salt, forklift_salt
-    from data_source.sheet_ids import INVOICING,REPORT_STATUS
+    import polars as pl
     from scan_google_sheet import scan_google_sheet
-    from dataframe.stuffing import coa
+
+    from data_source.sheet_ids import INVOICING, REPORT_STATUS
+    from dataframe.shore_handling import forklift_salt
 
 
 @app.cell
@@ -23,7 +22,7 @@ def _():
 @app.cell
 def _(invoicing_df):
     _df = mo.sql(
-        f"""
+        """
         FROM invoicing_df
             SELECT
             "month" AS invoice_month,
@@ -46,13 +45,12 @@ def _(invoicing_df):
         WHERE status <> 'Send for Approval'
         """
     )
-    return
 
 
 @app.cell(hide_code=True)
 def _(invoicing_df):
     sto_report_df = mo.sql(
-        f"""
+        """
         FROM
             invoicing_df
         SELECT
@@ -76,7 +74,6 @@ def _():
     mo.md(r"""
     # Berth Dues
     """)
-    return
 
 
 @app.cell
@@ -89,13 +86,12 @@ def _():
     mo.md(r"""
     # IOT - Bin Dispatch Monthly
     """)
-    return
 
 
 @app.cell(hide_code=True)
 def _():
     full_scow_df = mo.sql(
-        f"""
+        """
         -- Full Scows
         WITH
             scow_transfer AS (
@@ -166,7 +162,6 @@ def _():
         ORDER BY month_number
         """
     )
-    return
 
 
 @app.cell(hide_code=True)
@@ -174,7 +169,6 @@ def _():
     mo.md(r"""
     ## Salt Operation
     """)
-    return
 
 
 @app.cell
@@ -191,7 +185,7 @@ def _():
 @app.cell(hide_code=True)
 def _(forklift_salt_df, sto_report_df):
     forklift_raw_salt = mo.sql(
-        f"""
+        """
         WITH forklift_ AS (FROM
             forklift_salt_df
         SELECT
@@ -274,17 +268,15 @@ def _():
     mo.md(r"""
     ## STO Salt
     """)
-    return
 
 
 @app.cell(hide_code=True)
 def _(forklift_raw_salt):
     _df = mo.sql(
-        f"""
+        """
         FROM forklift_raw_salt
         """
     )
-    return
 
 
 @app.cell(hide_code=True)
@@ -292,13 +284,12 @@ def _():
     mo.md(r"""
     ## Monthly Salt
     """)
-    return
 
 
 @app.cell(hide_code=True)
 def _(forklift_raw_salt):
     _df = mo.sql(
-        f"""
+        """
         FROM forklift_raw_salt 
         SELECT month_number,"month",customer,SUM(total_price) AS total_salt_forklift_price,service
 
@@ -307,7 +298,6 @@ def _(forklift_raw_salt):
         ORDER BY month_number
         """
     )
-    return
 
 
 @app.cell

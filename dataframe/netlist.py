@@ -128,9 +128,7 @@ def _stuffing_type() -> pl.LazyFrame:
         .agg(pl.col("time_plugged").max())
         .drop("time_plugged")
         .select(pl.all().exclude("operation_type"))
-        .unique(
-            subset=["vessel_client", "container_number", "date_plugged"], keep="last"
-        )
+        .unique(subset=["vessel_client", "container_number", "date_plugged"], keep="last")
         .sort(by="date_plugged")
     )
 
@@ -191,9 +189,7 @@ def _cccs_adjusted_records() -> pl.LazyFrame:
                 pl.col("Storage").alias("storage_type"),
                 pl.col("Vessel").str.to_uppercase().alias("vessel"),
                 (
-                    pl.col("Scale Reading(-Fish Net) (Cal)")
-                    .str.replace(",", "")
-                    .cast(pl.Int64)
+                    pl.col("Scale Reading(-Fish Net) (Cal)").str.replace(",", "").cast(pl.Int64)
                     * 0.001  # Convert to Tons from Kilos
                 )
                 .round(3)
@@ -231,18 +227,14 @@ def _cccs_adjusted_records() -> pl.LazyFrame:
             on=["date", "destination", "vessel", "storage_type"],
             how="left",
         )
-        .with_columns(
-            normal_tonnage=pl.col("total_tonnage_right") - pl.col("overtime_tonnage")
-        )
+        .with_columns(normal_tonnage=pl.col("total_tonnage_right") - pl.col("overtime_tonnage"))
         .with_columns(
             perc_diff=pl.when(pl.col("tonnage_select") == "normal")
             .then(pl.col("normal_tonnage") / pl.col("tons"))
             .otherwise(pl.col("overtime_tonnage") / pl.col("tons"))
         )
         .with_columns(adjusted_tonnage=pl.col("total_tonnage") * pl.col("perc_diff"))
-        .group_by(
-            ["day_name", "date", "overtime", "vessel", "destination", "storage_type"]
-        )
+        .group_by(["day_name", "date", "overtime", "vessel", "destination", "storage_type"])
         .agg(
             start_time=pl.col("Time").min(),
             end_time=pl.col("Time").max(),
@@ -317,9 +309,7 @@ def _netList() -> pl.LazyFrame:
                 pl.col("stuffing_ox")
                 .eq(pl.lit("Basic OSS"))
                 .and_(
-                    pl.col("vessel_client").is_in(
-                        ["OCEAN BASKET", "AMIRANTE", "ISLAND CATCH"]
-                    )
+                    pl.col("vessel_client").is_in(["OCEAN BASKET", "AMIRANTE", "ISLAND CATCH"])
                 )
             )
             .then(pl.col("stuffing_ox"))
@@ -398,7 +388,7 @@ def _netList() -> pl.LazyFrame:
         .with_columns(
             invoice_value=(
                 pl.col("unit_price").round(3) * pl.col("total_tonnage").round(3)
-            ).cast(pl.Decimal(scale=2))
+            ).cast(pl.Decimal(scale=3))
         )
         .select(
             pl.col("day_name"),
@@ -415,58 +405,8 @@ def _netList() -> pl.LazyFrame:
             pl.col("invoice_value"),
             pl.col("remarks"),
         )
+        .unique()
     )
-<<<<<<< HEAD
-    .with_columns(service=pl.col("service") + " - " + pl.col("storage_type"))
-    .sort(by="date")
-    .join_asof(
-        UNLOADING_PRICE.lazy(),
-        by_left="service",
-        by_right="service",
-        on="date",
-        strategy="backward",
-    )
-    .drop("service_type")
-    .with_columns(
-        unit_price=pl.when(pl.col("overtime") == Overtime.overtime_200_text)
-        .then(pl.col("unit_price") * OvertimePerc.overtime_200)
-        .when(pl.col("overtime") == Overtime.overtime_150_text)
-        .then(pl.col("unit_price") * OvertimePerc.overtime_150)
-        .otherwise(pl.col("unit_price"))
-    )
-    .with_columns(
-        pl.when(
-            pl.col("vessel_client").is_in(by_catch_companies)
-            # & pl.col("vessel_client").ne(pl.col("vessel"))
-        )
-        .then(pl.col("vessel_client"))
-        .otherwise(pl.lit(None))
-        .alias("remarks")
-    )
-    .drop("vessel_client")
-    .with_columns(
-        invoice_value=(
-            pl.col("unit_price").round(3) * pl.col("total_tonnage").round(3)
-        ).cast(pl.Decimal(scale=3))
-    )
-    .select(
-        pl.col("day_name"),
-        pl.col("date"),
-        pl.col("vessel"),
-        pl.col("start_time"),
-        pl.col("destination"),
-        pl.col("overtime"),
-        pl.col("storage_type"),
-        pl.col("end_time"),
-        pl.col("total_tonnage"),
-        pl.col("service"),
-        pl.col("unit_price"),
-        pl.col("invoice_value"),
-        pl.col("remarks"),
-    ).unique()
-)
-=======
->>>>>>> 0434db2afac254d931c9d2efacd59961dd278a45
 
 
 # Maersk OSS stuffing list ; Separated between Full and Basic OSS
@@ -487,9 +427,7 @@ def _oss() -> pl.LazyFrame:
             .then(pl.lit("Container Stuffing") + " - " + pl.col("storage_type"))
             .otherwise(pl.lit("Stuffing"))
         )
-        .join_asof(
-            OSS_STUFFING_PRICE.lazy(), by="service", on="date", strategy="backward"
-        )
+        .join_asof(OSS_STUFFING_PRICE.lazy(), by="service", on="date", strategy="backward")
         .select(pl.all().exclude(["service"]))
         .with_columns(
             Price=pl.when(pl.col("overtime") == Overtime.overtime_200_text)
@@ -498,9 +436,7 @@ def _oss() -> pl.LazyFrame:
             .then(pl.col("unit_price") * OvertimePerc.overtime_150)
             .otherwise(pl.col("unit_price"))
         )
-        .with_columns(
-            invoice_value=(pl.col("unit_price") * pl.col("total_tonnage")).round(3)
-        )
+        .with_columns(invoice_value=(pl.col("unit_price") * pl.col("total_tonnage")).round(3))
         .select(pl.all().exclude("remarks"))
     )
 
@@ -575,23 +511,11 @@ def _iot_cargo() -> pl.LazyFrame:
         .drop("service")
         .with_columns(
             total_price=pl.when(pl.col("overtime") == "normal hours")
-            .then(
-                pl.col("total_tonnage")
-                * pl.col("unit_price")
-                * OvertimePerc.normal_hour
-            )
+            .then(pl.col("total_tonnage") * pl.col("unit_price") * OvertimePerc.normal_hour)
             .when(pl.col("overtime") == "overtime 150%")
-            .then(
-                pl.col("total_tonnage")
-                * pl.col("unit_price")
-                * OvertimePerc.overtime_150
-            )
+            .then(pl.col("total_tonnage") * pl.col("unit_price") * OvertimePerc.overtime_150)
             .when(pl.col("overtime") == "overtime 200%")
-            .then(
-                pl.col("total_tonnage")
-                * pl.col("unit_price")
-                * OvertimePerc.overtime_200
-            )
+            .then(pl.col("total_tonnage") * pl.col("unit_price") * OvertimePerc.overtime_200)
             .otherwise(0)
         )
         .select(
@@ -627,37 +551,12 @@ def _iot_stuffing() -> pl.LazyFrame:
             pl.col("endTime").alias("end_time"),
             pl.col("Total Tonnage").alias("total_tonnage"),
         )
-<<<<<<< HEAD
-        .filter(get_iot_cargo)
-    )
-    .with_columns(
-        day_name=pl.when(pl.col("date").is_in(ph_list.implode()))
-        .then(pl.lit("PH"))
-        .otherwise(pl.col("date").dt.to_string(format="%a")),
-        service=pl.lit("Loading to Cargo") + " - " + pl.col("storage"),
-    )
-    .join_asof(
-        IOT_CARGO_PRICE.lazy(),
-        by="service",
-        left_on="date",
-        right_on="date",
-        strategy="backward",
-    )
-    .drop("service")
-    .with_columns(
-        total_price=pl.when(pl.col("overtime") == "normal hours")
-        .then(pl.col("total_tonnage") * pl.col("unit_price") * OvertimePerc.normal_hour)
-        .when(pl.col("overtime") == "overtime 150%")
-        .then(
-            pl.col("total_tonnage") * pl.col("unit_price") * OvertimePerc.overtime_150
-=======
         .filter(get_iot_containers)
         .with_columns(
             day_name=pl.when(pl.col("date").is_in(ph_list))
             .then(pl.lit("PH"))
             .otherwise(pl.col("date").dt.to_string(format="%a")),
             service=pl.lit("Stuffing"),
->>>>>>> 0434db2afac254d931c9d2efacd59961dd278a45
         )
         .join_asof(
             STUFFING_PRICE.lazy(),
@@ -669,23 +568,11 @@ def _iot_stuffing() -> pl.LazyFrame:
         .select(pl.all().exclude(["service"]))
         .with_columns(
             total_price=pl.when(pl.col("overtime") == "normal hours")
-            .then(
-                pl.col("total_tonnage")
-                * pl.col("unit_price")
-                * OvertimePerc.normal_hour
-            )
+            .then(pl.col("total_tonnage") * pl.col("unit_price") * OvertimePerc.normal_hour)
             .when(pl.col("overtime") == "overtime 150%")
-            .then(
-                pl.col("total_tonnage")
-                * pl.col("unit_price")
-                * OvertimePerc.overtime_150
-            )
+            .then(pl.col("total_tonnage") * pl.col("unit_price") * OvertimePerc.overtime_150)
             .when(pl.col("overtime") == "overtime 200%")
-            .then(
-                pl.col("total_tonnage")
-                * pl.col("unit_price")
-                * OvertimePerc.overtime_200
-            )
+            .then(pl.col("total_tonnage") * pl.col("unit_price") * OvertimePerc.overtime_200)
             .otherwise(0)
         )
         .select(

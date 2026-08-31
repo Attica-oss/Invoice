@@ -7,11 +7,8 @@ with app.setup:
     from datetime import date
 
     import marimo as mo
-
     import polars as pl
 
-    from dataframe.bin_dispatch import empty_scows
-    from dataframe.transport import transfer
     from datasets.stuffing import coa
 
 
@@ -45,7 +42,7 @@ def format_datestr_to_month_year(date_str: str) -> str:
 
 @app.cell
 def _(month_selector):
-    title = mo.md(f"# 🐟 IOT Monthly Report")
+    title = mo.md("# 🐟 IOT Monthly Report")
 
     filter_bar = mo.hstack(
         [month_selector],
@@ -84,7 +81,6 @@ def _(month_selector):
             # actions,
         ]
     )
-    return
 
 
 @app.cell(hide_code=True)
@@ -140,7 +136,6 @@ def _(container_plugin, month_selector):
             )
         """
     )
-    return
 
 
 @app.cell
@@ -161,7 +156,6 @@ def _(container_transfer, scow_empty_transfer):
 @app.cell
 def _(haulage_price):
     haulage_price
-    return
 
 
 @app.cell

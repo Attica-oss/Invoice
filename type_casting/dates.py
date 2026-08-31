@@ -12,7 +12,7 @@ This module provides utilities for working with dates, including:
 
 from __future__ import annotations
 
-from datetime import date, datetime, time, timedelta, timezone
+from datetime import UTC, date, datetime, time, timedelta
 from enum import Enum
 from typing import Literal
 
@@ -85,7 +85,7 @@ class Year(int):
 
 
 # Constants
-CURRENT_DATE: date = datetime.now(tz=timezone.utc).date()
+CURRENT_DATE: date = datetime.now(tz=UTC).date()
 CURRENT_YEAR: Year = Year(CURRENT_DATE.year)
 START_OF_YEAR: date = Year.date_range_for_a_year(CURRENT_YEAR)[0]
 END_OF_YEAR: date = Year.date_range_for_a_year(CURRENT_YEAR)[1]

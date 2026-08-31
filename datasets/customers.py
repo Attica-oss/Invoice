@@ -1,8 +1,8 @@
 """Customer Validations"""
 
 import polars as pl
-from data_source.make_dataset import load_sheet as scan_google_sheet
 
+from data_source.make_dataset import load_sheet as scan_google_sheet
 from utils.config import CLIENT_SHEET_NAME, MASTER_ID
 
 CUSTOMERS: pl.LazyFrame = scan_google_sheet(sheet_id=MASTER_ID, sheet_name=CLIENT_SHEET_NAME)

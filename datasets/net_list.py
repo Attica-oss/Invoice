@@ -7,12 +7,12 @@ from functools import lru_cache
 
 import polars as pl
 
-from datasets.genesis import net_list_raw
 from datasets.customers import cargo
+from datasets.genesis import net_list_raw
+from datasets.price import unloading_price
 from datasets.stuffing import stuffing_type
 from datasets.truck_to_cold_store import cccs_adjusted_records
-from datasets.price import unloading_price
-from utils import CURRENT_YEAR,apply_overtime_rate,iot_soc
+from utils import CURRENT_YEAR, apply_overtime_rate, iot_soc
 
 
 def _non_cccs_operations() -> pl.LazyFrame:

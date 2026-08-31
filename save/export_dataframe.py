@@ -1,7 +1,7 @@
 """Export DataFrame to Excel sheet with default formatting."""
 
 from pathlib import Path
-from typing import Any,cast
+from typing import Any, cast
 
 import polars as pl
 import polars.selectors as cs
@@ -56,13 +56,7 @@ def _autofit_columns(
     """Size each column to its longest value, capped at max_width."""
 
     for column_index, column_name in enumerate(df.columns):
-        longest_value = (
-            df[column_name]
-            .cast(pl.String)
-            .fill_null("")
-            .str.len_chars()
-            .max()
-            )
+        longest_value = df[column_name].cast(pl.String).fill_null("").str.len_chars().max()
 
         width = max(len(column_name), cast(int, longest_value) if longest_value is not None else 0)
 
@@ -72,72 +66,73 @@ def _autofit_columns(
             min(width + 2, max_width),
         )
 
+
 def write_dataframe_sheet(
-        workbook: xlsxwriter.Workbook,
-        worksheet: Worksheet,
-        df: pl.DataFrame,
-        config: dict[str, Any],
-        table_name: str,
-    ) -> None:
-        """
-        Write a polars DataFrame as a styled Excel table.
+    workbook: xlsxwriter.Workbook,
+    worksheet: Worksheet,
+    df: pl.DataFrame,
+    config: dict[str, Any],
+    table_name: str,
+) -> None:
+    """
+    Write a polars DataFrame as a styled Excel table.
 
-        Config keys (all optional)
-        --------------------------
-        header_color, header_font_color : str hex colors for the header row
-        table_style : str               Excel table style name ("None" = manual)
-        banded_rows : bool
-        column_totals : list[str]       defaults to every numeric column
-        dtype_formats : dict            polars dtype -> Excel number format
-        max_column_width : int
-        header_row_height : int
-        sheet_zoom : int
-        Plus the print keys accepted by _apply_print_layout.
-        """
+    Config keys (all optional)
+    --------------------------
+    header_color, header_font_color : str hex colors for the header row
+    table_style : str               Excel table style name ("None" = manual)
+    banded_rows : bool
+    column_totals : list[str]       defaults to every numeric column
+    dtype_formats : dict            polars dtype -> Excel number format
+    max_column_width : int
+    header_row_height : int
+    sheet_zoom : int
+    Plus the print keys accepted by _apply_print_layout.
+    """
 
-        settings = DATAFRAME_SHEET_DEFAULTS | config
+    settings = DATAFRAME_SHEET_DEFAULTS | config
 
-        numeric_columns = df.select(cs.numeric()).columns
+    numeric_columns = df.select(cs.numeric()).columns
 
-        df.write_excel(
-            workbook=workbook,
-            worksheet=worksheet,
-            position="A1",
-            table_name=table_name,
-            table_style={
-                "style": settings["table_style"],
-                "banded_rows": settings["banded_rows"],
-                "first_column": False,
-                "last_column": False,
-            },
-            header_format={
-                "bg_color": settings["header_color"],
-                "font_color": settings["header_font_color"],
-                "bold": True,
-                "align": "center",
-                "valign": "vcenter",
-                "text_wrap": True,
-            },
-            column_totals=settings.get("column_totals", numeric_columns),
-            dtype_formats=settings["dtype_formats"],
-            autofit=True,
-            autofilter=True,
-            freeze_panes=(1, 0),
-            hide_gridlines=True,
-            sheet_zoom=settings["sheet_zoom"],
-        )
+    df.write_excel(
+        workbook=workbook,
+        worksheet=worksheet,
+        position="A1",
+        table_name=table_name,
+        table_style={
+            "style": settings["table_style"],
+            "banded_rows": settings["banded_rows"],
+            "first_column": False,
+            "last_column": False,
+        },
+        header_format={
+            "bg_color": settings["header_color"],
+            "font_color": settings["header_font_color"],
+            "bold": True,
+            "align": "center",
+            "valign": "vcenter",
+            "text_wrap": True,
+        },
+        column_totals=settings.get("column_totals", numeric_columns),
+        dtype_formats=settings["dtype_formats"],
+        autofit=True,
+        autofilter=True,
+        freeze_panes=(1, 0),
+        hide_gridlines=True,
+        sheet_zoom=settings["sheet_zoom"],
+    )
 
-        _autofit_columns(worksheet, df, settings["max_column_width"])
-        worksheet.set_row(0, settings["header_row_height"])
+    _autofit_columns(worksheet, df, settings["max_column_width"])
+    worksheet.set_row(0, settings["header_row_height"])
 
-        _apply_print_layout(
-            worksheet,
-            config,
-            last_row=df.height + 1,  # header + rows + totals row
-            last_col=df.width - 1,
-            landscape_default=True,
-            set_print_area=False,
-        )
+    _apply_print_layout(
+        worksheet,
+        config,
+        last_row=df.height + 1,  # header + rows + totals row
+        last_col=df.width - 1,
+        landscape_default=True,
+        set_print_area=False,
+    )
 
 
 def export_dataframes(

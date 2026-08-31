@@ -4,15 +4,14 @@ __generated_with = "0.23.14"
 app = marimo.App(width="columns")
 
 with app.setup:
-    import polars as pl
-    import marimo as mo
-
     from pathlib import Path
 
-    from dataframe import netList
-    # from datasets import net_list
+    import marimo as mo
+    import polars as pl
 
+    # from datasets import net_list
     from scan_google_sheet import scan_google_sheet
+
 
 
 @app.cell
@@ -94,7 +93,7 @@ def _(ops_activity_url: str):
 @app.cell(hide_code=True)
 def _(overtime_stuffing_df):
     ot_stuffing_df = mo.sql(
-        f"""
+        """
         WITH
             after_midnight AS (
                 FROM
@@ -162,7 +161,7 @@ def _():
 @app.cell(hide_code=True)
 def _(netlist, ot_stuffing_df):
     net_list_df = mo.sql(
-        f"""
+        """
         FROM
             netList n
             LEFT JOIN ot_stuffing_df o ON n.date = o.start_date
@@ -182,7 +181,7 @@ def _(netlist, ot_stuffing_df):
 @app.cell
 def _(net_list_df):
     pivoted_net_list_df = mo.sql(
-        f"""
+        """
         WITH
             base AS (
                 SELECT
@@ -219,13 +218,12 @@ def _():
     mo.md(r"""
     ## Container Stuffing
     """)
-    return
 
 
 @app.cell(hide_code=True)
 def _(detailed_ops, pivoted_net_list_df):
     _df = mo.sql(
-        f"""
+        """
         WITH
             exl AS (
                 FROM
@@ -265,7 +263,6 @@ def _(detailed_ops, pivoted_net_list_df):
         ORDER BY e.date
         """
     )
-    return
 
 
 @app.cell(hide_code=True)
@@ -273,13 +270,12 @@ def _():
     mo.md(r"""
     ## Transhipment
     """)
-    return
 
 
 @app.cell(hide_code=True)
 def _(detailed_ops, pivoted_net_list_df):
     _df = mo.sql(
-        f"""
+        """
         WITH
             exl AS (
                 FROM
@@ -319,7 +315,6 @@ def _(detailed_ops, pivoted_net_list_df):
         ORDER BY e.date
         """
     )
-    return
 
 
 @app.cell(hide_code=True)
@@ -327,13 +322,12 @@ def _():
     mo.md(r"""
     ## Simple Unloading
     """)
-    return
 
 
 @app.cell
 def _(detailed_ops, pivoted_net_list_df):
     _df = mo.sql(
-        f"""
+        """
         WITH
             exl AS (
                 FROM
@@ -373,7 +367,6 @@ def _(detailed_ops, pivoted_net_list_df):
         ORDER BY e.date
         """
     )
-    return
 
 
 @app.cell(hide_code=True)
@@ -381,13 +374,12 @@ def _():
     mo.md(r"""
     ## Unloading to CCCS
     """)
-    return
 
 
 @app.cell(hide_code=True)
 def _(detailed_ops, pivoted_net_list_df):
     _df = mo.sql(
-        f"""
+        """
         WITH
             exl AS (
                 FROM
@@ -427,7 +419,6 @@ def _(detailed_ops, pivoted_net_list_df):
         ORDER BY e.date
         """
     )
-    return
 
 
 @app.cell(hide_code=True)
@@ -437,7 +428,6 @@ def _():
 
     # Well to Well
     """)
-    return
 
 
 @app.cell
@@ -449,7 +439,7 @@ def _(ops_activity_url: str):
 @app.cell(hide_code=True)
 def _(well_to_well_df, well_to_well_ops_df):
     _df = mo.sql(
-        f"""
+        """
         WITH
             ops AS (
                 FROM
@@ -481,7 +471,6 @@ def _(well_to_well_df, well_to_well_ops_df):
         ORDER BY i.date
         """
     )
-    return
 
 
 @app.cell
@@ -518,7 +507,7 @@ def clean_operations_activity_metrics(df:pl.DataFrame):
 @app.cell(hide_code=True)
 def _(metrics_df):
     _df = mo.sql(
-        f"""
+        r"""
         WITH numbered AS (
             SELECT
                 ROW_NUMBER() OVER () AS row_id,
@@ -547,7 +536,6 @@ def _(metrics_df):
         WHERE "Extra Men" <> t.bracket_total
         """
     )
-    return
 
 
 @app.cell

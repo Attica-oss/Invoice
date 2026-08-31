@@ -4,11 +4,12 @@ __generated_with = "0.23.1"
 app = marimo.App(width="columns")
 
 with app.setup:
-    from datetime import date
     from calendar import monthrange
-    import polars as pl
+    from datetime import date
+
     import marimo as mo
-    from dataframe import coa,by_catch,transfer,cccs_stuffing,shore_crane
+    import polars as pl
+
 
 
 @app.function
@@ -271,7 +272,7 @@ def _(
     truck_to_cccs_df,
 ):
     summary_df = mo.sql(
-        f"""
+        """
         WITH
             tipping_normal AS (
                 FROM
@@ -670,7 +671,7 @@ def _():
 @app.cell(hide_code=True)
 def _(price_df, summary_df):
     pricing_df = mo.sql(
-        f"""
+        """
         WITH bc AS (FROM
             price_df
         WHERE
@@ -707,19 +708,18 @@ def _(price_df, summary_df):
 @app.cell(hide_code=True)
 def _(pricing_df):
     _df = mo.sql(
-        f"""
+        """
         FROM pricing_df
             SELECT * EXCLUDE("Unit Price")
         WHERE QTY > 0
         """
     )
-    return
 
 
 @app.cell(hide_code=True)
 def _(pricing_df):
     _df = mo.sql(
-        f"""
+        """
         With a AS (FROM pricing_df
 
         SELECT Description,Variant,"Unit Price",QTY,("Unit Price" * QTY)::DECIMAL AS total_price
@@ -729,13 +729,11 @@ def _(pricing_df):
          SELECT SUM(total_price)::DECIMAL AS total_price
         """
     )
-    return
 
 
 @app.cell
 def _(month_selector):
     eomonth(month_selector.value).isoformat()
-    return
 
 
 @app.cell

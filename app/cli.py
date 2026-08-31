@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from enum import Enum
 from time import sleep
 
+from app.check import check_logistics_records
 from app.logger import logger
 from app.save import save_df_to_csv
 from app.view import forklift_logistics_dataset, view_data
@@ -166,7 +167,7 @@ class App:
                     case MenuOption.CHECK:
                         logger.info("Selected: Check logistics records")
                         self.clear_screen()
-                        print("Checking logistics records...")
+                        check_logistics_records()
                     case MenuOption.EXIT:
                         self.exit_application()
             except KeyboardInterrupt:

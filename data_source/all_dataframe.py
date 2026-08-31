@@ -11,7 +11,7 @@ from data_source.sheet_ids import (
     MISC_SHEET_ID,
 )
 from type_casting.containers import containers_enum
-from type_casting.dates import CURRENT_YEAR, DayName, Days
+from type_casting.dates import CURRENT_YEAR, DayName
 
 
 def _to_f64(column: str) -> pl.Expr:
@@ -42,8 +42,12 @@ def miscellaneous() -> pl.LazyFrame:
             pl.col("storage_type"),
             pl.col("service").alias("operation_type"),
             _to_f64("total_tonnage").alias("total_tonnage"),
-            pl.col("bins_in").str.replace("", "0").cast(pl.Int64),
-            pl.col("bins_out").str.strip_chars("-").replace("", "0").cast(pl.Int64)
+            pl.col("bins_in").cast(pl.Utf8).str.replace("", "0").cast(pl.Int64),
+            pl.col("bins_out")
+            .cast(pl.Utf8)
+            .str.strip_chars("-")
+            .replace("", "0")
+            .cast(pl.Int64)
             * -1,
             _to_f64("static_loader").alias("static_loader"),
             _to_f64("overtime_tonnage").alias("overtime_tonnage"),

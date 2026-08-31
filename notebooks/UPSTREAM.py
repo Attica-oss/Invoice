@@ -4,40 +4,32 @@ __generated_with = "0.23.14"
 app = marimo.App(width="columns")
 
 with app.setup:
-    import polars as pl
     from datetime import date
 
-    from dataframe.transport import transfer
-    from dataframe.emr import shifting
-    from dataframe.bin_dispatch import empty_scows
+    import polars as pl
 
     from datasets.container_ops_activity import coa
-    from datasets.container_ops_activity import pallet
-    from dataframe.miscellaneous import cross_stuffing
     from datasets.truck_to_cold_store import cccs_record
-    from dataframe.transport import forklift
 
 
 @app.cell(hide_code=True)
 def _(mo):
     _df = mo.sql(
-        f"""
+        """
         FROM forklift
         WHERE customer = 'CCCS'
 
         """
     )
-    return
 
 
 @app.cell(hide_code=True)
 def _(mo):
     _df = mo.sql(
-        f"""
+        """
         FROM shifting
         """
     )
-    return
 
 
 @app.cell
@@ -95,18 +87,17 @@ def _(mo, month_selector, select_report):
 @app.cell(hide_code=True)
 def _(mo, transfer_df):
     _df = mo.sql(
-        f"""
+        """
         FROM transfer_df
         SELECT COUNT(*) AS number_of_units,SUM(shifting_price) AS shifting_price
         """
     )
-    return
 
 
 @app.cell(hide_code=True)
 def _(mo, stdu_ldf):
     _df = mo.sql(
-        f"""
+        """
         FROM stdu_ldf
             SELECT date,SUM("No of Scows")::INT AS scows
     
@@ -115,7 +106,6 @@ def _(mo, stdu_ldf):
         ORDER BY ALL
         """
     )
-    return
 
 
 @app.cell
@@ -132,7 +122,6 @@ def _(mo, month_selector, plugin_ldf, select_report):
         WHERE customer = '{select_report.value}' AND (date_plugged BETWEEN '{month_selector.value}' AND LAST_DAY(DATE '{month_selector.value}'))
         """
     )
-    return
 
 
 @app.cell
@@ -143,7 +132,6 @@ def _(mo, month_selector, select_report):
         WHERE invoiced = '{select_report.value}' AND  (date BETWEEN '{month_selector.value}' AND LAST_DAY(DATE '{month_selector.value}'))
         """
     )
-    return
 
 
 @app.cell
@@ -160,7 +148,6 @@ def _(mo, month_selector, select_report, truck_to_cccs):
         WHERE destination LIKE '%{select_report.value}%' AND  (date BETWEEN '{month_selector.value}' AND LAST_DAY(DATE '{month_selector.value}'))
         """
     )
-    return
 
 
 @app.cell

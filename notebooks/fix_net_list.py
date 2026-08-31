@@ -150,11 +150,10 @@ def _():
 @app.cell(hide_code=True)
 def _(stuffing_type):
     _df = mo.sql(
-        f"""
+        """
         FROM stuffing_type
         """
     )
-    return
 
 
 @app.cell
@@ -471,17 +470,15 @@ def _(
             pl.col("remarks"),
         ).unique()
     )
-    return
 
 
 @app.cell(hide_code=True)
 def _(netlist):
     _df = mo.sql(
-        f"""
+        """
         FROM netList
         """
     )
-    return
 
 
 @app.cell
@@ -493,7 +490,6 @@ def _():
 @app.cell
 def _(MSFU0021870):
     MSFU0021870
-    return
 
 
 if __name__ == "__main__":

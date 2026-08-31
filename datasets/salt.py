@@ -1,17 +1,25 @@
 """Salt dataset"""
 
 from __future__ import annotations
+
+from collections.abc import Iterable, Mapping
 from datetime import time as dt_time
-from typing import Iterable, Mapping
+
 import polars as pl
+
 from data_source.make_dataset import load_sheet as scan_google_sheet
-
-from utils import MIDNIGHT, SPECIAL_DAYS, UPPER_BOUND, UPPER_BOUND_SPECIAL_DAY, ZERO_DURATION, CURRENT_YEAR, OvertimePerc
-
-from utils.config import SALT_OPERATION_SHEET_NAME,SHORE_HANDLING_ID
-
+from datasets.customers import purseiner, ship_owner
 from datasets.price import get_price
-from datasets.customers import ship_owner, purseiner
+from utils import (
+    CURRENT_YEAR,
+    MIDNIGHT,
+    SPECIAL_DAYS,
+    UPPER_BOUND,
+    UPPER_BOUND_SPECIAL_DAY,
+    ZERO_DURATION,
+    OvertimePerc,
+)
+from utils.config import SALT_OPERATION_SHEET_NAME, SHORE_HANDLING_ID
 
 # ---------------------------------------------------------------------------
 # Rate-bucket splitting (single source of truth)

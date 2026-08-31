@@ -14,17 +14,28 @@ deduplicates both the HTTP round-trip and the CSV parse.
 
 from __future__ import annotations
 
-from functools import lru_cache
+import logging
+import platform
+from functools import cache
 
 import polars as pl
 from scan_google_sheet import scan_google_sheet as _scan_google_sheet
 
 from data_source.excel_file_path import ExcelFiles
 
+logger = logging.getLogger(__name__)
+
 _TIMEOUT = 20
 
 
-@lru_cache(maxsize=None)
+def is_windows() -> bool:
+    """True when running on Windows, the only OS where the Dropbox-synced
+    Excel files and mapped network drives this codebase reads from are
+    actually present."""
+    return platform.system() == "Windows"
+
+
+@cache
 def _scan_cached(
     sheet_id: str | None,
     sheet_name: str,
@@ -84,6 +95,13 @@ def clear_sheet_cache() -> None:
 
 
 def load_excel(file_path: ExcelFiles) -> pl.LazyFrame:
-    """Load an Excel file as a Polars ``LazyFrame``."""
+    """Load an Excel file as a Polars ``LazyFrame``.
+
+    Excel sources only exist on Windows -- elsewhere this skips the read
+    and returns an empty ``LazyFrame`` instead of failing.
+    """
     file, sheet = file_path.value
+    if not is_windows():
+        logger.warning("Skipping Excel read for %s (%s): not running on Windows", file, sheet)
+        return pl.LazyFrame()
     return pl.read_excel(source=file, sheet_name=sheet).lazy()

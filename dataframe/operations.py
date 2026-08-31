@@ -5,6 +5,7 @@ under their historical module-level names via :pep:`562` ``__getattr__`` --
 importing this module reads no Excel files and does no network I/O.
 """
 
+import logging
 from functools import lru_cache
 from typing import Any
 
@@ -12,10 +13,12 @@ import polars as pl
 
 from data.price import get_price
 from data_source.excel_file_path import ExcelFiles
-from data_source.make_dataset import load_gsheet_data
+from data_source.make_dataset import is_windows, load_gsheet_data
 from data_source.sheet_ids import OPS_SHEET_ID, RAW_DATA_SHEET_NAME
 from type_casting.dates import CURRENT_YEAR, SPECIAL_DAYS, DayName, public_holiday
 from type_casting.validations import FISH_STORAGE, OvertimePerc
+
+logger = logging.getLogger(__name__)
 
 # Path to the operations activity file
 OPS_ACTIVITY_PATH = ExcelFiles.OPERATIONS_ACTIVITY_2026.value
@@ -23,21 +26,12 @@ ADDITIONAL_OVERTIME_PATH = ExcelFiles.ADDITIONAL_OVERTIME.value
 BERTH_DUES_PATH = ExcelFiles.BERTH_DUES_2026.value
 
 
-<<<<<<< HEAD
-berth: pl.LazyFrame = pl.read_excel(
-    BERTH_DUES_PATH[0],
-    sheet_name=BERTH_DUES_PATH[1],
-    engine="calamine",
-    schema_overrides={"TIME IN": pl.Time, "TIME OUT": pl.Time},
-).lazy()
-=======
 # ---------------------------------------------------------------------------
 # Prices  (TODO: move to the price module)
 # ---------------------------------------------------------------------------
 @lru_cache(maxsize=1)
 def _extramen_price() -> pl.DataFrame:
     return get_price(["Extra Men"]).with_columns(date=pl.col("date"))
->>>>>>> 0434db2afac254d931c9d2efacd59961dd278a45
 
 
 @lru_cache(maxsize=1)
@@ -68,6 +62,9 @@ def _additional_overtime_price() -> pl.DataFrame:
 # ---------------------------------------------------------------------------
 @lru_cache(maxsize=1)
 def _berth() -> pl.LazyFrame:
+    if not is_windows():
+        logger.warning("Skipping Excel read for berth dues: not running on Windows")
+        return pl.LazyFrame()
     return pl.read_excel(
         BERTH_DUES_PATH[0],
         sheet_name=BERTH_DUES_PATH[1],
@@ -113,6 +110,11 @@ def add_day_name_column(date_col: pl.Expr) -> pl.Expr:
 
 @lru_cache(maxsize=1)
 def _main_file() -> pl.LazyFrame:
+    if not is_windows():
+        logger.warning(
+            "Skipping Excel read for operations activity: not running on Windows"
+        )
+        return pl.LazyFrame()
     return (
         pl.read_excel(
             OPS_ACTIVITY_PATH[0], sheet_name=OPS_ACTIVITY_PATH[1], engine="calamine"
@@ -266,57 +268,10 @@ def _hatch_to_hatch() -> pl.LazyFrame:
     )
 
 
-<<<<<<< HEAD
-# Well to well transfer
-
-hatch_to_hatch: pl.LazyFrame = (
-    handling_activity.filter(pl.col("Well-to-Well Transfer") > 0)
-    .select(
-        pl.col("day_name"),
-        pl.col("date"),
-        pl.col("vessel_name").alias("vessel"),
-        pl.col("Well-to-Well Transfer"),
-    )
-    .with_columns(service=pl.lit("Well to Well Transfer"))
-    .join_asof(WELL_TO_WELL.lazy(), by="service", on="date", strategy="backward")
-    .with_columns(
-        total_price=pl.when(pl.col("day_name").is_in(SPECIAL_DAYS))
-            .then(
-                OvertimePerc.overtime_150
-                * pl.col("unit_price")
-                * pl.col("Well-to-Well Transfer")
-            )
-            .otherwise(
-                OvertimePerc.normal_hour
-                * pl.col("unit_price")
-                * pl.col("Well-to-Well Transfer")
-            )
-    )
-    .with_columns(
-        price=pl.when(pl.col("day_name").is_in(SPECIAL_DAYS))
-        .then(OvertimePerc.overtime_150 * pl.col("unit_price"))
-        .otherwise(OvertimePerc.normal_hour * pl.col("unit_price"))
-    )
-    .select(
-        pl.col("day_name"),
-        pl.col("date"),
-        pl.col("vessel"),
-        pl.col("Well-to-Well Transfer").alias("tonnage"),
-        pl.col("unit_price"),
-        pl.col("total_price"),
-    )
-)
-
-# Rental of Calibration Weight Service
-
-tare: pl.LazyFrame = (
-    (
-=======
 @lru_cache(maxsize=1)
 def _tare() -> pl.LazyFrame:
     tare_rate = _tare_rate()
     return (
->>>>>>> 0434db2afac254d931c9d2efacd59961dd278a45
         (
             (
                 (
@@ -396,6 +351,11 @@ def _tare() -> pl.LazyFrame:
 
 @lru_cache(maxsize=1)
 def _additional() -> pl.LazyFrame:
+    if not is_windows():
+        logger.warning(
+            "Skipping Excel read for additional overtime: not running on Windows"
+        )
+        return pl.LazyFrame()
     return (
         pl.read_excel(
             ADDITIONAL_OVERTIME_PATH[0],

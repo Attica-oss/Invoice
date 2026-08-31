@@ -22,11 +22,10 @@ from functools import lru_cache
 
 import polars as pl
 
-
 from datasets.customers import bycatch_companies
 from datasets.genesis import genesis_raw
 from datasets.miscellaneous import miscellaneous_lf
-from utils import CURRENT_YEAR, SPECIAL_DAYS,UNLOADING_SERVICE, Overtime
+from utils import CURRENT_YEAR, SPECIAL_DAYS, UNLOADING_SERVICE, Overtime
 
 _JOIN_KEYS = ["date", "destination", "vessel", "storage_type"]
 

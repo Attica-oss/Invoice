@@ -4,16 +4,17 @@ __generated_with = "0.23.14"
 app = marimo.App(width="columns")
 
 with app.setup:
+    from calendar import monthrange
     from concurrent.futures import ThreadPoolExecutor
     from datetime import date
-    from calendar import monthrange
-    import polars as pl
+
     import marimo as mo
+    import polars as pl
+    from scan_google_sheet import scan_google_sheet
 
     from data import bc_items_lf
-    from save import export_dataframes
     from datasets import emr
-    from scan_google_sheet import scan_google_sheet
+    from save import export_dataframes
 
     with ThreadPoolExecutor(max_workers=5) as _pool:
         _f_pti = _pool.submit(lambda: emr.pti().collect())
@@ -33,74 +34,6 @@ with app.setup:
     PTI_DATASET = _f_pti.result()
     WASHING_DATASET = _fix_time(_f_washing.result())
     price_df = _f_price.result()
-
-
-@app.cell
-def _():
-    from datasets import miscellaneous_lf,forklift_scow_handling,scow_transfer
-
-    return forklift_scow_handling, miscellaneous_lf, scow_transfer
-
-
-@app.cell
-def _(forklift_scow_handling, miscellaneous_lf, scow_transfer):
-    misc_df = miscellaneous_lf()
-    fl_df = forklift_scow_handling.forklift_scow_handling_lf()
-    scow_df = scow_transfer()
-    return fl_df, misc_df, scow_df
-
-
-@app.cell
-def _(scow_df):
-    scow_df.filter(pl.col("status").eq("Full")).with_columns(
-        time_selection=pl.when(pl.col("movement_type").eq("Collection"))
-        .then(pl.col("time_in"))
-        .otherwise(pl.col("time_out"))
-    ).with_columns(
-        overtime=pl.when(
-            pl.col("day_name")
-            .is_in(["Sun", "PH"])
-            .and_(pl.col("time_selection").gt(pl.time(16, 0)))
-        )
-        .then(pl.lit("overtime 200%"))
-        .when(
-            (
-                pl.col("day_name")
-                .is_in(["Sun", "PH"])
-                .and_(pl.col("time_selection").le(pl.time(16, 0)))
-            ).or_(
-                pl.col("day_name")
-                .is_in(["Sun", "PH"])
-                .not_()
-                .and_(pl.col("time_selection").gt(pl.time(17, 0)))
-            )
-        )
-        .then(pl.lit("overtime 150%"))
-        .otherwise(pl.lit("normal hours"))
-    ).collect()
-    return
-
-
-@app.cell(hide_code=True)
-def _(fl_df):
-    _df = mo.sql(
-        f"""
-        FROM fl_df
-        """
-    )
-    return
-
-
-@app.cell(hide_code=True)
-def _(misc_df, month_selector):
-    _df = mo.sql(
-        f"""
-        FROM misc_df
-        WHERE operation_type LIKE '%Bin Dispatch%'  AND 
-            date BETWEEN '{month_selector.value}' AND LAST_DAY(DATE '{month_selector.value}')
-        """
-    )
-    return
 
 
 @app.function
@@ -236,7 +169,7 @@ def _(
     select_report,
     summary_table,
 ):
-    title = mo.md(f"# ⚙️🌊 IOT M&R Report")
+    title = mo.md("# ⚙️🌊 IOT M&R Report")
 
     filter_bar = mo.hstack(
         [month_selector, select_report],
@@ -275,7 +208,6 @@ def _(
             actions,
         ]
     )
-    return
 
 
 @app.cell(hide_code=True)
@@ -289,7 +221,6 @@ def _(month_selector, pti_df, select_report, washing_df):
         ),
         kind="warn",
     ) if not _has_data else None
-    return
 
 
 @app.function
@@ -304,7 +235,7 @@ def format_datestr_to_month_year(date_str: str) -> str:
 @app.cell(hide_code=True)
 def _(pricing_df):
     metrics_df = mo.sql(
-        f"""
+        """
         With a AS (FROM pricing_df
 
         SELECT Description,Variant,"Unit Price",QTY,ROUND("Unit Price" * QTY,2) AS total_price
@@ -375,7 +306,6 @@ def _(month_selector, select_report, washing_log_df):
         ORDER BY date
         """
     )
-    return
 
 
 @app.cell(hide_code=True)
@@ -388,7 +318,6 @@ def _(month_selector, pti_log_df, select_report):
         ORDER BY "Date Plugin"
         """
     )
-    return
 
 
 @app.cell
@@ -400,10 +329,10 @@ def _():
     return pti_log_df, washing_log_df
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(pti_df, washing_df):
     summary_df = mo.sql(
-        f"""
+        """
         WITH
 
             pti_main AS (
@@ -453,7 +382,7 @@ def _(pti_df, washing_df):
 @app.cell(hide_code=True)
 def _(summary_df):
     pricing_df = mo.sql(
-        f"""
+        """
         WITH bc AS (FROM
             price_df
         WHERE
@@ -491,13 +420,12 @@ def _(bc_df, copy_button):
     mo.stop(not copy_button.value)
     bc_df.write_clipboard()  # tab-separated, pastes cleanly into BC / Excel
     mo.md("✅ Copied to clipboard")
-    return
 
 
 @app.cell(hide_code=True)
 def _(pricing_df):
     bc_df = mo.sql(
-        f"""
+        """
         FROM pricing_df
             SELECT * EXCLUDE("Unit Price")
         WHERE QTY > 0
@@ -509,19 +437,18 @@ def _(pricing_df):
 @app.cell(hide_code=True)
 def _(pricing_df):
     _df = mo.sql(
-        f"""
+        """
         FROM pricing_df
             SELECT *, ("Unit Price" * QTY)::DECIMAL AS total_price
         WHERE QTY > 0
         """
     )
-    return
 
 
 @app.cell(hide_code=True)
 def _(pricing_df):
     service_breakdown_df = mo.sql(
-        f"""
+        """
         WITH
             mapped AS (
                 FROM
@@ -655,7 +582,6 @@ def _(month_selector, reports, save_button, select_report):
         output_path=f"output/{select_report.value} CCCS - {format_datestr_to_month_year(month_selector.value)}.xlsx",
     )
     mo.md(f"✅ Saved to `{output_file}`")
-    return
 
 
 if __name__ == "__main__":

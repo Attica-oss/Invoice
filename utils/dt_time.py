@@ -29,9 +29,9 @@ Rewrite notes
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date, time, timedelta
-from typing import Iterable, TypeVar
 
 import polars as pl
 
@@ -145,9 +145,7 @@ class PublicHolidayCalendar:
 
     def get_continuous_holidays(self, year: int) -> set[date]:
         return {
-            holiday.to_date(year)
-            for holiday in self.continuous_holidays
-            if holiday.applies(year)
+            holiday.to_date(year) for holiday in self.continuous_holidays if holiday.applies(year)
         }
 
     def get_one_time_holidays(self, year: int) -> set[date]:
@@ -189,11 +187,7 @@ class PublicHolidayCalendar:
 
     @staticmethod
     def _get_monday_after_sunday_holidays(holidays: set[date]) -> set[date]:
-        return {
-            holiday + timedelta(days=1)
-            for holiday in holidays
-            if holiday.weekday() == 6
-        }
+        return {holiday + timedelta(days=1) for holiday in holidays if holiday.weekday() == 6}
 
     @staticmethod
     def _calculate_easter_sunday(year: int) -> date:
@@ -255,7 +249,7 @@ class Days:
 # Duration formatting
 # ---------------------------------------------------------------------------
 
-FrameT = TypeVar("FrameT", pl.DataFrame, pl.LazyFrame)
+type FrameT = pl.DataFrame | pl.LazyFrame
 
 
 def duration_to_hhmm(
@@ -280,11 +274,11 @@ def duration_to_hhmm(
     schema = df.collect_schema()
 
     if duration_columns is None:
-        duration_columns = [
+        duration_columns: list[str] = [
             name for name, dtype in schema.items() if isinstance(dtype, pl.Duration)
         ]
     elif isinstance(duration_columns, str):
-        duration_columns = [duration_columns]
+        duration_columns: list[str] = [duration_columns]
 
     missing = [c for c in duration_columns if c not in schema]
     if missing:

@@ -24,8 +24,20 @@ dependencies = [
     "xlsxwriter>=3.2.9",
 ]
 
+[project.scripts]
+invoice = "main:main"
+
 [dependency-groups]
 dev = [
     "ruff>=0.15.2",
     "ty>=0.0.10",
 ]
+
+[tool.marimo.runtime]
+# Notebooks live in notebooks/, one level below the repo root where the
+# dataframe/, datasets/, data_source/, etc. packages sit. marimo puts the
+# notebook file's own directory on sys.path (not the repo root), so
+# without this, `from dataframe import ...` fails as ModuleNotFoundError
+# for any notebook not sitting directly in the repo root. Resolved
+# relative to this pyproject.toml's directory.
+pythonpath = ["."]

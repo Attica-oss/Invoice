@@ -4,9 +4,8 @@ __generated_with = "0.23.1"
 app = marimo.App(width="columns", app_title="Estimates")
 
 with app.setup:
-    import polars as pl
-    import openpyxl
     import marimo as mo
+    import polars as pl
 
 
 @app.cell(hide_code=True)
@@ -14,12 +13,11 @@ def _():
     mo.md(r"""
     # Transfer of Scows
     """)
-    return
 
 
 @app.cell
 def _():
-    from dataframe import full_scows,empty_scows
+    from dataframe import empty_scows, full_scows
 
     return empty_scows, full_scows
 
@@ -32,13 +30,12 @@ def _():
     *  Has the Trucking price of $3.5/tons,
     *  Has the CCCS movement fee of $3.5/tons
     """)
-    return
 
 
 @app.cell(hide_code=True)
 def _(full_scows):
     full_scow_transfer_df = mo.sql(
-        f"""
+        """
         FROM
             full_scows
         SELECT
@@ -72,13 +69,12 @@ def _():
 
     *  Has the Trucking price of $3.5/scows,
     """)
-    return
 
 
 @app.cell
 def _(empty_scows):
     empty_scow_transfer_df = mo.sql(
-        f"""
+        """
         FROM
             empty_scows
         SELECT
@@ -112,13 +108,12 @@ def _():
 
     * For both empty and full scow handling
     """)
-    return
 
 
 @app.cell(hide_code=True)
 def _(empty_scows, full_scows):
     forklift_scow_handling = mo.sql(
-        f"""
+        """
         WITH full_ AS (FROM
             full_scows
         SELECT
@@ -188,12 +183,11 @@ def _():
     * Washing
     * Pre-Trip Inspection
     """)
-    return
 
 
 @app.cell(hide_code=True)
 def _():
-    from dataframe import washing,pti,shifting
+    from dataframe import pti, shifting, washing
 
     return pti, shifting, washing
 
@@ -201,7 +195,7 @@ def _():
 @app.cell(hide_code=True)
 def _(washing):
     washing_df = mo.sql(
-        f"""
+        """
         WITH
             data_ AS (
                 FROM
@@ -252,7 +246,7 @@ def _(washing):
 @app.cell
 def _(pti):
     pti_df = mo.sql(
-        f"""
+        """
         WITH
             data_ AS (
                 FROM
@@ -321,13 +315,12 @@ def _():
     mo.md(r"""
     ## Shifting
     """)
-    return
 
 
 @app.cell(hide_code=True)
 def _(cross_stuffing, washing):
     shifting_at_washing_df = mo.sql(
-        f"""
+        """
         WITH
             washing_ AS (
                 FROM
@@ -389,7 +382,7 @@ def _(cross_stuffing, washing):
 @app.cell(hide_code=True)
 def _(shifting):
     internal_shifting_df = mo.sql(
-        f"""
+        """
         WITH data_ AS (FROM
             shifting
         SELECT
@@ -432,12 +425,17 @@ def _():
     mo.md(r"""
     ## Cold Store Services
     """)
-    return
 
 
 @app.cell
 def _():
-    from dataframe import dispatch_to_cargo,from_cccs_to_vessel,cross_stuffing,by_catch,cccs_stuffing
+    from dataframe import (
+        by_catch,
+        cccs_stuffing,
+        cross_stuffing,
+        dispatch_to_cargo,
+        from_cccs_to_vessel,
+    )
 
     return (
         by_catch,
@@ -451,7 +449,7 @@ def _():
 @app.cell(hide_code=True)
 def _(dispatch_to_cargo):
     dispatch_to_cargo_vessel_df = mo.sql(
-        f"""
+        """
         FROM
             dispatch_to_cargo
         SELECT
@@ -511,7 +509,7 @@ def _(dispatch_to_cargo):
 @app.cell(hide_code=True)
 def _(from_cccs_to_vessel):
     from_cold_store_to_vessel_df = mo.sql(
-        f"""
+        """
         FROM
             from_cccs_to_vessel
         SELECT
@@ -559,7 +557,7 @@ def _(from_cccs_to_vessel):
 @app.cell(hide_code=True)
 def _(cross_stuffing):
     cross_stuffing_df = mo.sql(
-        f"""
+        """
         FROM
             cross_stuffing
         SELECT
@@ -589,7 +587,6 @@ def _():
     * Tally
     * Tare Rental
     """)
-    return
 
 
 @app.cell
@@ -616,19 +613,18 @@ def _(cross_stuffing_tab, misc_url, scan_google_sheet):
 @app.cell(hide_code=True)
 def _(extra_cross_stuffing_service):
     _df = mo.sql(
-        f"""
+        """
         FROM extra_cross_stuffing_service
         SELECT "day" AS day_name,date,vessel_client AS vessel,invoiced AS customer,total_tonnage,overtime_tonnage,tally
         WHERE service <> 'Unstuffing to CCCS' AND tally <> 'NA'
         """
     )
-    return
 
 
 @app.cell(hide_code=True)
 def _(by_catch):
     by_catch_handling_df = mo.sql(
-        f"""
+        """
         WITH
             data_ AS (
                 FROM
@@ -676,7 +672,7 @@ def _(by_catch):
 @app.cell(hide_code=True)
 def _(cccs_stuffing):
     cold_store_stuffing_df = mo.sql(
-        f"""
+        """
         FROM
             cccs_stuffing
         SELECT
@@ -704,7 +700,7 @@ def _(cccs_stuffing):
 
 @app.cell
 def _():
-    from dataframe import oss,netList,iot_stuffing
+    from dataframe import iot_stuffing, oss
 
     return iot_stuffing, oss
 
@@ -712,7 +708,7 @@ def _():
 @app.cell(hide_code=True)
 def _(iot_stuffing):
     iot_s_df = mo.sql(
-        f"""
+        """
         WITH
             data_ AS (
                 FROM
@@ -754,7 +750,7 @@ def _(iot_stuffing):
 @app.cell(hide_code=True)
 def _(oss):
     oss_s_df = mo.sql(
-        f"""
+        """
         FROM oss
         SELECT 
          STRFTIME(date,'%a') AS day_name,
@@ -781,17 +777,16 @@ def _(oss):
 @app.cell(hide_code=True)
 def _(netlist):
     _df = mo.sql(
-        f"""
+        """
         FROM netList
         """
     )
-    return
 
 
 @app.cell(hide_code=True)
 def _(customer_df, netlist):
     net_df = mo.sql(
-        f"""
+        """
         WITH data_ AS (FROM netList
             SELECT STRFTIME(date,'%a') AS day_name,
             date,
@@ -830,7 +825,7 @@ def _(customer_df, netlist):
 
 @app.cell
 def _():
-    from dataframe import salt,forklift_for_salt
+    from dataframe import forklift_for_salt, salt
 
     return forklift_for_salt, salt
 
@@ -838,7 +833,7 @@ def _():
 @app.cell(hide_code=True)
 def _(salt):
     salt_df = mo.sql(
-        f"""
+        """
         FROM
             salt
         SELECT
@@ -876,7 +871,7 @@ def _(salt):
 @app.cell(hide_code=True)
 def _(forklift_for_salt):
     forklift_salt_df = mo.sql(
-        f"""
+        """
         WITH
             data_ AS (
                 FROM
@@ -982,7 +977,6 @@ def _():
     mo.md(r"""
     # Electricity
     """)
-    return
 
 
 @app.cell
@@ -995,17 +989,16 @@ def _():
 @app.cell(hide_code=True)
 def _(coa):
     _df = mo.sql(
-        f"""
+        """
         FROM coa
         """
     )
-    return
 
 
 @app.cell
 def _(coa):
     staged_electricity = mo.sql(
-        f"""
+        """
         WITH
             monthly_bounds AS (
                 SELECT
@@ -1121,7 +1114,7 @@ def _(coa):
 @app.cell(hide_code=True)
 def _(staged_electricity):
     electricity_df = mo.sql(
-        f"""
+        """
         FROM
             staged_electricity
         SELECT
@@ -1195,7 +1188,7 @@ def _():
 @app.cell(hide_code=True)
 def _(exchange_rate_df, pallet):
     pallet_df = mo.sql(
-        f"""
+        """
         WITH
             pallet_ AS (
                 FROM
@@ -1243,7 +1236,7 @@ def _(exchange_rate_df, pallet):
 @app.cell(hide_code=True)
 def _(pallet):
     liner_df = mo.sql(
-        f"""
+        """
         WITH
             pallet_ AS (
                 FROM
@@ -1283,7 +1276,7 @@ def _(pallet):
 
 @app.cell
 def _():
-    from dataframe import transfer,shore_crane,forklift
+    from dataframe import forklift, shore_crane, transfer
 
     return forklift, shore_crane, transfer
 
@@ -1291,7 +1284,7 @@ def _():
 @app.cell(hide_code=True)
 def _(staged_electricity, transfer):
     haulage_df = mo.sql(
-        f"""
+        """
         WITH non_full_delivery AS (
             FROM transfer
             SELECT
@@ -1375,7 +1368,7 @@ def _(staged_electricity, transfer):
 @app.cell(hide_code=True)
 def _(shore_crane):
     shore_crane_df = mo.sql(
-        f"""
+        """
         FROM
             shore_crane
         SELECT
@@ -1417,7 +1410,7 @@ def _(shore_crane):
 @app.cell(hide_code=True)
 def _(forklift):
     forklift_df = mo.sql(
-        f"""
+        """
         FROM (
             FROM forklift
             SELECT
@@ -1493,7 +1486,7 @@ def _(miscr_url, scan_google_sheet, truck_tab):
 @app.cell(hide_code=True)
 def _(truck_via_skiff_df):
     truck_skiff_df = mo.sql(
-        f"""
+        """
         FROM
             truck_via_skiff_df
         SELECT
@@ -1532,7 +1525,7 @@ def _(operations_url, scan_google_sheet, well_tab):
 @app.cell
 def _(customer_df, well_df):
     well_transfer_df = mo.sql(
-        f"""
+        """
         WITH
             data_ AS (
                 FROM
@@ -1577,7 +1570,7 @@ def _(additional_tab, operations_url, scan_google_sheet):
 @app.cell(hide_code=True)
 def _(additional_df, customer_df):
     additional_ot_df = mo.sql(
-        f"""
+        """
         WITH data_ AS (
             SELECT
                 day_name,
@@ -1633,7 +1626,7 @@ def _(extra_men_tab, operations_url, scan_google_sheet):
 @app.cell(hide_code=True)
 def _(customer_df, extra_men_df):
     xtra_men_df = mo.sql(
-        f"""
+        """
         WITH
             data_ AS (
                 FROM
@@ -1683,7 +1676,7 @@ def _(operations_url, scan_google_sheet, tare_tab):
 @app.cell(hide_code=True)
 def _(customer_df, tare_df):
     tare_rental_df = mo.sql(
-        f"""
+        """
         WITH data_ AS (FROM
             tare_df
         SELECT
@@ -1730,7 +1723,7 @@ def _(operations_url, scan_google_sheet):
 @app.cell(hide_code=True)
 def _(customer_df, miscellaneous_op_df):
     misc_ops_df = mo.sql(
-        f"""
+        """
         WITH data_ AS (FROM miscellaneous_op_df
         SELECT "day" AS day_name,date,origin AS vessel,destination,total_tonnage,overtime_tonnage,service AS operation_type,19 AS unit_price),
             client AS (
@@ -1800,7 +1793,7 @@ def _(
     xtra_men_df,
 ):
     master_df = mo.sql(
-        f"""
+        """
         WITH
             truck_skiff_ AS (
                 FROM
@@ -2430,7 +2423,7 @@ def _():
 @app.cell(hide_code=True)
 def _(truck_skiff_df):
     _df = mo.sql(
-        f"""
+        """
         FROM truck_skiff_df
         SELECT
             MONTH(date) AS month_number,
@@ -2448,7 +2441,6 @@ def _(truck_skiff_df):
             month_number
         """
     )
-    return
 
 
 @app.cell
@@ -2459,17 +2451,16 @@ def _():
 @app.cell(column=1, hide_code=True)
 def _(master_df):
     _df = mo.sql(
-        f"""
+        """
         FROM master_df
         """
     )
-    return
 
 
 @app.cell(hide_code=True)
 def _(master_df):
     by_customer = mo.sql(
-        f"""
+        """
         FROM master_df
         SELECT month_number,month_name,customer,SUM(total_price) AS total_invoice,sub_type,report_type
         GROUP  BY  ALL
@@ -2482,7 +2473,6 @@ def _(master_df):
 @app.cell
 def _(by_customer):
     float(by_customer.select(pl.col("total_invoice")).sum().to_series().to_list()[0])
-    return
 
 
 @app.cell
@@ -2509,7 +2499,6 @@ def _(master_df, month_selection):
         ORDER BY total_invoice
         """
     )
-    return
 
 
 @app.cell

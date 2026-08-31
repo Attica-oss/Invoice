@@ -1,18 +1,19 @@
 import marimo
 
-__generated_with = "0.24.0"
+__generated_with = "0.23.14"
 app = marimo.App(width="columns")
 
 with app.setup:
+    from calendar import monthrange
     from concurrent.futures import ThreadPoolExecutor
     from datetime import date
-    from calendar import monthrange
-    import polars as pl
+
     import marimo as mo
+    import polars as pl
 
     from data import bc_items_lf
+    from datasets import cccs_stuffing, coa, shore_crane, transfer
     from save import export_dataframes
-    from datasets import cccs_stuffing, coa, transfer, shore_crane
 
     with ThreadPoolExecutor(max_workers=5) as _pool:
         _f_stuffing = _pool.submit(lambda: cccs_stuffing().collect())
@@ -79,17 +80,6 @@ def eomonth(dt: str) -> date:
     return converted_date.replace(day=last_day)
 
 
-@app.cell(hide_code=True)
-def _(electricity_dataset):
-    _df = mo.sql(
-        f"""
-        FROM ELECTRICITY_DATASET
-        """,
-        output=False
-    )
-    return
-
-
 @app.cell
 def _():
     select_report = mo.ui.dropdown(
@@ -110,7 +100,7 @@ def _():
     )
 
     _today = date.today()
-    _years = sorted({_today.year})
+    _years = sorted({_today.year, _today.year + 1})
     month_options = {
         date(_y, _m, 1).strftime("%b %Y"): f"{_y}-{_m:02d}-01"
         for _y in _years
@@ -292,7 +282,7 @@ def _(
     select_report,
     summary_table,
 ):
-    title = mo.md(f"# 🚢 CCCS / OSS Report — {select_report.value.title()}")
+    title = mo.md(f"# 🚢 CCCS - Stuffing Report — {select_report.value.title()}")
 
     filter_bar = mo.hstack(
         [month_selector, select_report],
@@ -331,7 +321,6 @@ def _(
             actions,
         ]
     )
-    return
 
 
 @app.cell(hide_code=True)
@@ -358,7 +347,6 @@ def _(
         ),
         kind="warn",
     ) if not _has_data else None
-    return
 
 
 @app.function
@@ -373,7 +361,7 @@ def format_datestr_to_month_year(date_str: str) -> str:
 @app.cell(hide_code=True)
 def _(pricing_df):
     metrics_df = mo.sql(
-        f"""
+        """
         With a AS (FROM pricing_df
 
         SELECT Description,Variant,"Unit Price",QTY,ROUND("Unit Price" * QTY,2) AS total_price
@@ -389,73 +377,26 @@ def _(pricing_df):
 
 @app.cell(hide_code=True)
 def _(cccs_stuffing_dataset, month_selector, select_report):
-    stuffing_df = mo.sql(
-        f"""
-        FROM
-            CCCS_STUFFING_DATASET
-        SELECT
-            day_name,
-            date,
-            container_number,
-            customer,
-            service,
-            total_tonnage::DECIMAL AS total_tonnage,
-            overtime_tonnage::DECIMAL AS overtime_tonnage,
-            unit_price,
-            total_price::DECIMAL AS total_price
-        WHERE
-            invoiced = 'MAERSKLINE'
-            AND customer = '{select_report.value}'
-            AND date BETWEEN '{month_selector.value}' AND LAST_DAY(DATE '{month_selector.value}')
-        """
-    )
+    with mo.status.spinner("Loading stuffing data…"):
+        stuffing_df = mo.sql(
+            f"""
+            FROM CCCS_STUFFING_DATASET
+            SELECT day_name, date, container_number, customer, service,
+                   total_tonnage, overtime_tonnage, unit_price,
+                   total_price::DECIMAL AS total_price
+            WHERE invoiced <> 'MAERSKLINE'
+              AND customer = '{select_report.value}'
+              AND date BETWEEN '{month_selector.value}' AND LAST_DAY(DATE '{month_selector.value}')
+            """,
+            output=True,
+        )
     return (stuffing_df,)
 
 
 @app.cell(hide_code=True)
 def _(stuffing_df):
-    _df = mo.sql(
-        f"""
-        WITH
-            main AS (
-                FROM
-                    stuffing_df
-                SELECT
-                    day_name,
-                    service,
-                    total_tonnage,
-                    (total_tonnage - overtime_tonnage) AS normal_tonnage,
-                    overtime_tonnage,
-                    unit_price,
-                    total_price,
-                    CASE
-                        WHEN day_name IN ('Sun', 'PH') THEN 'overtime'
-                        ELSE 'normal'
-                    END AS overtime
-            ),
-            normal_hours AS (
-        FROM
-            main
-        SELECT
-            service,
-            SUM(normal_tonnage) AS normal_tonnage,
-            unit_price,
-            overtime || ' ' || 'hours' AS overtime
-        WHERE
-            overtime = 'normal'
-        GROUP BY ALL)
-
-
-        FROM main
-        """
-    )
-    return
-
-
-@app.cell(hide_code=True)
-def _(stuffing_df):
     stuffing_summary_df = mo.sql(
-        f"""
+        """
         FROM stuffing_df
         SELECT COALESCE(SUM(total_tonnage), 0.0) AS tonnage,
                COUNT(DISTINCT container_number) AS number_stuffed,
@@ -467,7 +408,7 @@ def _(stuffing_df):
 @app.cell
 def _(electricity_df):
     electricity_summary_df = mo.sql(
-        f"""
+        """
         FROM electricity_df
         SELECT SUM(number_of_days_on_plug) AS days_plugged,COUNT (DISTINCT container_number) AS number_stuffed
         """
@@ -478,7 +419,7 @@ def _(electricity_df):
 @app.cell(hide_code=True)
 def _(shore_crane_df):
     shore_crane_summary_df = mo.sql(
-        f"""
+        """
         FROM shore_crane_df
         SELECT COALESCE(SUM("hours"),0) AS total_hours
         """,
@@ -490,7 +431,7 @@ def _(shore_crane_df):
 @app.cell(hide_code=True)
 def _(haulage_df):
     haulage_summary_df = mo.sql(
-        f"""
+        """
         WITH
             del AS (
                 FROM
@@ -529,7 +470,7 @@ def _(month_selector, select_report, shore_crane_dataset):
         f"""
         FROM SHORE_CRANE_DATASET
                 SELECT * EXCLUDE (invoiced_to, operation_type)
-                WHERE invoiced_to = 'MAERSKLINE'
+                WHERE invoiced_to <> 'MAERSKLINE'
                   AND customer LIKE '%{select_report.value}%'
                   AND operation_type = 'CCCS Container Stuffing'
                   AND date BETWEEN '{month_selector.value}' AND LAST_DAY(DATE '{month_selector.value}')
@@ -552,7 +493,7 @@ def _(electricity_dataset, month_selector, select_report):
                     ) AS date_stop
                 FROM ELECTRICITY_DATASET
                 WHERE (operation_type LIKE '%CCCS%' OR operation_type LIKE '%Exchange%')
-                  AND customer = 'MAERSKLINE'
+                  AND customer <> 'MAERSKLINE'
                   AND vessel_client LIKE '%{select_report.value}%'
                   AND date_plugged <= LAST_DAY(DATE '{month_selector.value}')
                   AND (date_out >= DATE '{month_selector.value}' OR date_out IS NULL)
@@ -630,29 +571,9 @@ def _(
 
 
 @app.cell(hide_code=True)
-def _(container_origin, electricity_df, select_report, transfer_dataset):
-    _df = mo.sql(
-        f"""
-         WITH valid_containers AS (SELECT DISTINCT e.container_number
-                    FROM electricity_df e
-                    INNER JOIN CONTAINER_ORIGIN co
-                        ON trim(e.container_number) = trim(co.container_number)
-                        AND e.date_plugged  = co.date_plugged
-                        AND e.time_plugged  = co.time_plugged
-                    WHERE co.original_vessel LIKE '%{select_report.value}%')
-
-        FROM TRANSFER_DATASET t
-                SEMI JOIN valid_containers v ON trim(t.container_number) = trim(v.container_number)
-        WHERE movement_type = 'Delivery' --AND date BETWEEN '2026-07-01' AND '2026-07-31'
-        """
-    )
-    return
-
-
-@app.cell(hide_code=True)
 def _(electricity_df, haulage_df, shore_crane_df, stuffing_df):
     summary_df = mo.sql(
-        f"""
+        """
         WITH explicit_tonnage AS (
                 FROM
                     stuffing_df
@@ -950,7 +871,7 @@ def _(electricity_df, haulage_df, shore_crane_df, stuffing_df):
 @app.cell(hide_code=True)
 def _(summary_df):
     pricing_df = mo.sql(
-        f"""
+        """
         WITH bc AS (FROM
             price_df
         WHERE
@@ -994,13 +915,12 @@ def _(bc_df, copy_button):
     mo.stop(not copy_button.value)
     bc_df.write_clipboard()  # tab-separated, pastes cleanly into BC / Excel
     mo.md("✅ Copied to clipboard")
-    return
 
 
 @app.cell(hide_code=True)
 def _(pricing_df):
     bc_df = mo.sql(
-        f"""
+        """
         FROM pricing_df
             SELECT * EXCLUDE("Unit Price")
         WHERE QTY > 0
@@ -1012,19 +932,18 @@ def _(pricing_df):
 @app.cell(hide_code=True)
 def _(pricing_df):
     _df = mo.sql(
-        f"""
+        """
         FROM pricing_df
             SELECT *, "Unit Price" * QTY
         WHERE QTY > 0
         """
     )
-    return
 
 
 @app.cell(hide_code=True)
 def _(pricing_df):
     service_breakdown_df = mo.sql(
-        f"""
+        """
         WITH mapped AS (
                     FROM pricing_df
                     SELECT
@@ -1236,7 +1155,6 @@ def _(month_selector, reports, save_button, select_report):
         output_path=f"output/{select_report.value} CCCS - {format_datestr_to_month_year(month_selector.value)}.xlsx",
     )
     mo.md(f"✅ Saved to `{output_file}`")
-    return
 
 
 if __name__ == "__main__":

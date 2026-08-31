@@ -72,6 +72,13 @@ operations_dataframes: dict[str, pl.LazyFrame] = {
     "berth_dues": operations.berth,
 }
 
+# Names backed (directly or transitively) by dataframe.operations's Excel
+# readers, which data_source.make_dataset.is_windows() gates to Windows --
+# elsewhere these are empty, zero-column frames rather than a real failure.
+EXCEL_BACKED_NAMES: frozenset[str] = frozenset(
+    {"extramen", "hatch_to_hatch", "additional_overtime", "berth_dues"}
+)
+
 shore_handling_dataframes: dict[str, pl.LazyFrame] = {
     "salt": shore_handling.salt,
     # "bin_tipping": shore_handling.bin_tipping,

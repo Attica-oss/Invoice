@@ -4,11 +4,12 @@ __generated_with = "0.23.14"
 app = marimo.App(width="columns")
 
 with app.setup:
-    from datetime import date
     from calendar import monthrange
-    import polars as pl
+    from datetime import date
+
     import marimo as mo
-    from dataframe import forklift,forklift_for_salt,salt
+    import polars as pl
+
 
 
 @app.function
@@ -52,7 +53,6 @@ def _():
     mo.md(r"""
     ## Salt Operations
     """)
-    return
 
 
 @app.cell(hide_code=True)
@@ -71,7 +71,6 @@ def _():
     mo.md(r"""
     # Forklift
     """)
-    return
 
 
 @app.cell(hide_code=True)
@@ -138,7 +137,7 @@ def _(month_selector, select_report):
 @app.cell(hide_code=True)
 def _(forklift_services_df, unpiv):
     forklift_summary_df = mo.sql(
-        f"""
+        """
         WITH totals AS (
             FROM forklift_services_df
             SELECT
@@ -166,7 +165,7 @@ def _(forklift_services_df, unpiv):
 @app.cell
 def _(forklift_salt_df, forklift_summary_df):
     all_forklift_df = mo.sql(
-        f"""
+        """
         WITH
             f_normal AS (
                 FROM
@@ -257,7 +256,7 @@ def _(forklift_salt_df, forklift_summary_df):
 @app.cell(hide_code=True)
 def _(all_forklift_df, salt_df):
     summary_df = mo.sql(
-        f"""
+        """
         WITH
             salt_normal AS (
                 FROM
@@ -313,7 +312,7 @@ def _():
 @app.cell(hide_code=True)
 def _(price_df, summary_df):
     pricing_df = mo.sql(
-        f"""
+        """
         WITH bc AS (FROM
             price_df
         WHERE
@@ -341,29 +340,27 @@ def _(price_df, summary_df):
 @app.cell(hide_code=True)
 def _(pricing_df):
     _df = mo.sql(
-        f"""
+        """
         FROM pricing_df
         """
     )
-    return
 
 
 @app.cell(hide_code=True)
 def _(pricing_df):
     _df = mo.sql(
-        f"""
+        """
         FROM pricing_df
             SELECT * EXCLUDE("Unit Price")
         WHERE QTY > 0
         """
     )
-    return
 
 
 @app.cell(hide_code=True)
 def _(pricing_df):
     _df = mo.sql(
-        f"""
+        """
         With a AS (FROM pricing_df
 
         SELECT Description,Variant,"Unit Price",QTY,("Unit Price" * QTY)::DECIMAL AS total_price
@@ -373,13 +370,11 @@ def _(pricing_df):
          SELECT COALESCE(SUM(total_price)::DECIMAL,0) AS total_price
         """
     )
-    return
 
 
 @app.cell
 def _(month_selector):
     eomonth(month_selector.value).isoformat()
-    return
 
 
 @app.cell

@@ -53,17 +53,15 @@ transfer_direct: pl.Expr = pl.col("operation_type").str.contains("Direct")
 exchange_hands: pl.Expr = pl.col("operation_type").str.contains("Exchange")
 
 
-on_plug_or_partially_stuffed: pl.Expr = pl.col("location").is_in(
-    ["For Completion", "On Plug"]
-)
+on_plug_or_partially_stuffed: pl.Expr = pl.col("location").is_in(["For Completion", "On Plug"])
 on_plug: pl.Expr = pl.col("location").is_in(["On Plug"])
 partially_stuffed: pl.Expr = pl.col("location").is_in(["For Completion"])
 plugged_only: pl.Expr = pl.col("location") == "Plugin Only"
 
 # Durations
-duration: pl.Expr = (
-    (pl.col("date_out") - pl.col("date_plugged")).dt.total_hours() / 24
-).cast(pl.Int64)
+duration: pl.Expr = ((pl.col("date_out") - pl.col("date_plugged")).dt.total_hours() / 24).cast(
+    pl.Int64
+)
 
 
 def load_pallet_dataset() -> pl.LazyFrame:
@@ -90,24 +88,18 @@ def _pallet() -> pl.LazyFrame:
     LINER_PRICE = prices["liner"]
     return load_pallet_dataset().with_columns(
         pallet_price=pl.when(
-            (
-                pl.col("remarks")
-                .cast(pl.Utf8)
-                .str.contains(pl.lit("Pallet"), strict=True)
-            ).and_(pl.col("shipping_line").eq(pl.lit("IOT")))
+            (pl.col("remarks").cast(pl.Utf8).str.contains(pl.lit("Pallet"), strict=True)).and_(
+                pl.col("shipping_line").eq(pl.lit("IOT"))
+            )
         )
         .then(PALLET_IOT_PRICE)
-        .when(
-            pl.col("remarks").cast(pl.Utf8).str.contains(pl.lit("Pallet"), strict=True)
-        )
+        .when(pl.col("remarks").cast(pl.Utf8).str.contains(pl.lit("Pallet"), strict=True))
         .then(PALLET_PRICE)
         .otherwise(0),
         liner_price=pl.when(
-            (
-                pl.col("remarks")
-                .cast(pl.Utf8)
-                .str.contains(pl.lit("Liner"), strict=True)
-            ).and_(pl.col("shipping_line").eq(pl.lit("CMA CGM")))
+            (pl.col("remarks").cast(pl.Utf8).str.contains(pl.lit("Liner"), strict=True)).and_(
+                pl.col("shipping_line").eq(pl.lit("CMA CGM"))
+            )
         )
         .then(LINER_PRICE)
         .otherwise(0),
@@ -124,17 +116,12 @@ def _coa() -> pl.LazyFrame:
     STANDARD_ELECTRICITY = prices["standard_electricity"]
     return (
         load_gsheet_data(sheet_id=STUFFING_SHEET_ID, sheet_name=PLUGIN_SHEET_NAME)
-        .filter(
-            pl.col("date_out")
-            .dt.year()
-            .eq(CURRENT_YEAR)
-            .or_(pl.col("date_out").is_null())
-        )
+        .filter(pl.col("date_out").dt.year().eq(CURRENT_YEAR).or_(pl.col("date_out").is_null()))
         .select(
             pl.col("vessel_client").str.to_uppercase().cast(dtype=enum_customer()),
             pl.col("customer").cast(dtype=pl.Enum(shipper)),
             pl.col("date_plugged"),
-            pl.col("time_plugged"),
+            pl.col("time_plugged").cast(dtype=pl.Time),
             pl.col("container_number").cast(dtype=containers_enum),
             pl.col("operation_type"),
             pl.col("shipping_line").cast(dtype=pl.Enum(shipping_line)),
@@ -154,12 +141,8 @@ def _coa() -> pl.LazyFrame:
             .when(partially_stuffed)
             .then(duration)
             .otherwise(duration + 1),
-            plugin_price=pl.when(transfer_direct | exchange_hands)
-            .then(0)
-            .otherwise(PLUGIN_PRICE),
-            monitoring_price=pl.when(
-                transfer_direct | on_plug_or_partially_stuffed | plugged_only
-            )
+            plugin_price=pl.when(transfer_direct | exchange_hands).then(0).otherwise(PLUGIN_PRICE),
+            monitoring_price=pl.when(transfer_direct | on_plug_or_partially_stuffed | plugged_only)
             .then(0)
             .otherwise(MONITORING_PRICE),
         )
@@ -172,13 +155,9 @@ def _coa() -> pl.LazyFrame:
             .then(MAGNUM_ELECTRICITY)
             .otherwise(STANDARD_ELECTRICITY)
         )
+        .with_columns(total_electricity=pl.col("electricity_unit_price") * pl.col("days_on_plug"))
         .with_columns(
-            total_electricity=pl.col("electricity_unit_price") * pl.col("days_on_plug")
-        )
-        .with_columns(
-            total=pl.col("plugin_price")
-            + pl.col("monitoring_price")
-            + pl.col("total_electricity")
+            total=pl.col("plugin_price") + pl.col("monitoring_price") + pl.col("total_electricity")
         )
     )
 

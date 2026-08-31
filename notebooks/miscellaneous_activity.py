@@ -5,9 +5,9 @@ app = marimo.App(width="columns")
 
 with app.setup:
     import polars as pl
-    from dataframe import full_scows
-    from data_source.all_dataframe import miscellaneous
     from scan_google_sheet import scan_google_sheet
+
+    from data_source.all_dataframe import miscellaneous
 
 
 @app.cell
@@ -19,7 +19,7 @@ def _():
 @app.cell(hide_code=True)
 def _(mo, sapmer_ldf, stuffing_ldf):
     _df = mo.sql(
-        f"""
+        """
         WITH stuff AS (FROM stuffing_ldf
         SELECT vessel_client,date_plugged,container_number,set_point
             WHERE date_plugged BETWEEN '2026-07-22' AND '2026-07-31' AND customer = 'SAPMER'),sapmer AS (FROM sapmer_ldf SELECT 
@@ -28,7 +28,6 @@ def _(mo, sapmer_ldf, stuffing_ldf):
         FROM stuff S LEFT JOIN sapmer M ON M."Container num" = S.container_number
         """
     )
-    return
 
 
 @app.cell
@@ -40,7 +39,6 @@ def _():
 @app.cell
 def _(sapmer_ldf):
     sapmer_ldf
-    return
 
 
 @app.cell
@@ -62,7 +60,6 @@ def _():
 @app.cell
 def _(scow_path):
     pl.read_excel(scow_path).filter(pl.col("Date").dt.year().eq(2026).and_(pl.col("Date").dt.month().eq(7)))
-    return
 
 
 @app.cell
@@ -74,23 +71,21 @@ def _():
 @app.cell(hide_code=True)
 def _(misc_ldf, mo):
     _df = mo.sql(
-        f"""
+        """
         FROM misc_ldf
         WHERE operation_type LIKE '%Bin Dispatch%' AND MONTH(date) = 7
         """
     )
-    return
 
 
 @app.cell(hide_code=True)
 def _(mo):
     _df = mo.sql(
-        f"""
+        """
         From full_scows
         WHERE MONTH(date) = 7
         """
     )
-    return
 
 
 @app.cell

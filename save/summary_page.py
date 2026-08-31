@@ -1,5 +1,6 @@
 
 from typing import Any
+
 import polars as pl
 import xlsxwriter
 from xlsxwriter.worksheet import Worksheet
