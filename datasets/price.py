@@ -14,7 +14,7 @@ import polars as pl
 from data_source.make_dataset import load_sheet as scan_google_sheet
 
 # from data_source.sheet_ids import MASTER_ID, PRICE_SHEET_NAME
-from utils import PolarsEnum
+from type_casting import PolarsEnum
 
 # Master Validation / Pricing
 MASTER_ID: str = "1ai-zQMtbPUx0LeQeLmXcpPgKvL5cyvwDfSJqRzxfUQg"

@@ -7,7 +7,7 @@ from functools import lru_cache
 import polars as pl
 
 from data_source.make_dataset import load_sheet as scan_google_sheet
-from utils.config import (
+from data_source.sheet_ids import (
     NET_LIST_SHEET_NAME,
     OPS_SHEET_ID,
     RAW_DATA_SHEET_NAME,
