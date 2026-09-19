@@ -5,7 +5,7 @@ from __future__ import annotations
 import polars as pl
 
 from datasets.salt import load_salt
-from utils import duration_to_hhmm
+from type_casting import duration_to_hhmm
 
 
 def forklift_salt(salt: pl.LazyFrame | None = None) -> pl.LazyFrame:

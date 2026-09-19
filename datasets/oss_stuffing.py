@@ -13,7 +13,7 @@ import polars as pl
 
 from datasets.net_list import net_list
 from datasets.price import oss_stuffing_price
-from utils import apply_overtime_rate
+from type_casting import apply_overtime_rate
 
 
 def oss() -> pl.LazyFrame:

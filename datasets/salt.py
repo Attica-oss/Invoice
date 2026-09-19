@@ -8,9 +8,10 @@ from datetime import time as dt_time
 import polars as pl
 
 from data_source.make_dataset import load_sheet as scan_google_sheet
+from data_source.sheet_ids import SALT_OPERATION_SHEET_NAME, SHORE_HANDLING_ID
 from datasets.customers import purseiner, ship_owner
 from datasets.price import get_price
-from utils import (
+from type_casting import (
     CURRENT_YEAR,
     MIDNIGHT,
     SPECIAL_DAYS,
@@ -19,7 +20,6 @@ from utils import (
     ZERO_DURATION,
     OvertimePerc,
 )
-from utils.config import SALT_OPERATION_SHEET_NAME, SHORE_HANDLING_ID
 
 # ---------------------------------------------------------------------------
 # Rate-bucket splitting (single source of truth)
