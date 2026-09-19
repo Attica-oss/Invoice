@@ -236,8 +236,8 @@ def _cccs_adjusted_records() -> pl.LazyFrame:
         .with_columns(adjusted_tonnage=pl.col("total_tonnage") * pl.col("perc_diff"))
         .group_by(["day_name", "date", "overtime", "vessel", "destination", "storage_type"])
         .agg(
-            start_time=pl.col("Time").min(),
-            end_time=pl.col("Time").max(),
+            start_time=pl.col("Time").min().dt.time(),
+            end_time=pl.col("Time").max().dt.time(),
             total_tonnage=pl.col("adjusted_tonnage").sum().round(3),
         )
         .select(

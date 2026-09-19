@@ -19,13 +19,14 @@ import platform
 from functools import cache
 
 import polars as pl
+
+from data_source.config import TIMEOUT as _TIMEOUT
 from scan_google_sheet import scan_google_sheet as _scan_google_sheet
+
 
 from data_source.excel_file_path import ExcelFiles
 
 logger = logging.getLogger(__name__)
-
-_TIMEOUT = 20
 
 
 def is_windows() -> bool:
@@ -42,6 +43,7 @@ def _scan_cached(
     url: str | None,
     query: str | None,
     parse_dates: bool,
+    timeout: int | None = _TIMEOUT,
 ) -> pl.LazyFrame:
     """One network fetch per distinct argument tuple."""
     return _scan_google_sheet(
@@ -50,7 +52,7 @@ def _scan_cached(
         url=url,
         query=query,
         parse_dates=parse_dates,
-        timeout=_TIMEOUT,
+        timeout=timeout,
     )
 
 
@@ -61,7 +63,7 @@ def load_sheet(
     *,
     query: str | None = None,
     parse_dates: bool = True,
-    timeout: int | None = None,  # accepted for drop-in compatibility; unused
+    timeout: int | None = _TIMEOUT,  # accepted for drop-in compatibility; unused
 ) -> pl.LazyFrame:
     """Load a Google Sheet tab as a cached Polars ``LazyFrame``.
 
@@ -77,7 +79,7 @@ def load_sheet(
     """
     if (sheet_id is None) == (url is None):
         raise ValueError("Provide exactly one of sheet_id or url.")
-    return _scan_cached(sheet_id, sheet_name, url, query, parse_dates)
+    return _scan_cached(sheet_id, sheet_name, url, query, parse_dates, timeout)
 
 
 def load_gsheet_data(
@@ -102,6 +104,8 @@ def load_excel(file_path: ExcelFiles) -> pl.LazyFrame:
     """
     file, sheet = file_path.value
     if not is_windows():
-        logger.warning("Skipping Excel read for %s (%s): not running on Windows", file, sheet)
+        logger.warning(
+            "Skipping Excel read for %s (%s): not running on Windows", file, sheet
+        )
         return pl.LazyFrame()
     return pl.read_excel(source=file, sheet_name=sheet).lazy()

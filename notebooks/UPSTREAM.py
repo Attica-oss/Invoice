@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.23.14"
+__generated_with = "0.24.0"
 app = marimo.App(width="columns")
 
 with app.setup:
@@ -10,32 +10,36 @@ with app.setup:
 
     from datasets.container_ops_activity import coa
     from datasets.truck_to_cold_store import cccs_record
+    from dataframe.transport import forklift,transfer
+    from dataframe.emr import shifting
 
 
 @app.cell(hide_code=True)
-def _(mo):
+def _(mo, month_selector):
     _df = mo.sql(
-        """
+        f"""
         FROM forklift
-        WHERE customer = 'CCCS'
-
+        WHERE invoiced_in LIKE '%SAPMER%'  AND (date BETWEEN '{month_selector.value}' AND LAST_DAY(DATE '{month_selector.value}'))
         """
     )
+    return
 
 
 @app.cell(hide_code=True)
 def _(mo):
     _df = mo.sql(
-        """
+        f"""
         FROM shifting
+        WHERE invoice_to = 'SAPMER'
         """
     )
+    return
 
 
 @app.cell
 def _(mo):
     select_report = mo.ui.dropdown(
-        label="Select Line", options=["IOT"], value="IOT"
+        label="Select Line", options=["SAPMER","IOT"], value="IOT"
     )
 
     month_options = {
@@ -46,7 +50,8 @@ def _(mo):
         "May 2026": "2026-05-01",
         "Jun 2026": "2026-06-01",
         "Jul 2026": "2026-07-01",
-        "Aug 2026": "2026-08-01"
+        "Aug 2026": "2026-08-01",
+        "Sep 2026": "2026-09-01"
     }
 
 
@@ -87,25 +92,27 @@ def _(mo, month_selector, select_report):
 @app.cell(hide_code=True)
 def _(mo, transfer_df):
     _df = mo.sql(
-        """
+        f"""
         FROM transfer_df
         SELECT COUNT(*) AS number_of_units,SUM(shifting_price) AS shifting_price
         """
     )
+    return
 
 
 @app.cell(hide_code=True)
 def _(mo, stdu_ldf):
     _df = mo.sql(
-        """
+        f"""
         FROM stdu_ldf
             SELECT date,SUM("No of Scows")::INT AS scows
-    
+
         WHERE "Status" = 'Empty'
         GROUP BY ALL
         ORDER BY ALL
         """
     )
+    return
 
 
 @app.cell
@@ -122,16 +129,18 @@ def _(mo, month_selector, plugin_ldf, select_report):
         WHERE customer = '{select_report.value}' AND (date_plugged BETWEEN '{month_selector.value}' AND LAST_DAY(DATE '{month_selector.value}'))
         """
     )
+    return
 
 
 @app.cell
-def _(mo, month_selector, select_report):
+def _(cross_stuffing, mo, month_selector, select_report):
     _df = mo.sql(
         f"""
         FROM cross_stuffing
         WHERE invoiced = '{select_report.value}' AND  (date BETWEEN '{month_selector.value}' AND LAST_DAY(DATE '{month_selector.value}'))
         """
     )
+    return
 
 
 @app.cell
@@ -148,6 +157,7 @@ def _(mo, month_selector, select_report, truck_to_cccs):
         WHERE destination LIKE '%{select_report.value}%' AND  (date BETWEEN '{month_selector.value}' AND LAST_DAY(DATE '{month_selector.value}'))
         """
     )
+    return
 
 
 @app.cell

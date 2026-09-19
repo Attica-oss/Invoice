@@ -105,6 +105,8 @@ def _():
         options=["OSS", "STO", "Extended OSS"],
         value="OSS",
     )
+
+    mode
     return (mode,)
 
 
@@ -114,6 +116,7 @@ def _(mode):
     well_inv_df = scan_google_sheet(
         url="https://docs.google.com/spreadsheets/d/1PvTkl6DYZdhtaiNshz0qwtSPxC8S1OOeu905NmhFKNs/edit?gid=1301483182#gid=1301483182",
         sheet_name="WelltoWell",
+        timeout=10
     )
     return (well_inv_df,)
 
@@ -165,6 +168,7 @@ def _(extra_men_ldf, mode):
         """,
         output=False
     )
+    return
 
 
 @app.cell(hide_code=True)
@@ -187,6 +191,7 @@ def _(additional_ldf, mode):
         """,
         output=False
     )
+    return
 
 
 @app.cell
@@ -339,7 +344,7 @@ def _(berth_ldf, mode):
 
 
 @app.cell
-def _(berth_df, select_report, mode):
+def _(berth_df, mode, select_report):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     _options = (
         berth_df.filter(pl.col("vessel").eq(select_report.value))
@@ -359,7 +364,7 @@ def _(berth_df, select_report, mode):
 
 
 @app.cell
-def _(berth_df, select_report, start_date, mode):
+def _(berth_df, mode, select_report, start_date):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     mo.stop(
         start_date.value is None,
@@ -400,7 +405,21 @@ def _(berth_df, select_report, start_date, mode):
 
 
 @app.cell
-def _(copy_button, customer, document_date, metrics_df, period_end, period_start, posting_date, save_button, select_report, start_date, sto_number, summary_table, mode):
+def _(
+    copy_button,
+    customer,
+    document_date,
+    metrics_df,
+    mode,
+    period_end,
+    period_start,
+    posting_date,
+    save_button,
+    select_report,
+    start_date,
+    sto_number,
+    summary_table,
+):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     title = mo.md(f"# ⛴️ {mode.value} Report")
 
@@ -445,6 +464,7 @@ def _(copy_button, customer, document_date, metrics_df, period_end, period_start
             actions,
         ]
     )
+    return
 
 
 @app.cell
@@ -453,6 +473,7 @@ def _(bc_df, copy_button, mode):
     mo.stop(not copy_button.value)
     bc_df.write_clipboard()  # tab-separated, pastes cleanly into BC / Excel
     mo.md("✅ Copied to clipboard")
+    return
 
 
 @app.cell
@@ -460,12 +481,13 @@ def _():
     report_status_df = scan_google_sheet(
         url="https://docs.google.com/spreadsheets/d/1xNh4SiP_xw8Ck1baLhFazBsmMLIbOHjF4tg_M89efvI/edit?gid=1899664910#gid=1899664910",
         sheet_name="report_status",
+        timeout=10
     )
     return (report_status_df,)
 
 
 @app.cell(hide_code=True)
-def _(berth_ldf, report_status_df, select_report, start_date, mode):
+def _(berth_ldf, mode, report_status_df, select_report, start_date):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     report_data_df = mo.sql(
         f"""
@@ -520,7 +542,7 @@ def _(berth_ldf, report_status_df, select_report, start_date, mode):
 
 
 @app.cell
-def _(report_data_df, mode):
+def _(mode, report_data_df):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     document_date = mo.ui.text(
         label="Document Date:",
@@ -576,7 +598,14 @@ def _(mode):
 
 
 @app.cell(hide_code=True)
-def _(forklift_hours, no_of_plugin, number_of_containers, salt_operations, total_tonnage, mode):
+def _(
+    forklift_hours,
+    mode,
+    no_of_plugin,
+    number_of_containers,
+    salt_operations,
+    total_tonnage,
+):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     summary_table = mo.Html(
         f"""
@@ -662,7 +691,7 @@ def _(forklift_hours, no_of_plugin, number_of_containers, salt_operations, total
 
 
 @app.cell
-def _(final_berth_df, select_report, start_date, mode):
+def _(final_berth_df, mode, select_report, start_date):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     mo.callout(
         mo.md(
@@ -672,6 +701,7 @@ def _(final_berth_df, select_report, start_date, mode):
         ),
         kind="warn",
     ) if final_berth_df.is_empty() else None
+    return
 
 
 @app.cell(hide_code=True)
@@ -680,6 +710,7 @@ def _(mode):
     mo.md(r"""
     ## Datasets
     """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -688,10 +719,11 @@ def _(mode):
     mo.md(r"""
     ### Berth Dues :⚓
     """)
+    return
 
 
 @app.cell(hide_code=True)
-def _(berth_df, select_report, start_date, mode):
+def _(berth_df, mode, select_report, start_date):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     final_berth_df = mo.sql(
         f"""
@@ -718,7 +750,7 @@ def _(final_berth_df, mode):
 
 
 @app.cell
-def _(discount_berthing_figure: int, value_berthing_figure: int, mode):
+def _(discount_berthing_figure: int, mode, value_berthing_figure: int):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     mo.stop(mode.value != "STO")
     berth_discount = mo.stat(value=discount_berthing_figure,label="Discount ($)",bordered=True)
@@ -726,6 +758,7 @@ def _(discount_berthing_figure: int, value_berthing_figure: int, mode):
     berth_total_value = mo.stat(value=(value_berthing_figure + discount_berthing_figure),label="Total Berthing ($)",bordered=True)
 
     mo.vstack([mo.md("## Berthing"),berth_value,berth_discount,berth_total_value],justify="center")
+    return
 
 
 @app.cell(hide_code=True)
@@ -734,10 +767,11 @@ def _(mode):
     mo.md(r"""
     ### Tare Weight ::lucide:weight::
     """)
+    return
 
 
 @app.cell(hide_code=True)
-def _(end_date, select_report, start_date, tare_dataset, mode):
+def _(end_date, mode, select_report, start_date, tare_dataset):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     tare_df = mo.sql(
         f"""
@@ -780,10 +814,11 @@ def _(mode):
     mo.md(r"""
     ### Calibration Summary
     """)
+    return
 
 
 @app.cell(hide_code=True)
-def _(end_date, select_report, start_date, tare_dataset, unpivoted, mode):
+def _(end_date, mode, select_report, start_date, tare_dataset, unpivoted):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     tare_summary_df = mo.sql(
         f"""
@@ -841,10 +876,11 @@ def _(mode):
     ### Stuffing ::lucide:container::
     ----
     """)
+    return
 
 
 @app.cell(hide_code=True)
-def _(end_date, select_report, start_date, stuffing_dataset, mode):
+def _(end_date, mode, select_report, start_date):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     stuffing_df = mo.sql(
         f"""
@@ -886,10 +922,11 @@ def _(mode):
     mo.md(r"""
     * Stuffing Metrics for summary
     """)
+    return
 
 
 @app.cell
-def _(stuffing_df, mode):
+def _(mode, stuffing_df):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     # STO summary figures shown in the UI and on the Summary sheet.
     no_of_plugin = stuffing_df.filter(pl.col("remarks").is_null()).height
@@ -911,10 +948,11 @@ def _(mode):
     mo.md(r"""
     ### Salt
     """)
+    return
 
 
 @app.cell(hide_code=True)
-def _(end_date, salt_dataset, select_report, start_date, mode):
+def _(end_date, mode, salt_dataset, select_report, start_date):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     salt_df = mo.sql(
         f"""
@@ -931,10 +969,11 @@ def _(mode):
     mo.md(r"""
     ### Summary of Salt Ops
     """)
+    return
 
 
 @app.cell(hide_code=True)
-def _(salt_df, unpivoted, mode):
+def _(mode, salt_df, unpivoted):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     salt_summary_df = mo.sql(
         """
@@ -972,10 +1011,11 @@ def _(mode):
     mo.md(r"""
     * Salt metrics for summary
     """)
+    return
 
 
 @app.cell
-def _(salt_summary_df, mode):
+def _(mode, salt_summary_df):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     salt_operations = salt_summary_df.select(pl.col("quantity").sum()).item()
     return (salt_operations,)
@@ -987,10 +1027,11 @@ def _(mode):
     mo.md(r"""
     ### Forklift ::lucide:forklift::
     """)
+    return
 
 
 @app.cell
-def _(end_date, select_report, start_date, mode):
+def _(end_date, mode, select_report, start_date):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     pl.read_excel(
         source=r"C:\Users\gmounac\Dropbox\Container and Transport\Transport Section\Forklift Usage\Forklift Record.xlsx",
@@ -1011,10 +1052,11 @@ def _(end_date, select_report, start_date, mode):
             )
         )
     ).sort(["Date of Service", "Time Out"])
+    return
 
 
 @app.cell(hide_code=True)
-def _(end_date, forklift_salt_dataset, select_report, start_date, mode):
+def _(end_date, forklift_salt_dataset, mode, select_report, start_date):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     f_salt_df = mo.sql(
         f"""
@@ -1026,7 +1068,7 @@ def _(end_date, forklift_salt_dataset, select_report, start_date, mode):
 
 
 @app.cell(hide_code=True)
-def _(end_date, forklift_dataset, select_report, start_date, mode):
+def _(end_date, forklift_dataset, mode, select_report, start_date):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     forklift_df = mo.sql(
         f"""
@@ -1038,7 +1080,7 @@ def _(end_date, forklift_dataset, select_report, start_date, mode):
 
 
 @app.cell(hide_code=True)
-def _(forklift_df, unpivoted, mode):
+def _(forklift_df, mode, unpivoted):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     forklift_summary_df = mo.sql(
         """
@@ -1072,7 +1114,7 @@ def _(forklift_df, unpivoted, mode):
 
 
 @app.cell(hide_code=True)
-def _(f_salt_df, unpivoted, mode):
+def _(f_salt_df, mode, unpivoted):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     forklift_salt_summary_df = mo.sql(
         """
@@ -1114,6 +1156,7 @@ def _(mode):
     mo.md(r"""
     * Forklift metrics for summary
     """)
+    return
 
 
 @app.cell
@@ -1171,10 +1214,11 @@ def _(mode):
 
     #### Extra Men
     """)
+    return
 
 
 @app.cell(hide_code=True)
-def _(end_date, extra_men_dataset_new, select_report, start_date, mode):
+def _(end_date, extra_men_dataset_new, mode, select_report, start_date):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     extra_men_df = mo.sql(
         f"""
@@ -1237,10 +1281,17 @@ def _(mode):
     mo.md(r"""
     #### Additional Overtime
     """)
+    return
 
 
 @app.cell(hide_code=True)
-def _(additional_overtime_dataset_new, end_date, select_report, start_date, mode):
+def _(
+    additional_overtime_dataset_new,
+    end_date,
+    mode,
+    select_report,
+    start_date,
+):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     additional_overtime_df = mo.sql(
         f"""
@@ -1260,10 +1311,11 @@ def _(mode):
     mo.md(r"""
     #### Well to Well
     """)
+    return
 
 
 @app.cell(hide_code=True)
-def _(end_date, select_report, start_date, well_inv_df, mode):
+def _(end_date, mode, select_report, start_date, well_inv_df):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     well_to_well_df = mo.sql(
         f"""
@@ -1285,7 +1337,7 @@ def _(end_date, select_report, start_date, well_inv_df, mode):
 
 
 @app.cell(hide_code=True)
-def _(well_to_well_df, mode):
+def _(mode, well_to_well_df):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     summary_well_to_well_df = mo.sql(
         """
@@ -1318,10 +1370,11 @@ def _(mode):
     mo.md(r"""
     ### Net List
     """)
+    return
 
 
 @app.cell(hide_code=True)
-def _(end_date, net_list_dataset, select_report, start_date, mode):
+def _(end_date, mode, net_list_dataset, select_report, start_date):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     _full_oss_override = """CASE
                     WHEN service = 'Full OSS' AND overtime = 'normal hours'
@@ -1354,7 +1407,7 @@ def _(end_date, net_list_dataset, select_report, start_date, mode):
 
 
 @app.cell(hide_code=True)
-def _(net_list_df, mode):
+def _(mode, net_list_df):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     summary_net_list_df = mo.sql(
         """
@@ -1373,10 +1426,11 @@ def _(mode):
     mo.md(r"""
     * Net list metrics for summary
     """)
+    return
 
 
 @app.cell
-def _(summary_net_list_df, mode):
+def _(mode, summary_net_list_df):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     total_tonnage = summary_net_list_df.select(
         pl.col("total_tonnage").sum()
@@ -1390,10 +1444,11 @@ def _(mode):
     mo.md(r"""
     ### Shore Crane ::lucide:git-pull-request-create::
     """)
+    return
 
 
 @app.cell(hide_code=True)
-def _(end_date, select_report, shore_crane_dataset, start_date, mode):
+def _(end_date, mode, select_report, start_date):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     shore_crane_df = mo.sql(
         f"""
@@ -1407,7 +1462,7 @@ def _(end_date, select_report, shore_crane_dataset, start_date, mode):
 
 
 @app.cell(hide_code=True)
-def _(shore_crane_df, mode):
+def _(mode, shore_crane_df):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     summary_shore_crane_df = mo.sql(
         """
@@ -1514,6 +1569,7 @@ def _(mode):
     mo.md(r"""
     ### Transfer
     """)
+    return
 
 
 @app.cell
@@ -1527,7 +1583,7 @@ def _(mode):
 
 
 @app.cell(hide_code=True)
-def _(affectation_df, end_date, select_report, start_date, mode):
+def _(affectation_df, end_date, mode, select_report, start_date):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     to_filter_transfer_df = mo.sql(
         f"""
@@ -1545,19 +1601,21 @@ def _(mode):
     mo.md(r"""
     #### Container still on plug
     """)
+    return
 
 
 @app.cell
-def _(to_filter_transfer_df, mode):
+def _(mode, to_filter_transfer_df):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     container_on_plug = to_filter_transfer_df.filter(
         pl.col("exit_date").is_null()
     )
     container_on_plug
+    return
 
 
 @app.cell(hide_code=True)
-def _(to_filter_transfer_df, transfer_dataset, mode):
+def _(mode):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     transfer_df = mo.sql(
         """
@@ -1598,7 +1656,7 @@ def _(to_filter_transfer_df, transfer_dataset, mode):
 
 
 @app.cell(hide_code=True)
-def _(transfer_df, mode):
+def _(mode, transfer_df):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     summary_transfer_df = mo.sql(
         """
@@ -1665,6 +1723,7 @@ def _(mode):
     mo.md(r"""
     ## Summaries Df (Business Central line items)
     """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -1673,6 +1732,7 @@ def _(mode):
     mo.md(r"""
     --- Berth Dues
     """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -1725,10 +1785,11 @@ def _(mode):
     mo.md(r"""
     -- Tare Weight
     """)
+    return
 
 
 @app.cell(hide_code=True)
-def _(tare_summary_df, mode):
+def _(mode, tare_summary_df):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     tare_bc = mo.sql(
         """
@@ -1757,10 +1818,11 @@ def _(mode):
     mo.md(r"""
     -- Stuffing
     """)
+    return
 
 
 @app.cell(hide_code=True)
-def _(stuffing_df, mode):
+def _(mode, stuffing_df):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     stuffing_bc = mo.sql(
         """
@@ -1843,10 +1905,11 @@ def _(mode):
     mo.md(r"""
     -- Salt Operation
     """)
+    return
 
 
 @app.cell(hide_code=True)
-def _(salt_summary_df, mode):
+def _(mode, salt_summary_df):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     salt_bc = mo.sql(
         """
@@ -1876,6 +1939,7 @@ def _(mode):
     mo.md(r"""
     --- Forklift
     """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -1950,10 +2014,11 @@ def _(mode):
     mo.md(r"""
     -- Extra Men
     """)
+    return
 
 
 @app.cell(hide_code=True)
-def _(summary_extra_men_df, mode):
+def _(mode, summary_extra_men_df):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     extra_men_bc = mo.sql(
         """
@@ -1983,6 +2048,7 @@ def _(mode):
     mo.md(r"""
     -- Additional Overtime
     """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -2006,10 +2072,11 @@ def _(mode):
     mo.md(r"""
     --- Well to Well
     """)
+    return
 
 
 @app.cell(hide_code=True)
-def _(summary_well_to_well_df, mode):
+def _(mode, summary_well_to_well_df):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     well_to_well_bc = mo.sql(
         """
@@ -2038,10 +2105,11 @@ def _(mode):
     mo.md(r"""
     --- Net List
     """)
+    return
 
 
 @app.cell(hide_code=True)
-def _(summary_net_list_df, mode):
+def _(mode, summary_net_list_df):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     net_list_bc = mo.sql(
         """
@@ -2092,10 +2160,11 @@ def _(mode):
     mo.md(r"""
     --- Shore Crane
     """)
+    return
 
 
 @app.cell(hide_code=True)
-def _(summary_shore_crane_df, mode):
+def _(mode, summary_shore_crane_df):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     shore_crane_bc = mo.sql(
         """
@@ -2125,10 +2194,11 @@ def _(mode):
     mo.md(r"""
     --- Transfer
     """)
+    return
 
 
 @app.cell(hide_code=True)
-def _(summary_transfer_df, mode):
+def _(mode, summary_transfer_df):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     transfer_bc = mo.sql(
         """
@@ -2158,10 +2228,24 @@ def _(mode):
     mo.md(r"""
     ## Combined Summaries
     """)
+    return
 
 
 @app.cell
-def _(additional_overtime_bc, berth_bc, extra_men_bc, forklift_bc, net_list_bc, salt_bc, shore_crane_bc, stuffing_bc, tare_bc, transfer_bc, well_to_well_bc, mode):
+def _(
+    additional_overtime_bc,
+    berth_bc,
+    extra_men_bc,
+    forklift_bc,
+    mode,
+    net_list_bc,
+    salt_bc,
+    shore_crane_bc,
+    stuffing_bc,
+    tare_bc,
+    transfer_bc,
+    well_to_well_bc,
+):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     combined_services_bc = pl.concat(
         [
@@ -2312,7 +2396,7 @@ def _(combined_services_bc, customer, mode):
 
 
 @app.cell(hide_code=True)
-def _(service_breakdown_df, mode):
+def _(mode, service_breakdown_df):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     metrics_df = mo.sql(
         """
@@ -2342,7 +2426,7 @@ def _(mode):
 
 
 @app.cell(hide_code=True)
-def _(pricing_df, mode):
+def _(mode, pricing_df):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     bc_df = mo.sql(
         """
@@ -2354,7 +2438,12 @@ def _(pricing_df, mode):
 
 
 @app.cell(hide_code=True)
-def _(discount_berthing_figure: int, pricing_df, value_berthing_figure: int, mode):
+def _(
+    discount_berthing_figure: int,
+    mode,
+    pricing_df,
+    value_berthing_figure: int,
+):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     service_breakdown_df = mo.sql(
         f"""
@@ -2378,7 +2467,26 @@ def _(discount_berthing_figure: int, pricing_df, value_berthing_figure: int, mod
 
 
 @app.cell
-def _(additional_overtime_df, days_on_electricity, end_date, extra_men_df, final_berth_df, final_forklift_df, net_list_df, no_of_plugin, salt_df, select_report, service_breakdown_df, shore_crane_df, start_date, stuffing_df, tare_df, transfer_df, well_to_well_df, mode):
+def _(
+    additional_overtime_df,
+    days_on_electricity,
+    end_date,
+    extra_men_df,
+    final_berth_df,
+    final_forklift_df,
+    mode,
+    net_list_df,
+    no_of_plugin,
+    salt_df,
+    select_report,
+    service_breakdown_df,
+    shore_crane_df,
+    start_date,
+    stuffing_df,
+    tare_df,
+    transfer_df,
+    well_to_well_df,
+):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     _detail_sheets = {
         "Berth Dues": final_berth_df,
@@ -2433,7 +2541,7 @@ def _(additional_overtime_df, days_on_electricity, end_date, extra_men_df, final
 
 
 @app.cell
-def _(reports, save_button, select_report, end_date, mode):
+def _(end_date, mode, reports, save_button, select_report):
     mo.stop(mode.value not in ("STO", "Extended OSS"))
     mo.stop(
         not save_button.value,
@@ -2445,10 +2553,11 @@ def _(reports, save_button, select_report, end_date, mode):
         output_path=f"output/{select_report.value} {mode.value} - {format_datestr_to_month_year(str(end_date))}.xlsx",
     )
     mo.md(f"✅ Saved to `{output_file}`")
+    return
 
 
 @app.cell
-def _(report_status_df, select_report, mode):
+def _(mode, report_status_df, select_report):
     mo.stop(mode.value != "OSS")
     _options = (
         report_status_df.filter(pl.col("vessel/client").eq(select_report.value))
@@ -2472,12 +2581,27 @@ def _(report_status_df, select_report, mode):
 def _(mode):
     mo.stop(mode.value != "OSS")
     mo.md(r"""
- 
+
     """)
+    return
 
 
 @app.cell
-def _(oss_copy_button, oss_customer, oss_document_date, oss_metrics_df, oss_period_end, oss_period_start, oss_posting_date, oss_save_button, select_report, oss_start_date, oss_sto_number, oss_summary_table, mode):
+def _(
+    mode,
+    oss_copy_button,
+    oss_customer,
+    oss_document_date,
+    oss_metrics_df,
+    oss_period_end,
+    oss_period_start,
+    oss_posting_date,
+    oss_save_button,
+    oss_start_date,
+    oss_sto_number,
+    oss_summary_table,
+    select_report,
+):
     mo.stop(mode.value != "OSS")
     oss_title = mo.md("# ::lucide:blocks:: OSS Report")
 
@@ -2522,10 +2646,11 @@ def _(oss_copy_button, oss_customer, oss_document_date, oss_metrics_df, oss_peri
             oss_actions,
         ]
     )
+    return
 
 
 @app.cell(hide_code=True)
-def _(report_status_df, select_report, oss_start_date, mode):
+def _(mode, oss_start_date, report_status_df, select_report):
     mo.stop(mode.value != "OSS")
     oss_report_data_df = mo.sql(
         f"""
@@ -2556,14 +2681,14 @@ def _(report_status_df, select_report, oss_start_date, mode):
 
 
 @app.cell
-def _(oss_report_data_df, mode):
+def _(mode, oss_report_data_df):
     mo.stop(mode.value != "OSS")
     oss_end_date = get_first_value(oss_report_data_df, "end_date", default="")
     return (oss_end_date,)
 
 
 @app.cell
-def _(oss_report_data_df, mode):
+def _(mode, oss_report_data_df):
     mo.stop(mode.value != "OSS")
     oss_document_date = mo.ui.text(
         label="Document Date:",
@@ -2619,7 +2744,7 @@ def _(mode):
 
 
 @app.cell(hide_code=True)
-def _(oss_days_on_electricity, oss_no_of_plugin, mode):
+def _(mode, oss_days_on_electricity, oss_no_of_plugin):
     mo.stop(mode.value != "OSS")
     oss_summary_table = mo.Html(
         f"""
@@ -2666,6 +2791,7 @@ def _(mode):
     mo.md(r"""
     ## Datasets
     """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -2674,10 +2800,11 @@ def _(mode):
     mo.md(r"""
     ### Stuffing ::lucide:container::
     """)
+    return
 
 
 @app.cell(hide_code=True)
-def _(oss_end_date, full_oss_dataset, select_report, oss_start_date, mode):
+def _(full_oss_dataset, mode, oss_end_date, oss_start_date, select_report):
     mo.stop(mode.value != "OSS")
     oss_stuffing_old_df = mo.sql(
         f"""
@@ -2686,11 +2813,11 @@ def _(oss_end_date, full_oss_dataset, select_report, oss_start_date, mode):
         ORDER BY date
         """
     )
-    return (oss_stuffing_old_df,)
+    return
 
 
 @app.cell(hide_code=True)
-def _(oss_stuffing_old_df, mode):
+def _(mode, stuffing_old_df):
     mo.stop(mode.value != "OSS")
     _df = mo.sql(
         """
@@ -2699,6 +2826,7 @@ def _(oss_stuffing_old_df, mode):
         GROUP BY ALL
         """
     )
+    return
 
 
 @app.cell(hide_code=True)
@@ -2707,10 +2835,11 @@ def _(mode):
     mo.md(r"""
     ### Electricity ::lucide:plug-zap::
     """)
+    return
 
 
 @app.cell(hide_code=True)
-def _(oss_end_date, select_report, oss_start_date, stuffing_dataset, mode):
+def _(mode, oss_end_date, oss_start_date, select_report, stuffing_dataset):
     mo.stop(mode.value != "OSS")
     stuffing_i_df = mo.sql(
         f"""
@@ -2743,10 +2872,11 @@ def _(oss_end_date, select_report, oss_start_date, stuffing_dataset, mode):
         """,
         output=False
     )
+    return
 
 
 @app.cell(hide_code=True)
-def _(oss_end_date, select_report, oss_start_date, stuffing_dataset, mode):
+def _(mode, oss_end_date, oss_start_date, select_report, stuffing_dataset):
     mo.stop(mode.value != "OSS")
     oss_stuffing_df = mo.sql(
         f"""
@@ -2775,7 +2905,7 @@ def _(oss_end_date, select_report, oss_start_date, stuffing_dataset, mode):
 
 
 @app.cell
-def _(oss_stuffing_df, mode):
+def _(mode, oss_stuffing_df):
     mo.stop(mode.value != "OSS")
     # STO summary figures shown in the UI and on the Summary sheet.
     oss_no_of_plugin = oss_stuffing_df.filter(pl.col("remarks").is_null()).height
@@ -2789,7 +2919,7 @@ def _(oss_stuffing_df, mode):
 
 
 @app.cell(hide_code=True)
-def _(oss_stuffing_df, mode):
+def _(mode, stuffing_df):
     mo.stop(mode.value != "OSS")
     oss_plugin_summary_df = mo.sql(
         """
@@ -2856,7 +2986,7 @@ def _(oss_stuffing_df, mode):
             electricity_60
         """
     )
-    return (oss_plugin_summary_df,)
+    return
 
 
 @app.cell(hide_code=True)
@@ -2865,10 +2995,11 @@ def _(mode):
     mo.md(r"""
     ### Net List
     """)
+    return
 
 
 @app.cell(hide_code=True)
-def _(oss_end_date, full_oss_dataset, select_report, oss_start_date, mode):
+def _(full_oss_dataset, mode, oss_end_date, oss_start_date, select_report):
     mo.stop(mode.value != "OSS")
     oss_net_list_df = mo.sql(
         f"""
@@ -2882,7 +3013,7 @@ def _(oss_end_date, full_oss_dataset, select_report, oss_start_date, mode):
 
 
 @app.cell(hide_code=True)
-def _(oss_net_list_df, mode):
+def _(mode, net_list_df):
     mo.stop(mode.value != "OSS")
     oss_summary_net_list_df = mo.sql(
         """
@@ -2892,7 +3023,7 @@ def _(oss_net_list_df, mode):
         ORDER BY service,overtime
         """
     )
-    return (oss_summary_net_list_df,)
+    return
 
 
 @app.cell(hide_code=True)
@@ -2901,10 +3032,11 @@ def _(mode):
     mo.md(r"""
     ### Shore Crane ::lucide:git-pull-request-create::
     """)
+    return
 
 
 @app.cell(hide_code=True)
-def _(oss_end_date, select_report, shore_crane_dataset, oss_start_date, mode):
+def _(mode, oss_end_date, oss_start_date, select_report, shore_crane_dataset):
     mo.stop(mode.value != "OSS")
     oss_shore_crane_df = mo.sql(
         f"""
@@ -2918,7 +3050,7 @@ def _(oss_end_date, select_report, shore_crane_dataset, oss_start_date, mode):
 
 
 @app.cell(hide_code=True)
-def _(oss_shore_crane_df, mode):
+def _(mode, shore_crane_df):
     mo.stop(mode.value != "OSS")
     oss_summary_shore_crane_df = mo.sql(
         """
@@ -3016,7 +3148,7 @@ def _(oss_shore_crane_df, mode):
             s.sort
         """
     )
-    return (oss_summary_shore_crane_df,)
+    return
 
 
 @app.cell(hide_code=True)
@@ -3025,6 +3157,7 @@ def _(mode):
     mo.md(r"""
     ### Transfer
     """)
+    return
 
 
 @app.cell
@@ -3034,11 +3167,11 @@ def _(mode):
         source=VALIDATION_XLSX,
         table_name="Affectation",
     ).pipe(clean_affectation)
-    return (oss_affectation_df,)
+    return
 
 
 @app.cell(hide_code=True)
-def _(oss_affectation_df, oss_end_date, select_report, oss_start_date, mode):
+def _(affectation_df, mode, oss_end_date, oss_start_date, select_report):
     mo.stop(mode.value != "OSS")
     oss_to_filter_transfer_df = mo.sql(
         f"""
@@ -3056,19 +3189,21 @@ def _(mode):
     mo.md(r"""
     #### Container still on plug
     """)
+    return
 
 
 @app.cell
-def _(oss_to_filter_transfer_df, mode):
+def _(mode, oss_to_filter_transfer_df):
     mo.stop(mode.value != "OSS")
     container_on_plug = oss_to_filter_transfer_df.filter(
         pl.col("exit_date").is_null()
     )
     container_on_plug
+    return
 
 
 @app.cell(hide_code=True)
-def _(oss_to_filter_transfer_df, transfer_dataset, mode):
+def _(mode, to_filter_transfer_df, transfer_dataset):
     mo.stop(mode.value != "OSS")
     oss_transfer_df = mo.sql(
         """
@@ -3109,7 +3244,7 @@ def _(oss_to_filter_transfer_df, transfer_dataset, mode):
 
 
 @app.cell(hide_code=True)
-def _(oss_transfer_df, mode):
+def _(mode, transfer_df):
     mo.stop(mode.value != "OSS")
     oss_summary_transfer_df = mo.sql(
         """
@@ -3167,7 +3302,7 @@ def _(oss_transfer_df, mode):
             m.sort
         """
     )
-    return (oss_summary_transfer_df,)
+    return
 
 
 @app.cell(hide_code=True)
@@ -3176,6 +3311,7 @@ def _(mode):
     mo.md(r"""
     ## Summaries Df (Business Central line items)
     """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -3184,10 +3320,11 @@ def _(mode):
     mo.md(r"""
     -- Stuffing
     """)
+    return
 
 
 @app.cell(hide_code=True)
-def _(oss_plugin_summary_df, mode):
+def _(mode, plugin_summary_df):
     mo.stop(mode.value != "OSS")
     oss_stuffing_bc = mo.sql(
         """
@@ -3265,10 +3402,11 @@ def _(mode):
     mo.md(r"""
     --- Net List
     """)
+    return
 
 
 @app.cell(hide_code=True)
-def _(oss_summary_net_list_df, mode):
+def _(mode, summary_net_list_df):
     mo.stop(mode.value != "OSS")
     oss_net_list_bc = mo.sql(
         """
@@ -3316,10 +3454,11 @@ def _(mode):
     mo.md(r"""
     --- Shore Crane
     """)
+    return
 
 
 @app.cell(hide_code=True)
-def _(oss_summary_shore_crane_df, mode):
+def _(mode, summary_shore_crane_df):
     mo.stop(mode.value != "OSS")
     oss_shore_crane_bc = mo.sql(
         """
@@ -3349,10 +3488,11 @@ def _(mode):
     mo.md(r"""
     --- Transfer
     """)
+    return
 
 
 @app.cell(hide_code=True)
-def _(oss_summary_transfer_df, mode):
+def _(mode, summary_transfer_df):
     mo.stop(mode.value != "OSS")
     oss_transfer_bc = mo.sql(
         """
@@ -3382,10 +3522,17 @@ def _(mode):
     mo.md(r"""
     ## Combined Summaries
     """)
+    return
 
 
 @app.cell
-def _(oss_net_list_bc, oss_shore_crane_bc, oss_stuffing_bc, oss_transfer_bc, mode):
+def _(
+    mode,
+    oss_net_list_bc,
+    oss_shore_crane_bc,
+    oss_stuffing_bc,
+    oss_transfer_bc,
+):
     mo.stop(mode.value != "OSS")
     oss_combined_services_bc = pl.concat(
         [
@@ -3407,11 +3554,11 @@ def _(oss_net_list_bc, oss_shore_crane_bc, oss_stuffing_bc, oss_transfer_bc, mod
         ]
     )
     oss_combined_services_bc
-    return (oss_combined_services_bc,)
+    return
 
 
 @app.cell(hide_code=True)
-def _(oss_combined_services_bc, mode):
+def _(combined_services_bc, mode):
     mo.stop(mode.value != "OSS")
     oss_pricing_df = mo.sql(
         """
@@ -3456,11 +3603,11 @@ def _(oss_combined_services_bc, mode):
         WHERE s.QTY IS NOT NULL AND s.QTY >0
         """
     )
-    return (oss_pricing_df,)
+    return
 
 
 @app.cell(hide_code=True)
-def _(oss_pricing_df, mode):
+def _(mode, pricing_df):
     mo.stop(mode.value != "OSS")
     oss_metrics_df = mo.sql(
         """
@@ -3477,15 +3624,16 @@ def _(oss_pricing_df, mode):
 
 
 @app.cell
-def _(oss_bc_df, oss_copy_button, mode):
+def _(mode, oss_bc_df, oss_copy_button):
     mo.stop(mode.value != "OSS")
     mo.stop(not oss_copy_button.value)
     oss_bc_df.write_clipboard()  # tab-separated, pastes cleanly into BC / Excel
     mo.md("✅ Copied to clipboard")
+    return
 
 
 @app.cell(hide_code=True)
-def _(oss_pricing_df, mode):
+def _(mode, pricing_df):
     mo.stop(mode.value != "OSS")
     oss_bc_df = mo.sql(
         """
@@ -3498,7 +3646,7 @@ def _(oss_pricing_df, mode):
 
 
 @app.cell(hide_code=True)
-def _(oss_pricing_df, mode):
+def _(mode, pricing_df):
     mo.stop(mode.value != "OSS")
     oss_service_breakdown_df = mo.sql(
         """
@@ -3520,7 +3668,26 @@ def _(oss_pricing_df, mode):
 
 
 @app.cell
-def _(additional_overtime_df, oss_days_on_electricity, oss_end_date, extra_men_df, final_berth_df, final_forklift_df, oss_net_list_df, oss_no_of_plugin, salt_df, select_report, oss_service_breakdown_df, oss_shore_crane_df, oss_start_date, oss_stuffing_df, tare_df, oss_transfer_df, well_to_well_df, mode):
+def _(
+    additional_overtime_df,
+    extra_men_df,
+    final_berth_df,
+    final_forklift_df,
+    mode,
+    oss_days_on_electricity,
+    oss_end_date,
+    oss_net_list_df,
+    oss_no_of_plugin,
+    oss_service_breakdown_df,
+    oss_shore_crane_df,
+    oss_start_date,
+    oss_stuffing_df,
+    oss_transfer_df,
+    salt_df,
+    select_report,
+    tare_df,
+    well_to_well_df,
+):
     mo.stop(mode.value != "OSS")
     _detail_sheets = {
         "Berth Dues": final_berth_df,
@@ -3571,22 +3738,28 @@ def _(additional_overtime_df, oss_days_on_electricity, oss_end_date, extra_men_d
             if len(_df) > 0
         },
     }
-    return (oss_reports,)
+    return
 
 
 @app.cell
-def _(oss_reports, oss_save_button, select_report, oss_end_date, mode):
-    mo.stop(mode.value != "OSS")
-    mo.stop(
-        not oss_save_button.value,
-        mo.md("*Click the button to generate the file.*"),
-    )
+def _():
+    # mo.stop(mode.value != "OSS")
+    # mo.stop(
+    #     not oss_save_button.value,
+    #     mo.md("*Click the button to generate the file.*"),
+    # )
 
-    output_file = export_dataframes(
-        dataframes=oss_reports,
-        output_path=f"output/{select_report.value} {mode.value} - {format_datestr_to_month_year(str(oss_end_date))}.xlsx",
-    )
-    mo.md(f"✅ Saved to `{output_file}`")
+    # output_file = export_dataframes(
+    #     dataframes=oss_reports,
+    #     output_path=f"output/{select_report.value} {mode.value} - {format_datestr_to_month_year(str(oss_end_date))}.xlsx",
+    # )
+    # mo.md(f"✅ Saved to `{output_file}`")
+    return
+
+
+@app.cell
+def _():
+    return
 
 
 if __name__ == "__main__":

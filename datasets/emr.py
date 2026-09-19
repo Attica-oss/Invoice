@@ -242,7 +242,7 @@ def pti_staging() -> pl.LazyFrame:
             ),
             billing_quantity=(
                 pl.when(pl.col("invoice_to") == "IOT")
-                .then(pl.col("days").cast(pl.Float64))
+                .then(pl.col("days").cast(pl.Int64))
                 .otherwise(pl.col("hours"))
             ),
             billing_unit=(
@@ -275,6 +275,9 @@ def pti(
     """
     lf = staging if staging is not None else pti_staging()
 
+    prev_end = pl.col("datetime_end_right")
+    prev_gen = pl.col("generator_right")
+
     return (
         lf.with_columns(
             previous=pl.col("cum_count") - 1
@@ -295,21 +298,20 @@ def pti(
             shifting_required=(
                 (
                     pl.col("datetime_start")
-                    - pl.col("datetime_end_right")
+                    - prev_end
                 )
-                > SHIFTING_GAP
-            )
+                >= SHIFTING_GAP
+            ).fill_null(False)
             | (
-                pl.col("generator_right")
-                != pl.col("generator")
+                pl.col("generator").ne_missing(prev_gen)
             )
         )
         .with_columns(
-            no_shifting=pl.col("shifting_required").fill_null(True)
+            no_of_shifting=pl.col("shifting_required").fill_null(True)
         )
         .with_columns(
             shifting_price=(
-                pl.when(pl.col("no_shifting"))
+                pl.when(pl.col("no_of_shifting"))
                 .then(pl.lit(emr_prices().shifting))
                 .otherwise(pl.lit(0.0))
             )
@@ -337,14 +339,14 @@ def pti(
             "status",
             "plugin_price",
             "electricity_price",
-            pl.when(pl.col("no_shifting"))
+            pl.when(pl.col("no_of_shifting"))
             .then(1)
             .otherwise(0)
-            .alias("no_shifting"),
+            .alias("no_of_shifting"),
             "generator",
             "shifting_price",
             "total_price",
-        )
+        ).sort(by="datetime_start")
     )
 # ---------------------------------------------------------------------------
 # Washing

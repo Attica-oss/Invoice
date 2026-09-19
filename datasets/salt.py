@@ -126,7 +126,7 @@ def load_salt() -> pl.LazyFrame:
 
     return (
         scan_google_sheet(
-            sheet_id=SHORE_HANDLING_ID, sheet_name=SALT_OPERATION_SHEET_NAME
+            sheet_id=SHORE_HANDLING_ID, sheet_name=SALT_OPERATION_SHEET_NAME,timeout=10
         )
         .filter(
             pl.col("date").dt.year().eq(CURRENT_YEAR),

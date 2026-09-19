@@ -6,6 +6,7 @@ from functools import lru_cache
 
 import polars as pl
 
+from data_source.config import TIMEOUT as _TIMEOUT
 from data_source.make_dataset import load_sheet as scan_google_sheet
 from data_source.sheet_ids import BC_ITEMS_SHEET_NAME, MASTER_ID, PRICE_SHEET_NAME
 from type_casting import PolarsEnum
@@ -38,7 +39,10 @@ def price_table() -> pl.LazyFrame:
     Load + clean the price sheet once (small table → keep in memory).
     """
     lf: pl.LazyFrame = scan_google_sheet(
-        sheet_id=MASTER_ID, sheet_name=PRICE_SHEET_NAME, parse_dates=True
+        sheet_id=MASTER_ID,
+        sheet_name=PRICE_SHEET_NAME,
+        parse_dates=True,
+        timeout=_TIMEOUT,
     )
 
     # A blank EndingDate marks the currently-active price. The 0.3.0 Rust
@@ -71,7 +75,9 @@ def get_price(services: list[str] | None = None) -> pl.DataFrame:
 
 def bc_items() -> pl.LazyFrame:
     """Load + clean the BC items sheet once (small table → keep in memory)."""
-    lf: pl.LazyFrame = scan_google_sheet(sheet_id=MASTER_ID, sheet_name=BC_ITEMS_SHEET_NAME).select(
+    lf: pl.LazyFrame = scan_google_sheet(
+        sheet_id=MASTER_ID, sheet_name=BC_ITEMS_SHEET_NAME
+    ).select(
         pl.col("Type"),
         pl.col("No."),
         pl.col("Description"),

@@ -1,10 +1,11 @@
 """Stores all dataframes as list and dicts"""
 
+from functools import _lru_cache_wrapper
+
 import polars as pl
 
 from dataframe import (
     bin_dispatch,
-    emr,
     invoice,
     miscellaneous,
     netlist,
@@ -14,6 +15,8 @@ from dataframe import (
     transport,
     washing_lf,
 )
+from dataframe import emr as prev_emr
+from datasets import emr
 
 # Invoice Dataframes
 
@@ -28,10 +31,10 @@ invoice_dataframes: dict[str, pl.LazyFrame] = {
 
 # EMR Dataframes
 
-emr_dataframes: dict[str, pl.LazyFrame] = {
-    "shifting": emr.shifting,
-    "washing": emr.washing,
-    "pti": emr.pti,
+emr_dataframes: dict[str, pl.LazyFrame | _lru_cache_wrapper] = {
+    "shifting": prev_emr.shifting,
+    "washing": prev_emr.washing,
+    "pti": emr.pti(),
 }
 
 # Washing DataFrame
