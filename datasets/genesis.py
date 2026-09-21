@@ -23,4 +23,4 @@ def net_list_raw() -> pl.LazyFrame:
 @lru_cache(maxsize=1)
 def genesis_raw() -> pl.LazyFrame:
     """The Genesis raw-data sheet, unfiltered."""
-    return scan_google_sheet(sheet_id=OPS_SHEET_ID, sheet_name=RAW_DATA_SHEET_NAME)
+    return scan_google_sheet(sheet_id=OPS_SHEET_ID, sheet_name=RAW_DATA_SHEET_NAME,timeout=120)

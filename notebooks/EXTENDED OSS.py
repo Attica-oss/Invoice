@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.23.14"
+__generated_with = "0.24.0"
 app = marimo.App(width="columns")
 
 with app.setup:
@@ -122,7 +122,7 @@ def _():
 @app.cell(hide_code=True)
 def _(extra_men_ldf):
     EXTRA_MEN_DATASET_NEW = mo.sql(
-        """
+        f"""
         WITH main AS (FROM
             extra_men_ldf
         SELECT
@@ -143,12 +143,13 @@ def _(extra_men_ldf):
         """,
         output=False
     )
+    return
 
 
 @app.cell(hide_code=True)
 def _(additional_ldf):
     ADDITIONAL_OVERTIME_DATASET_NEW = mo.sql(
-        """
+        f"""
         FROM additional_ldf
         SELECT 
         Day AS day_name,
@@ -164,6 +165,7 @@ def _(additional_ldf):
         """,
         output=False
     )
+    return
 
 
 @app.cell
@@ -287,7 +289,7 @@ def _():
 @app.cell(hide_code=True)
 def _(berth_ldf):
     berth_df = mo.sql(
-        """
+        f"""
         FROM berth_ldf
         SELECT "VESSEL NAME" AS vessel,
         "DATE IN"::DATE + "TIME IN"::TIME AS date_in,
@@ -422,6 +424,7 @@ def _(
             actions,
         ]
     )
+    return
 
 
 @app.cell
@@ -429,6 +432,7 @@ def _(bc_df, copy_button):
     mo.stop(not copy_button.value)
     bc_df.write_clipboard()  # tab-separated, pastes cleanly into BC / Excel
     mo.md("✅ Copied to clipboard")
+    return
 
 
 @app.cell
@@ -649,6 +653,7 @@ def _(final_berth_df, select_report, start_date):
         ),
         kind="warn",
     ) if final_berth_df.is_empty() else None
+    return
 
 
 @app.cell(hide_code=True)
@@ -656,6 +661,7 @@ def _():
     mo.md(r"""
     ## Datasets
     """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -663,6 +669,7 @@ def _():
     mo.md(r"""
     ### Berth Dues :⚓
     """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -695,6 +702,7 @@ def _():
     mo.md(r"""
     ### Tare Weight ::lucide:weight::
     """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -739,6 +747,7 @@ def _():
     mo.md(r"""
     ### Calibration Summary
     """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -798,6 +807,7 @@ def _():
     ### Stuffing ::lucide:container::
     ----
     """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -840,6 +850,7 @@ def _():
     mo.md(r"""
     * Stuffing Metrics for summary
     """)
+    return
 
 
 @app.cell
@@ -863,6 +874,7 @@ def _():
     mo.md(r"""
     ### Salt
     """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -881,12 +893,13 @@ def _():
     mo.md(r"""
     ### Summary of Salt Ops
     """)
+    return
 
 
 @app.cell(hide_code=True)
 def _(salt_df, unpivoted):
     salt_summary_df = mo.sql(
-        """
+        f"""
         WITH
             summaries AS (
                 FROM
@@ -920,6 +933,7 @@ def _():
     mo.md(r"""
     * Salt metrics for summary
     """)
+    return
 
 
 @app.cell
@@ -933,6 +947,7 @@ def _():
     mo.md(r"""
     ### Forklift ::lucide:forklift::
     """)
+    return
 
 
 @app.cell
@@ -956,6 +971,7 @@ def _(end_date, select_report, start_date):
             )
         )
     ).sort(["Date of Service", "Time Out"])
+    return
 
 
 @app.cell(hide_code=True)
@@ -983,7 +999,7 @@ def _(end_date, forklift_dataset, select_report, start_date):
 @app.cell(hide_code=True)
 def _(forklift_df, unpivoted):
     forklift_summary_df = mo.sql(
-        """
+        f"""
         WITH
             summaries AS (FROM forklift_df
         SELECT 
@@ -1016,7 +1032,7 @@ def _(forklift_df, unpivoted):
 @app.cell(hide_code=True)
 def _(f_salt_df, unpivoted):
     forklift_salt_summary_df = mo.sql(
-        """
+        f"""
         WITH
             summaries AS (
                 SELECT
@@ -1054,6 +1070,7 @@ def _():
     mo.md(r"""
     * Forklift metrics for summary
     """)
+    return
 
 
 @app.cell
@@ -1069,7 +1086,7 @@ def _(forklift_salt_summary_df, forklift_summary_df):
 @app.cell(hide_code=True)
 def _(f_salt_df, forklift_df):
     final_forklift_df = mo.sql(
-        """
+        f"""
         WITH main AS (FROM
             forklift_df
         SELECT
@@ -1108,6 +1125,7 @@ def _():
 
     #### Extra Men
     """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -1127,7 +1145,7 @@ def _(end_date, extra_men_dataset_new, select_report, start_date):
 @app.cell(hide_code=True)
 def _(extra_men_df):
     summary_extra_men_df = mo.sql(
-        """
+        f"""
         WITH normal AS (FROM extra_men_df
             SELECT 'Normal Hour' AS description,SUM(total_tonnage * extra_men::INT)::DECIMAL AS value,MIN(price) AS unit_price
         WHERE price = 0.8),overtime AS (FROM extra_men_df
@@ -1152,6 +1170,7 @@ def _():
     mo.md(r"""
     #### Additional Overtime
     """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -1173,6 +1192,7 @@ def _():
     mo.md(r"""
     #### Well to Well
     """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -1199,7 +1219,7 @@ def _(end_date, select_report, start_date, well_inv_df):
 @app.cell(hide_code=True)
 def _(well_to_well_df):
     summary_well_to_well_df = mo.sql(
-        """
+        f"""
         WITH main AS (FROM
             well_to_well_df
         SELECT
@@ -1228,6 +1248,7 @@ def _():
     mo.md(r"""
     ### Net List
     """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -1269,7 +1290,7 @@ def _(end_date, net_list_dataset, select_report, start_date):
 @app.cell(hide_code=True)
 def _(net_list_df):
     summary_net_list_df = mo.sql(
-        """
+        f"""
         FROM net_list_df
         SELECT service,storage_type,overtime,SUM(total_tonnage)::DECIMAL AS total_tonnage,SUM(invoice_value)::DECIMAL AS total_price
         GROUP BY ALL
@@ -1284,6 +1305,7 @@ def _():
     mo.md(r"""
     * Net list metrics for summary
     """)
+    return
 
 
 @app.cell
@@ -1299,6 +1321,7 @@ def _():
     mo.md(r"""
     ### Shore Crane ::lucide:git-pull-request-create::
     """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -1317,7 +1340,7 @@ def _(end_date, select_report, shore_crane_dataset, start_date):
 @app.cell(hide_code=True)
 def _(shore_crane_df):
     summary_shore_crane_df = mo.sql(
-        """
+        f"""
         WITH
             ot_2 AS (
                 FROM
@@ -1420,6 +1443,7 @@ def _():
     mo.md(r"""
     ### Transfer
     """)
+    return
 
 
 @app.cell
@@ -1459,6 +1483,7 @@ def _():
     mo.md(r"""
     #### Container still on plug
     """)
+    return
 
 
 @app.cell
@@ -1467,12 +1492,13 @@ def _(to_filter_transfer_df):
         pl.col("exit_date").is_null()
     )
     container_on_plug
+    return
 
 
 @app.cell(hide_code=True)
 def _(to_filter_transfer_df, transfer_dataset):
     transfer_df = mo.sql(
-        """
+        f"""
         WITH
             t AS (
                 FROM
@@ -1512,7 +1538,7 @@ def _(to_filter_transfer_df, transfer_dataset):
 @app.cell(hide_code=True)
 def _(transfer_df):
     summary_transfer_df = mo.sql(
-        """
+        f"""
         WITH
             main AS (
                 FROM
@@ -1575,6 +1601,7 @@ def _():
     mo.md(r"""
     ## Summaries Df (Business Central line items)
     """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -1582,12 +1609,13 @@ def _():
     mo.md(r"""
     --- Berth Dues
     """)
+    return
 
 
 @app.cell(hide_code=True)
 def _(final_berth_df):
     berth_bc = mo.sql(
-        """
+        f"""
         WITH type_map AS (
                         SELECT * FROM (
                             VALUES
@@ -1632,12 +1660,13 @@ def _():
     mo.md(r"""
     -- Tare Weight
     """)
+    return
 
 
 @app.cell(hide_code=True)
 def _(tare_summary_df):
     tare_bc = mo.sql(
-        """
+        f"""
         WITH map AS (
                     SELECT * FROM (
                         VALUES
@@ -1662,12 +1691,13 @@ def _():
     mo.md(r"""
     -- Stuffing
     """)
+    return
 
 
 @app.cell(hide_code=True)
 def _(stuffing_df):
     stuffing_bc = mo.sql(
-        """
+        f"""
         WITH
             plugin AS (
                 FROM
@@ -1746,12 +1776,13 @@ def _():
     mo.md(r"""
     -- Salt Operation
     """)
+    return
 
 
 @app.cell(hide_code=True)
 def _(salt_summary_df):
     salt_bc = mo.sql(
-        """
+        f"""
         WITH variant_map AS (
                     SELECT * FROM (
                         VALUES
@@ -1777,12 +1808,13 @@ def _():
     mo.md(r"""
     --- Forklift
     """)
+    return
 
 
 @app.cell(hide_code=True)
 def _(forklift_salt_summary_df, forklift_summary_df):
     forklift_bc = mo.sql(
-        """
+        f"""
         WITH
             all_data AS (
                 FROM
@@ -1849,12 +1881,13 @@ def _():
     mo.md(r"""
     -- Extra Men
     """)
+    return
 
 
 @app.cell(hide_code=True)
 def _(summary_extra_men_df):
     extra_men_bc = mo.sql(
-        """
+        f"""
         WITH normal AS (FROM summary_extra_men_df
             SELECT COALESCE(SUM(value),0) AS QTY,
             'EXTRA MEN' AS Description,
@@ -1880,12 +1913,13 @@ def _():
     mo.md(r"""
     -- Additional Overtime
     """)
+    return
 
 
 @app.cell(hide_code=True)
 def _(additional_overtime_df):
     additional_overtime_bc = mo.sql(
-        """
+        f"""
         FROM additional_overtime_df
         SELECT COALESCE(SUM(number_of_stevedores::INT * number_of_hours),0) AS QTY,
         'ADDITIONAL OVERTIME' AS Description,
@@ -1901,12 +1935,13 @@ def _():
     mo.md(r"""
     --- Well to Well
     """)
+    return
 
 
 @app.cell(hide_code=True)
 def _(summary_well_to_well_df):
     well_to_well_bc = mo.sql(
-        """
+        f"""
         WITH variant_map AS (
                     SELECT * FROM (
                         VALUES
@@ -1931,12 +1966,13 @@ def _():
     mo.md(r"""
     --- Net List
     """)
+    return
 
 
 @app.cell(hide_code=True)
 def _(summary_net_list_df):
     net_list_bc = mo.sql(
-        """
+        f"""
         WITH
                     service_map AS (
                         SELECT * FROM (
@@ -1983,12 +2019,13 @@ def _():
     mo.md(r"""
     --- Shore Crane
     """)
+    return
 
 
 @app.cell(hide_code=True)
 def _(summary_shore_crane_df):
     shore_crane_bc = mo.sql(
-        """
+        f"""
         WITH variant_map AS (
                     SELECT * FROM (
                         VALUES
@@ -2014,12 +2051,13 @@ def _():
     mo.md(r"""
     --- Transfer
     """)
+    return
 
 
 @app.cell(hide_code=True)
 def _(summary_transfer_df):
     transfer_bc = mo.sql(
-        """
+        f"""
         WITH variant_map AS (
                     SELECT * FROM (
                         VALUES
@@ -2045,6 +2083,7 @@ def _():
     mo.md(r"""
     ## Combined Summaries
     """)
+    return
 
 
 @app.cell
@@ -2211,7 +2250,7 @@ def _(combined_services_bc, customer):
 @app.cell(hide_code=True)
 def _(service_breakdown_df):
     metrics_df = mo.sql(
-        """
+        f"""
         WITH
             a AS (
                 FROM
@@ -2239,7 +2278,7 @@ def _():
 @app.cell(hide_code=True)
 def _(pricing_df):
     bc_df = mo.sql(
-        """
+        f"""
         FROM pricing_df
             SELECT * EXCLUDE("Unit Price")
         """
@@ -2354,6 +2393,7 @@ def _(month_selector, reports, save_button, select_report):
         output_path=f"output/{select_report.value} STO - {format_datestr_to_month_year(month_selector.value)}.xlsx",
     )
     mo.md(f"✅ Saved to `{output_file}`")
+    return
 
 
 if __name__ == "__main__":

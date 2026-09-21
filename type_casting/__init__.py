@@ -16,6 +16,24 @@ load; every code path that uses ``.days.*`` imports a ``dates`` symbol
 from importlib import import_module
 from typing import Any
 
+<<<<<<< HEAD
+__all__ = [
+    "PolarsEnum",
+    "CURRENT_YEAR",
+    "DayName",
+    "Days",
+    "containers_enum",
+    "enum_customer",
+    "shipping_line",
+    "shipper",
+    "MovementType",
+    "PalletType",
+    "PLUGGED_STATUS",
+    "SetPoint",
+    "Numbers",
+    "CastToNumbers",
+]
+=======
 # public name -> submodule that defines it
 _SPEC: dict[str, str] = {
     # cast_to_numbers
@@ -69,3 +87,4 @@ def __dir__() -> list[str]:
 
 
 __all__ = list(_SPEC)
+>>>>>>> 87c49bd523ee43cecdec4378df56cffef69dbed3

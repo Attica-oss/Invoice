@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.23.14"
+__generated_with = "0.24.0"
 app = marimo.App(width="columns")
 
 with app.setup:
@@ -10,6 +10,8 @@ with app.setup:
     import marimo as mo
     import polars as pl
 
+    from dataframe.transport import forklift
+    from dataframe.shore_handling import forklift_salt,salt
 
 
 @app.function
@@ -17,6 +19,12 @@ def eomonth(dt: str) -> date:
     converted_date = date.fromisoformat(dt)
     last_day = monthrange(converted_date.year, converted_date.month)[1]
     return converted_date.replace(day=last_day)
+
+
+@app.cell
+def _():
+    forklift_for_salt  = forklift_salt()
+    return (forklift_for_salt,)
 
 
 @app.cell
@@ -33,7 +41,8 @@ def _():
         "May 2026": "2026-05-01",
         "Jun 2026": "2026-06-01",
         "Jul 2026": "2026-07-01",
-        "Aug 2026": "2026-08-01"
+        "Aug 2026": "2026-08-01",
+        "Sep 2026": "2026-09-01"
     }
 
 
@@ -53,6 +62,7 @@ def _():
     mo.md(r"""
     ## Salt Operations
     """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -71,10 +81,11 @@ def _():
     mo.md(r"""
     # Forklift
     """)
+    return
 
 
 @app.cell(hide_code=True)
-def _(month_selector, select_report):
+def _(forklift_for_salt, month_selector, select_report):
     forklift_salt_df = mo.sql(
         f"""
         WITH main AS (FROM
@@ -137,7 +148,7 @@ def _(month_selector, select_report):
 @app.cell(hide_code=True)
 def _(forklift_services_df, unpiv):
     forklift_summary_df = mo.sql(
-        """
+        f"""
         WITH totals AS (
             FROM forklift_services_df
             SELECT
@@ -165,7 +176,7 @@ def _(forklift_services_df, unpiv):
 @app.cell
 def _(forklift_salt_df, forklift_summary_df):
     all_forklift_df = mo.sql(
-        """
+        f"""
         WITH
             f_normal AS (
                 FROM
@@ -256,7 +267,7 @@ def _(forklift_salt_df, forklift_summary_df):
 @app.cell(hide_code=True)
 def _(all_forklift_df, salt_df):
     summary_df = mo.sql(
-        """
+        f"""
         WITH
             salt_normal AS (
                 FROM
@@ -312,7 +323,7 @@ def _():
 @app.cell(hide_code=True)
 def _(price_df, summary_df):
     pricing_df = mo.sql(
-        """
+        f"""
         WITH bc AS (FROM
             price_df
         WHERE
@@ -340,27 +351,29 @@ def _(price_df, summary_df):
 @app.cell(hide_code=True)
 def _(pricing_df):
     _df = mo.sql(
-        """
+        f"""
         FROM pricing_df
         """
     )
+    return
 
 
 @app.cell(hide_code=True)
 def _(pricing_df):
     _df = mo.sql(
-        """
+        f"""
         FROM pricing_df
             SELECT * EXCLUDE("Unit Price")
         WHERE QTY > 0
         """
     )
+    return
 
 
 @app.cell(hide_code=True)
 def _(pricing_df):
     _df = mo.sql(
-        """
+        f"""
         With a AS (FROM pricing_df
 
         SELECT Description,Variant,"Unit Price",QTY,("Unit Price" * QTY)::DECIMAL AS total_price
@@ -370,11 +383,13 @@ def _(pricing_df):
          SELECT COALESCE(SUM(total_price)::DECIMAL,0) AS total_price
         """
     )
+    return
 
 
 @app.cell
 def _(month_selector):
     eomonth(month_selector.value).isoformat()
+    return
 
 
 @app.cell

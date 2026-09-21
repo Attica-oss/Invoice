@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.23.14"
+__generated_with = "0.24.0"
 app = marimo.App(width="columns")
 
 with app.setup:
@@ -100,7 +100,7 @@ def _():
     )
 
     _today = date.today()
-    _years = sorted({_today.year, _today.year + 1})
+    _years = sorted({_today.year})
     month_options = {
         date(_y, _m, 1).strftime("%b %Y"): f"{_y}-{_m:02d}-01"
         for _y in _years
@@ -321,6 +321,7 @@ def _(
             actions,
         ]
     )
+    return
 
 
 @app.cell(hide_code=True)
@@ -347,6 +348,7 @@ def _(
         ),
         kind="warn",
     ) if not _has_data else None
+    return
 
 
 @app.function
@@ -361,7 +363,7 @@ def format_datestr_to_month_year(date_str: str) -> str:
 @app.cell(hide_code=True)
 def _(pricing_df):
     metrics_df = mo.sql(
-        """
+        f"""
         With a AS (FROM pricing_df
 
         SELECT Description,Variant,"Unit Price",QTY,ROUND("Unit Price" * QTY,2) AS total_price
@@ -396,7 +398,7 @@ def _(cccs_stuffing_dataset, month_selector, select_report):
 @app.cell(hide_code=True)
 def _(stuffing_df):
     stuffing_summary_df = mo.sql(
-        """
+        f"""
         FROM stuffing_df
         SELECT COALESCE(SUM(total_tonnage), 0.0) AS tonnage,
                COUNT(DISTINCT container_number) AS number_stuffed,
@@ -408,7 +410,7 @@ def _(stuffing_df):
 @app.cell
 def _(electricity_df):
     electricity_summary_df = mo.sql(
-        """
+        f"""
         FROM electricity_df
         SELECT SUM(number_of_days_on_plug) AS days_plugged,COUNT (DISTINCT container_number) AS number_stuffed
         """
@@ -419,7 +421,7 @@ def _(electricity_df):
 @app.cell(hide_code=True)
 def _(shore_crane_df):
     shore_crane_summary_df = mo.sql(
-        """
+        f"""
         FROM shore_crane_df
         SELECT COALESCE(SUM("hours"),0) AS total_hours
         """,
@@ -431,7 +433,7 @@ def _(shore_crane_df):
 @app.cell(hide_code=True)
 def _(haulage_df):
     haulage_summary_df = mo.sql(
-        """
+        f"""
         WITH
             del AS (
                 FROM
@@ -573,7 +575,7 @@ def _(
 @app.cell(hide_code=True)
 def _(electricity_df, haulage_df, shore_crane_df, stuffing_df):
     summary_df = mo.sql(
-        """
+        f"""
         WITH explicit_tonnage AS (
                 FROM
                     stuffing_df
@@ -871,7 +873,7 @@ def _(electricity_df, haulage_df, shore_crane_df, stuffing_df):
 @app.cell(hide_code=True)
 def _(summary_df):
     pricing_df = mo.sql(
-        """
+        f"""
         WITH bc AS (FROM
             price_df
         WHERE
@@ -915,12 +917,13 @@ def _(bc_df, copy_button):
     mo.stop(not copy_button.value)
     bc_df.write_clipboard()  # tab-separated, pastes cleanly into BC / Excel
     mo.md("✅ Copied to clipboard")
+    return
 
 
 @app.cell(hide_code=True)
 def _(pricing_df):
     bc_df = mo.sql(
-        """
+        f"""
         FROM pricing_df
             SELECT * EXCLUDE("Unit Price")
         WHERE QTY > 0
@@ -932,18 +935,19 @@ def _(pricing_df):
 @app.cell(hide_code=True)
 def _(pricing_df):
     _df = mo.sql(
-        """
+        f"""
         FROM pricing_df
             SELECT *, "Unit Price" * QTY
         WHERE QTY > 0
         """
     )
+    return
 
 
 @app.cell(hide_code=True)
 def _(pricing_df):
     service_breakdown_df = mo.sql(
-        """
+        f"""
         WITH mapped AS (
                     FROM pricing_df
                     SELECT
@@ -1155,6 +1159,7 @@ def _(month_selector, reports, save_button, select_report):
         output_path=f"output/{select_report.value} CCCS - {format_datestr_to_month_year(month_selector.value)}.xlsx",
     )
     mo.md(f"✅ Saved to `{output_file}`")
+    return
 
 
 if __name__ == "__main__":
